@@ -1,10 +1,10 @@
 const { chromium } = require('playwright');
 
 const TABS = [
-  { path: 'playbook', label: 'THE PLAN', shot: 'preview-top.png' },
-  { path: 'taste-heat', label: 'THE BLOCK', shot: 'preview-taste-heat.png' },
-  { path: 'menu-sound', label: 'THE VIBE', shot: 'preview-menu-audio.png' },
-  { path: 'live-pulse', label: 'THE FLOOR', shot: 'preview-live-pulse.png' },
+  { path: 'playbook', label: 'PLAYBOOK', shot: 'preview-top.png' },
+  { path: 'taste-heat', label: 'TASTE HEAT', shot: 'preview-taste-heat.png' },
+  { path: 'menu-sound', label: 'MENU & AUDIO', shot: 'preview-menu-audio.png' },
+  { path: 'live-pulse', label: 'LIVE PULSE', shot: 'preview-live-pulse.png' },
 ];
 
 (async () => {

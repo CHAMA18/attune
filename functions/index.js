@@ -1,5 +1,5 @@
 /**
- * Roomtone OS — Firebase backend (Qloo LLM Hackathon)
+ * Attune — Firebase backend (Qloo LLM Hackathon)
  * =====================================================
  * One function, two routes (wired via Hosting rewrite /api/** -> fn "api"):
  *
@@ -8,7 +8,7 @@
  *                            never holds the Qloo key (hackathon rule-friendly:
  *                            private server-side caching is allowed).
  *
- *   /api/llm/playbook     -> POST { grounding context JSON from Roomtone OS }
+ *   /api/llm/playbook     -> POST { grounding context JSON from Attune }
  *                            -> LLM (OpenAI / Gemini / Anthropic, switchable)
  *                            -> { playbook: "<operator-facing copy>" }
  *
@@ -48,7 +48,7 @@ const CORS_HEADERS = {
 };
 
 const SYSTEM_PROMPT =
-  "You write venue operations playbooks for Roomtone OS, a dashboard for " +
+  "You write venue operations playbooks for Attune, a dashboard for " +
   "independent restaurant/bar operators. You are given JSON containing Qloo " +
   "taste data for the venue's surrounding block (place/artist affinities, " +
   "micro-tribes, palate signals). Use ONLY this data — never invent metrics. " +

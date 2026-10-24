@@ -1,6 +1,6 @@
 {
-  "name": "roomtone-os-functions",
-  "description": "Firebase backend for Roomtone OS: Qloo proxy + LLM playbook generator",
+  "name": "attune-functions",
+  "description": "Firebase backend for Attune: Qloo proxy + LLM playbook generator",
   "engines": {
     "node": "20"
   },

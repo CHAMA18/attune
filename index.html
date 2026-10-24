@@ -5,14 +5,17 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
 <meta name="shell-type" content="mobile_tab"/>
-<title>Roomtone OS</title>
+<script>
+  try {
+    if (localStorage.getItem('roomtone-theme') === 'light') document.documentElement.classList.add('light');
+  } catch (e) { /* storage unavailable: stay dark */ }
+</script>
+<title>Attune</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23111319'/%3E%3Cg fill='none' stroke='%23ffb68c' stroke-width='1.9' stroke-linecap='round'%3E%3Cpath d='M9 4.6 V10.4'/%3E%3Cpath d='M15 4.6 V10.4'/%3E%3Cpath d='M9 10.4 C9 13.5 15 13.5 15 10.4'/%3E%3Cpath d='M12 12.7 V17.4'/%3E%3C/g%3E%3Ccircle cx='12' cy='7.4' r='1.25' fill='%23ffb68c'/%3E%3C/svg%3E"/>
 
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://api.fontshare.com" rel="preconnect"/>
-<link crossorigin href="https://cdn.fontshare.com" rel="preconnect"/>
-<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 
 <style>
@@ -32,24 +35,36 @@
   }
   .animate-radar-dot { animation: pulse-subtle 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 
-  /* ---- Visual polish layer (world-class pass) ---- */
-  @keyframes rt-shimmer { 0% { transform: translateX(-120%); } 100% { transform: translateX(320%); } }
-  .rt-shimmer { position: relative; overflow: hidden; }
-  .rt-shimmer::after {
-    content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 45%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
-    animation: rt-shimmer 2.8s cubic-bezier(0.45,0,0.35,1) infinite;
+  .logo-dot {
+    fill: rgb(var(--c-primary));
+    transform-box: fill-box;
+    transform-origin: center;
   }
-  @keyframes rt-eq { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
-  .rt-eq { display: flex; align-items: flex-end; gap: 2px; height: 16px; }
-  .rt-eq span { width: 2px; height: 100%; border-radius: 1px; background: #ffb68c; transform-origin: bottom; animation: rt-eq 1.15s ease-in-out infinite; }
-  .rt-eq span:nth-child(2n) { animation-duration: 0.9s; opacity: 0.75; }
-  .rt-eq span:nth-child(3n) { animation-duration: 1.35s; opacity: 0.55; }
-  .rt-card { box-shadow: 0 12px 32px -14px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05); }
-  .rt-hairline-x { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,182,140,0.5), transparent); }
+
+  /* Live radar (Discover screen). All colors flow through the theme tokens. */
+  .radar-ring { fill: none; stroke: rgb(var(--c-outline-variant)); stroke-width: 1; opacity: 0.5; }
+  .radar-ring-active { stroke: rgb(var(--c-primary)); opacity: 0.95; }
+  .radar-cross { stroke: rgb(var(--c-outline-variant)); stroke-width: 1; opacity: 0.35; }
+  .radar-cross-dim { opacity: 0.18; }
+  .radar-label { fill: rgb(var(--c-outline)); }
+  .radar-label-active { fill: rgb(var(--c-primary)); }
+  .radar-beam-stop { stop-color: rgb(var(--c-primary)); }
+  .radar-beam-edge { stroke: rgb(var(--c-primary)); stroke-width: 1.5; opacity: 0.65; }
+  .radar-beam { transform-origin: 150px 150px; animation: radar-spin 4s linear infinite; }
+  @keyframes radar-spin { to { transform: rotate(360deg); } }
+  .radar-door { fill: rgb(var(--c-primary)); }
+  .radar-door-pulse { stroke: rgb(var(--c-primary)); stroke-width: 1; opacity: 0.35; }
+  .blip { cursor: pointer; }
+  .blip-patron { color: rgb(var(--c-primary)); }
+  .blip-patron-warm { color: rgb(var(--c-secondary)); }
+  .blip-venue { color: rgb(var(--c-tertiary)); }
+  .blip .sel-ring { opacity: 0; }
+  .blip.blip-sel .sel-ring { opacity: 1; }
+  /* Blips flare when the beam passes them: delay per blip = bearing/360 of the period. */
+  @keyframes blip-flash { 0%, 28%, 100% { opacity: 0.6; } 1.5% { opacity: 1; } 10% { opacity: 0.85; } }
+  .blip .blip-core { animation: blip-flash 4s linear infinite; animation-delay: var(--blip-delay, 0s); }
   @media (prefers-reduced-motion: reduce) {
-    .rt-shimmer::after { display: none; }
-    .rt-shimmer::after, .rt-eq span { animation: none !important; }
+    .radar-beam, .blip .blip-core { animation: none; }
   }
 
   body { min-height: max(884px, 100dvh); }
@@ -64,6 +79,42 @@
   nav a[data-path]:hover { color: #e1e2e9; }
   nav a[data-path][aria-current="page"],
   nav a[data-path][aria-current="page"]:hover { color: #ffb68c; }
+
+  /* App drawer. Same plain-rule pattern as the bottom nav above so the active
+     item stays amber even while a touch device keeps :hover latched. */
+  .drawer-root a[data-path] { color: #dbc1b4; }
+  .drawer-root a[data-path]:hover { color: #e1e2e9; }
+  .drawer-root a[data-path][aria-current="page"],
+  .drawer-root a[data-path][aria-current="page"]:hover { color: #ffb68c; }
+
+  /* Slide-out motion. The rail mirrors the appbar's centered 390px column on
+     desktop; the panel slides inside it, so the two transforms never fight. */
+  .drawer-rail {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 390px;
+    max-width: 100%;
+  }
+  @media (min-width: 481px) {
+    .drawer-rail { left: 50%; transform: translateX(-50%); }
+  }
+  .drawer-root {
+    visibility: hidden;
+    transition: visibility 0s linear 0.32s;
+  }
+  .drawer-root.drawer-open { visibility: visible; transition-delay: 0s; }
+  .drawer-backdrop {
+    opacity: 0;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .drawer-root.drawer-open .drawer-backdrop { opacity: 1; }
+  .drawer-panel {
+    transform: translateX(-100%);
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .drawer-root.drawer-open .drawer-panel { transform: translateX(0); }
 
   @media (min-width: 481px) {
     html {
@@ -83,17 +134,150 @@
       transform: translateX(-50%);
     }
   }
+
+  /* Theme tokens as RGB channel triplets (consumed by tailwind.config colors)
+     so alpha modifiers like bg-primary/10 keep working in both themes. */
+  :root {
+    --c-primary: 255 182 140;
+    --c-inverse-primary: 153 71 3;
+    --c-error: 255 180 171;
+    --c-surface-container-low: 25 28 33;
+    --c-on-secondary-fixed-variant: 98 64 7;
+    --c-secondary-fixed-dim: 240 190 123;
+    --c-secondary-container: 98 64 7;
+    --c-secondary-fixed: 255 221 180;
+    --c-tertiary-fixed: 111 251 190;
+    --c-on-error-container: 255 218 214;
+    --c-on-tertiary-fixed: 0 33 19;
+    --c-surface-bright: 54 57 63;
+    --c-on-secondary-fixed: 41 24 0;
+    --c-surface-container: 29 32 37;
+    --c-on-background: 225 226 233;
+    --c-on-error: 105 0 5;
+    --c-tertiary-fixed-dim: 78 222 163;
+    --c-tertiary: 78 222 163;
+    --c-surface-container-highest: 50 53 58;
+    --c-on-surface-variant: 219 193 180;
+    --c-on-primary-fixed: 50 18 0;
+    --c-secondary: 240 190 123;
+    --c-on-primary-fixed-variant: 117 52 0;
+    --c-on-tertiary-container: 0 49 31;
+    --c-on-tertiary-fixed-variant: 0 82 54;
+    --c-error-container: 147 0 10;
+    --c-on-secondary-container: 221 173 108;
+    --c-background: 17 19 25;
+    --c-inverse-surface: 225 226 233;
+    --c-on-surface: 225 226 233;
+    --c-outline-variant: 85 67 57;
+    --c-surface-variant: 50 53 58;
+    --c-inverse-on-surface: 46 48 54;
+    --c-on-primary: 83 34 0;
+    --c-on-tertiary: 0 56 36;
+    --c-outline: 163 140 128;
+    --c-surface-dim: 17 19 25;
+    --c-primary-fixed: 255 219 201;
+    --c-on-primary-container: 73 29 0;
+    --c-tertiary-container: 0 165 114;
+    --c-primary-container: 217 119 54;
+    --c-surface-tint: 255 182 140;
+    --c-surface-container-lowest: 11 14 19;
+    --c-surface: 17 19 25;
+    --c-on-secondary: 69 43 0;
+    --c-surface-container-high: 39 42 48;
+    --c-primary-fixed-dim: 255 182 140;
+  }
+  html.light {
+    --c-primary: 143 74 0;
+    --c-inverse-primary: 255 182 140;
+    --c-error: 179 38 30;
+    --c-surface-container-low: 241 235 224;
+    --c-on-secondary-fixed-variant: 255 255 255;
+    --c-secondary-fixed-dim: 122 89 0;
+    --c-secondary-container: 255 221 179;
+    --c-secondary-fixed: 74 53 0;
+    --c-tertiary-fixed: 0 51 37;
+    --c-on-error-container: 65 14 11;
+    --c-on-tertiary-fixed: 255 255 255;
+    --c-surface-bright: 255 248 239;
+    --c-on-secondary-fixed: 255 255 255;
+    --c-surface-container: 234 226 212;
+    --c-on-background: 33 29 21;
+    --c-on-error: 255 255 255;
+    --c-tertiary-fixed-dim: 0 82 60;
+    --c-tertiary: 0 106 79;
+    --c-surface-container-highest: 220 210 190;
+    --c-on-surface-variant: 93 82 67;
+    --c-on-primary-fixed: 255 255 255;
+    --c-secondary: 122 89 0;
+    --c-on-primary-fixed-variant: 255 255 255;
+    --c-on-tertiary-container: 0 39 26;
+    --c-on-tertiary-fixed-variant: 255 255 255;
+    --c-error-container: 249 222 220;
+    --c-on-secondary-container: 74 53 0;
+    --c-background: 243 238 229;
+    --c-inverse-surface: 54 47 38;
+    --c-on-surface: 33 29 21;
+    --c-outline-variant: 201 187 170;
+    --c-surface-variant: 220 210 190;
+    --c-inverse-on-surface: 247 243 236;
+    --c-on-primary: 255 255 255;
+    --c-on-tertiary: 255 255 255;
+    --c-outline: 133 117 97;
+    --c-surface-dim: 219 210 194;
+    --c-primary-fixed: 51 24 0;
+    --c-on-primary-container: 51 24 0;
+    --c-tertiary-container: 137 248 196;
+    --c-primary-container: 255 219 201;
+    --c-surface-tint: 143 74 0;
+    --c-surface-container-lowest: 255 253 249;
+    --c-surface: 247 243 236;
+    --c-on-secondary: 255 255 255;
+    --c-surface-container-high: 227 218 201;
+    --c-primary-fixed-dim: 90 46 0;
+  }
+
+  /* Light-theme remap for the hardcoded (non-token) colors above. */
+  html.light, html.light body { background-color: #f3eee5; color: #211d15; }
+  html.light nav a[data-path] { color: #6b5d4b; }
+  html.light nav a[data-path]:hover { color: #211d15; }
+  html.light nav a[data-path][aria-current="page"],
+  html.light nav a[data-path][aria-current="page"]:hover { color: #8f4a00; }
+  html.light .drawer-root a[data-path] { color: #6b5d4b; }
+  html.light .drawer-root a[data-path]:hover { color: #211d15; }
+  html.light .drawer-root a[data-path][aria-current="page"],
+  html.light .drawer-root a[data-path][aria-current="page"]:hover { color: #8f4a00; }
+  html.light body > header[class] { box-shadow: 0 1px 12px rgba(87, 66, 27, 0.16); }
+  html.light body > nav[class] { box-shadow: 0 -4px 18px rgba(87, 66, 27, 0.12); }
+  html.light .drawer-panel { box-shadow: 8px 0 48px rgba(87, 66, 27, 0.22); }
+
+  @media (min-width: 481px) {
+    html.light { background-color: #e3dac9; }
+    html.light body {
+      box-shadow: 0 0 0 1px rgba(87, 66, 27, 0.14), 0 30px 90px rgba(87, 66, 27, 0.28);
+    }
+  }
+
+  /* Auth shell (drawer Sign Out -> operator authentication). */
+  .auth-shell {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+  }
+  .auth-shell.auth-visible {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+  @keyframes auth-rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .auth-shell .auth-rise { animation: auth-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .auth-shell .auth-d1 { animation-delay: 0.07s; }
+  .auth-shell .auth-d2 { animation-delay: 0.14s; }
+  .auth-shell .auth-d3 { animation-delay: 0.21s; }
 </style>
 
-<script>
-  /* Auth gate: no local session -> straight to the operator access pages. */
-  (function authGate() {
-    try {
-      var session = localStorage.getItem('roomtone.session') || sessionStorage.getItem('roomtone.session');
-      if (!session) location.replace('auth.html#sign-in');
-    } catch (e) { /* storage unavailable (private mode): fail open for the demo */ }
-  })();
-</script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script id="tailwind-config">
   tailwind.config = {
@@ -101,27 +285,27 @@
     theme: {
       extend: {
         colors: {
-          'primary': '#ffb68c', 'inverse-primary': '#994703', 'error': '#ffb4ab',
-          'surface-container-low': '#191c21', 'on-secondary-fixed-variant': '#624007',
-          'secondary-fixed-dim': '#f0be7b', 'secondary-container': '#624007',
-          'secondary-fixed': '#ffddb4', 'tertiary-fixed': '#6ffbbe',
-          'on-error-container': '#ffdad6', 'on-tertiary-fixed': '#002113',
-          'surface-bright': '#36393f', 'on-secondary-fixed': '#291800',
-          'surface-container': '#1d2025', 'on-background': '#e1e2e9', 'on-error': '#690005',
-          'tertiary-fixed-dim': '#4edea3', 'tertiary': '#4edea3',
-          'surface-container-highest': '#32353a', 'on-surface-variant': '#dbc1b4',
-          'on-primary-fixed': '#321200', 'secondary': '#f0be7b',
-          'on-primary-fixed-variant': '#753400', 'on-tertiary-container': '#00311f',
-          'on-tertiary-fixed-variant': '#005236', 'error-container': '#93000a',
-          'on-secondary-container': '#ddad6c', 'background': '#111319',
-          'inverse-surface': '#e1e2e9', 'on-surface': '#e1e2e9', 'outline-variant': '#554339',
-          'surface-variant': '#32353a', 'inverse-on-surface': '#2e3036', 'on-primary': '#532200',
-          'on-tertiary': '#003824', 'outline': '#a38c80', 'surface-dim': '#111319',
-          'primary-fixed': '#ffdbc9', 'on-primary-container': '#491d00',
-          'tertiary-container': '#00a572', 'primary-container': '#d97736',
-          'surface-tint': '#ffb68c', 'surface-container-lowest': '#0b0e13',
-          'surface': '#111319', 'on-secondary': '#452b00',
-          'surface-container-high': '#272a30', 'primary-fixed-dim': '#ffb68c'
+          'primary': 'rgb(var(--c-primary) / <alpha-value>)', 'inverse-primary': 'rgb(var(--c-inverse-primary) / <alpha-value>)', 'error': 'rgb(var(--c-error) / <alpha-value>)',
+          'surface-container-low': 'rgb(var(--c-surface-container-low) / <alpha-value>)', 'on-secondary-fixed-variant': 'rgb(var(--c-on-secondary-fixed-variant) / <alpha-value>)',
+          'secondary-fixed-dim': 'rgb(var(--c-secondary-fixed-dim) / <alpha-value>)', 'secondary-container': 'rgb(var(--c-secondary-container) / <alpha-value>)',
+          'secondary-fixed': 'rgb(var(--c-secondary-fixed) / <alpha-value>)', 'tertiary-fixed': 'rgb(var(--c-tertiary-fixed) / <alpha-value>)',
+          'on-error-container': 'rgb(var(--c-on-error-container) / <alpha-value>)', 'on-tertiary-fixed': 'rgb(var(--c-on-tertiary-fixed) / <alpha-value>)',
+          'surface-bright': 'rgb(var(--c-surface-bright) / <alpha-value>)', 'on-secondary-fixed': 'rgb(var(--c-on-secondary-fixed) / <alpha-value>)',
+          'surface-container': 'rgb(var(--c-surface-container) / <alpha-value>)', 'on-background': 'rgb(var(--c-on-background) / <alpha-value>)', 'on-error': 'rgb(var(--c-on-error) / <alpha-value>)',
+          'tertiary-fixed-dim': 'rgb(var(--c-tertiary-fixed-dim) / <alpha-value>)', 'tertiary': 'rgb(var(--c-tertiary) / <alpha-value>)',
+          'surface-container-highest': 'rgb(var(--c-surface-container-highest) / <alpha-value>)', 'on-surface-variant': 'rgb(var(--c-on-surface-variant) / <alpha-value>)',
+          'on-primary-fixed': 'rgb(var(--c-on-primary-fixed) / <alpha-value>)', 'secondary': 'rgb(var(--c-secondary) / <alpha-value>)',
+          'on-primary-fixed-variant': 'rgb(var(--c-on-primary-fixed-variant) / <alpha-value>)', 'on-tertiary-container': 'rgb(var(--c-on-tertiary-container) / <alpha-value>)',
+          'on-tertiary-fixed-variant': 'rgb(var(--c-on-tertiary-fixed-variant) / <alpha-value>)', 'error-container': 'rgb(var(--c-error-container) / <alpha-value>)',
+          'on-secondary-container': 'rgb(var(--c-on-secondary-container) / <alpha-value>)', 'background': 'rgb(var(--c-background) / <alpha-value>)',
+          'inverse-surface': 'rgb(var(--c-inverse-surface) / <alpha-value>)', 'on-surface': 'rgb(var(--c-on-surface) / <alpha-value>)', 'outline-variant': 'rgb(var(--c-outline-variant) / <alpha-value>)',
+          'surface-variant': 'rgb(var(--c-surface-variant) / <alpha-value>)', 'inverse-on-surface': 'rgb(var(--c-inverse-on-surface) / <alpha-value>)', 'on-primary': 'rgb(var(--c-on-primary) / <alpha-value>)',
+          'on-tertiary': 'rgb(var(--c-on-tertiary) / <alpha-value>)', 'outline': 'rgb(var(--c-outline) / <alpha-value>)', 'surface-dim': 'rgb(var(--c-surface-dim) / <alpha-value>)',
+          'primary-fixed': 'rgb(var(--c-primary-fixed) / <alpha-value>)', 'on-primary-container': 'rgb(var(--c-on-primary-container) / <alpha-value>)',
+          'tertiary-container': 'rgb(var(--c-tertiary-container) / <alpha-value>)', 'primary-container': 'rgb(var(--c-primary-container) / <alpha-value>)',
+          'surface-tint': 'rgb(var(--c-surface-tint) / <alpha-value>)', 'surface-container-lowest': 'rgb(var(--c-surface-container-lowest) / <alpha-value>)',
+          'surface': 'rgb(var(--c-surface) / <alpha-value>)', 'on-secondary': 'rgb(var(--c-on-secondary) / <alpha-value>)',
+          'surface-container-high': 'rgb(var(--c-surface-container-high) / <alpha-value>)', 'primary-fixed-dim': 'rgb(var(--c-primary-fixed-dim) / <alpha-value>)'
         },
         borderRadius: { 'DEFAULT': '0.125rem', 'lg': '0.25rem', 'xl': '0.5rem', 'full': '0.75rem' },
         spacing: {
@@ -130,11 +314,10 @@
           'space-sm': '0.5rem', 'gutter-desktop': '1.75rem', 'margin': '1rem', 'space-xl': '2.5rem'
         },
         fontFamily: {
-          'sans': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'],
           'label-caps': ['JetBrains Mono'], 'headline-lg': ['Playfair Display'],
-          'body-sm': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'], 'metric-stat': ['JetBrains Mono'],
-          'display-hero-mobile': ['Playfair Display'], 'body-lg': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-          'headline-sm': ['Playfair Display'], 'body-md': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          'body-sm': ['Plus Jakarta Sans'], 'metric-stat': ['JetBrains Mono'],
+          'display-hero-mobile': ['Playfair Display'], 'body-lg': ['Plus Jakarta Sans'],
+          'headline-sm': ['Playfair Display'], 'body-md': ['Plus Jakarta Sans'],
           'display-hero': ['Playfair Display'], 'headline-lg-mobile': ['Playfair Display'],
           'code-terminal': ['JetBrains Mono'], 'headline-md': ['Playfair Display'],
           'title-editorial': ['Playfair Display']
@@ -162,16 +345,30 @@
 
 <body class="bg-background font-body-md text-on-surface antialiased flex flex-col min-h-screen">
 
+<svg width="0" height="0" class="absolute" aria-hidden="true"><defs>
+  <linearGradient id="attune-g" x1="6" y1="3" x2="18" y2="20" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#ffc9a3"/>
+    <stop offset="1" stop-color="#d97736"/>
+  </linearGradient>
+</defs></svg>
+
 <header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_1px_16px_rgba(0,0,0,0.4)]">
   <div class="h-20 px-margin flex items-center justify-between gap-space-sm">
     <div class="flex items-center gap-space-sm flex-shrink-0">
+      <button type="button" id="drawer-trigger" aria-label="Open menu" aria-expanded="false" aria-controls="app-drawer"
+              class="w-10 h-10 -ml-1 flex items-center justify-center rounded-full hover:bg-surface-container-high/60 transition-colors flex-shrink-0">
+        <span class="material-symbols-outlined text-on-surface text-2xl">menu</span>
+      </button>
       <div class="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-container-high/60 shadow-[0_0_12px_rgba(217,119,54,0.12)]">
-        <span class="material-symbols-outlined text-primary text-xl">graphic_eq</span>
+        <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M9 3.5 V10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+          <path d="M15 3.5 V10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+          <path d="M9 10 C9 13.4 15 13.4 15 10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+          <path d="M12 12.4 V16.9" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+          <circle cx="12" cy="6.6" r="1.2" class="logo-dot animate-radar-dot"/>
+        </svg>
       </div>
-      <div class="flex flex-col">
-        <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-widest">ROOMTONE</span>
-        <span class="font-title-editorial text-title-editorial text-on-surface tracking-tight leading-none italic">OS</span>
-      </div>
+      <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-widest">ATTUNE</span>
     </div>
 
     <div class="flex-1 flex flex-col items-center justify-center px-space-xs min-w-0">
@@ -188,53 +385,347 @@
       </button>
     </div>
 
-    <div class="flex items-center gap-space-xs flex-shrink-0 relative">
-      <button id="profileTrigger" aria-haspopup="menu" aria-expanded="false" aria-controls="profileMenu"
-              class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container-high/60 transition-colors">
+    <div class="flex items-center gap-space-xs flex-shrink-0">
+      <button class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container-high/60 transition-colors">
         <img alt="Operator profile" class="w-8 h-8 rounded-full object-cover"
              src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffb68c'/%3E%3Cstop offset='0.55' stop-color='%23d97736'/%3E%3Cstop offset='1' stop-color='%23753400'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' fill='url(%23g)'/%3E%3Ccircle cx='20' cy='15.5' r='6.5' fill='%23532200' opacity='0.92'/%3E%3Cpath d='M6.5 41c1.3-8.6 7-13.2 13.5-13.2S32.2 32.4 33.5 41z' fill='%23532200' opacity='0.92'/%3E%3C/svg%3E"/>
       </button>
-
-      <!-- Operator profile menu (session identity + sign out) -->
-      <div id="profileMenu" role="menu" aria-label="Operator profile"
-           class="hidden absolute right-0 top-full mt-2 w-64 rounded-xl bg-surface-container-low shadow-[0_16px_48px_rgba(0,0,0,0.65)] border border-surface-container-high p-space-sm z-[60]">
-        <div class="px-2 pt-1 pb-2">
-          <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Signed in as</span>
-          <p class="font-body-md text-body-md text-on-surface font-medium mt-1 truncate" id="profileName">Operator</p>
-          <p class="font-body-sm text-body-sm text-on-surface-variant truncate" id="profileEmail">operator@roomtone.os</p>
-          <span class="inline-flex items-center gap-1 mt-1.5 font-label-caps text-label-caps text-secondary-fixed bg-secondary-container/60 px-2 py-0.5 rounded-full">
-            <span class="material-symbols-outlined text-[11px]">storefront</span>
-            <span id="profileVenue">Venue</span>
-          </span>
-        </div>
-        <div class="h-px bg-surface-container-high my-1"></div>
-        <button id="qlooConnectBtn" role="menuitem"
-                class="w-full px-2 py-2 rounded-lg flex items-center gap-2 text-on-surface hover:bg-surface-container-high transition-colors">
-          <span class="material-symbols-outlined text-lg text-primary">hub</span>
-          <span class="font-label-caps text-label-caps tracking-wider">CONNECT QLOO</span>
-          <span id="qlooMenuDot" class="ml-auto font-label-caps text-label-caps text-outline-variant">DEMO</span>
-        </button>
-        <div class="h-px bg-surface-container-high my-1"></div>
-        <button id="signOutBtn" role="menuitem"
-                class="w-full px-2 py-2 rounded-lg flex items-center gap-2 text-error hover:bg-error-container/40 transition-colors">
-          <span class="material-symbols-outlined text-lg">logout</span>
-          <span class="font-label-caps text-label-caps tracking-wider">SIGN OUT</span>
-        </button>
-      </div>
     </div>
   </div>
 </header>
 
+<!-- ==================== APP DRAWER (opened from the appbar) ==================== -->
+<div id="app-drawer" class="drawer-root fixed inset-0 z-[60]" aria-hidden="true">
+  <div class="drawer-backdrop absolute inset-0 bg-black/60 backdrop-blur-[2px]" data-drawer-dismiss></div>
+  <div class="drawer-rail">
+    <aside role="dialog" aria-modal="true" aria-label="Attune menu" tabindex="-1"
+           class="drawer-panel absolute top-0 bottom-0 left-0 w-[296px] max-w-[86vw] pt-safe bg-surface-container-low shadow-[8px_0_48px_rgba(0,0,0,0.65)] flex flex-col overflow-hidden">
+
+      <!-- Brand row (mirrors the appbar) -->
+      <div class="h-20 px-space-sm flex items-center justify-between flex-shrink-0">
+        <div class="flex items-center gap-space-sm">
+          <div class="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-container-high/60 shadow-[0_0_12px_rgba(217,119,54,0.12)]">
+            <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M9 3.5 V10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+              <path d="M15 3.5 V10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+              <path d="M9 10 C9 13.4 15 13.4 15 10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+              <path d="M12 12.4 V16.9" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+              <circle cx="12" cy="6.6" r="1.2" class="logo-dot animate-radar-dot"/>
+            </svg>
+          </div>
+          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-widest">ATTUNE</span>
+        </div>
+        <button type="button" data-drawer-close aria-label="Close menu"
+                class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container-high/60 transition-colors flex-shrink-0">
+          <span class="material-symbols-outlined text-on-surface-variant text-2xl">close</span>
+        </button>
+      </div>
+
+      <!-- Operator card -->
+      <div class="px-space-md pb-space-sm flex-shrink-0">
+        <div class="rounded-xl bg-surface-container p-space-sm flex items-center gap-space-sm">
+          <img alt="Operator profile" class="w-9 h-9 rounded-full object-cover flex-shrink-0"
+               src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffb68c'/%3E%3Cstop offset='0.55' stop-color='%23d97736'/%3E%3Cstop offset='1' stop-color='%23753400'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' fill='url(%23g)'/%3E%3Ccircle cx='20' cy='15.5' r='6.5' fill='%23532200' opacity='0.92'/%3E%3Cpath d='M6.5 41c1.3-8.6 7-13.2 13.5-13.2S32.2 32.4 33.5 41z' fill='%23532200' opacity='0.92'/%3E%3C/svg%3E"/>
+          <div class="flex flex-col min-w-0">
+            <span class="font-body-md text-body-md text-on-surface font-medium truncate">Mara Ellison</span>
+            <span class="font-label-caps text-label-caps text-on-surface-variant truncate">FLOOR OPERATOR</span>
+          </div>
+          <span class="ml-auto flex items-center gap-1 flex-shrink-0">
+            <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
+            <span class="font-label-caps text-label-caps text-tertiary">ON SHIFT</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Drawer body -->
+      <div class="px-space-md flex-1 overflow-y-auto">
+        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">NAVIGATE</p>
+        <div class="flex flex-col gap-1">
+          <a data-path="playbook" aria-current="page" href="#"
+             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg bg-surface-container/80 text-primary">
+            <span class="material-symbols-outlined text-xl">calendar_month</span>
+            <span class="font-body-md text-body-md font-medium">Home</span>
+          </a>
+          <a data-path="taste-heat" href="#"
+             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-xl">radar</span>
+            <span class="font-body-md text-body-md">Discover</span>
+          </a>
+          <a data-path="menu-sound" href="#"
+             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-xl">nightlife</span>
+            <span class="font-body-md text-body-md">Menu</span>
+          </a>
+          <a data-path="live-pulse" href="#"
+             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-xl">vital_signs</span>
+            <span class="font-body-md text-body-md">Live</span>
+          </a>
+        </div>
+
+        <section class="mt-space-lg mb-space-md rounded-xl bg-surface-container p-space-sm space-y-2.5" aria-label="Audio Guardrails" data-guardrails>
+          <div class="flex items-center justify-between px-1">
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-secondary text-base">graphic_eq</span>
+              <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Audio Guardrails</span>
+            </div>
+            <span class="font-label-caps text-label-caps text-outline">PREVIEW</span>
+          </div>
+          <div class="flex items-center justify-between gap-2 px-1">
+            <span class="font-label-caps text-label-caps text-on-surface-variant">PLAYER LEVEL</span>
+            <span class="font-label-caps text-label-caps text-primary" data-guardrail-level>READY</span>
+          </div>
+          <div class="h-1.5 w-full rounded-full bg-surface-container-highest overflow-hidden" role="meter" aria-label="Menu player output level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-guardrail-meter>
+            <div class="h-full rounded-full bg-tertiary transition-all duration-300" style="width:0%" data-guardrail-meter-fill></div>
+          </div>
+          <div class="space-y-1.5 pt-1">
+            <div class="flex items-center justify-between gap-2 bg-surface-container-low/70 rounded-lg px-2 py-2">
+              <div class="min-w-0">
+                <span class="font-body-sm text-body-sm text-on-surface font-medium block">Auto-duck on announcements</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant block">Lower music by 6 dB while paging</span>
+              </div>
+              <div class="flex-shrink-0" data-guardrail="duck">
+                <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-tertiary/10 text-tertiary" data-on="true" aria-pressed="true"><span data-state>ON</span></button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-2 bg-surface-container-low/70 rounded-lg px-2 py-2">
+              <div class="min-w-0">
+                <span class="font-body-sm text-body-sm text-on-surface font-medium block">Night descent limiter</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant block">Lower music by 6 dB after 23:00</span>
+              </div>
+              <div class="flex-shrink-0" data-guardrail="night">
+                <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-tertiary/10 text-tertiary" data-on="true" aria-pressed="true"><span data-state>ON</span></button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-2 bg-surface-container-low/70 rounded-lg px-2 py-2">
+              <div class="min-w-0">
+                <span class="font-body-sm text-body-sm text-on-surface font-medium block">Spoken-word veto</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant block">Block spoken announcements when enabled</span>
+              </div>
+              <div class="flex-shrink-0" data-guardrail="veto">
+                <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-surface-container-highest text-on-surface-variant" data-on="false" aria-pressed="false"><span data-state>OFF</span></button>
+              </div>
+            </div>
+          </div>
+          <button type="button" data-guardrail-preview class="w-full flex items-center justify-center gap-1.5 rounded-lg bg-surface-container-high px-2 py-2 text-secondary hover:bg-surface-bright transition-colors">
+            <span class="material-symbols-outlined text-base">campaign</span>
+            <span class="font-label-caps text-label-caps tracking-wider">Preview Staff Announcement</span>
+          </button>
+          <p class="font-body-sm text-body-sm text-on-surface-variant px-1" data-guardrail-status aria-live="polite">Controls affect this browser’s menu preview; they don’t control connected speakers.</p>
+        </section>
+
+        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">VENUE SYSTEM</p>
+        <div class="flex flex-col gap-1 pb-space-md">
+          <button type="button"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">tune</span>
+            <span class="font-body-md text-body-md">Venue Settings</span>
+          </button>
+          <button type="button"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">library_music</span>
+            <span class="font-body-md text-body-md">Sound Library</span>
+          </button>
+          <button type="button"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">summarize</span>
+            <span class="font-body-md text-body-md">Nightly Report</span>
+          </button>
+        </div>
+
+        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">PREFERENCES</p>
+        <div class="flex flex-col gap-1 pb-space-md">
+          <button type="button" id="theme-toggle" aria-pressed="true"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl" data-theme-icon>dark_mode</span>
+            <span class="font-body-md text-body-md" data-theme-label>Dark Mode</span>
+            <span class="ml-auto relative inline-flex h-4 w-8 items-center rounded-full bg-primary flex-shrink-0 transition-colors" data-theme-track>
+              <span class="absolute left-0.5 h-3 w-3 rounded-full bg-on-primary transition-transform translate-x-4" data-theme-knob></span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-space-md pt-space-sm pb-safe flex-shrink-0 border-t border-surface-container-high/70">
+        <button type="button" id="drawer-signout"
+                class="w-full flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-surface-container transition-colors">
+          <span class="material-symbols-outlined text-xl">logout</span>
+          <span class="font-body-md text-body-md">Sign Out</span>
+        </button>
+        <p class="font-label-caps text-label-caps text-outline px-space-sm pt-space-xs pb-space-sm">ATTUNE &#183; V1.0.0</p>
+      </div>
+
+    </aside>
+  </div>
+</div>
+
+<!-- ==================== AUTH (drawer Sign Out -> operator authentication) ==================== -->
+<div id="auth-shell" class="auth-shell fixed inset-0 z-[80] overflow-y-auto" aria-hidden="true">
+  <div class="relative min-h-full w-full max-w-[390px] mx-auto flex flex-col bg-surface-container-lowest px-margin pt-safe pb-safe overflow-hidden">
+
+    <!-- ambient art -->
+    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div class="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-primary/15 blur-3xl"></div>
+      <div class="absolute top-1/3 -left-28 w-72 h-72 rounded-full bg-tertiary/10 blur-3xl"></div>
+      <svg class="absolute -bottom-14 -right-12 w-64 h-64 opacity-[0.07] text-primary" viewBox="0 0 200 200" fill="none" stroke="currentColor">
+        <circle cx="100" cy="100" r="30"/>
+        <circle cx="100" cy="100" r="58"/>
+        <circle cx="100" cy="100" r="86"/>
+        <line x1="100" y1="14" x2="100" y2="186"/>
+        <line x1="14" y1="100" x2="186" y2="100"/>
+      </svg>
+    </div>
+
+    <!-- brand row -->
+    <div class="relative h-20 flex items-center justify-between flex-shrink-0 auth-rise">
+      <div class="flex items-center gap-space-sm">
+        <div class="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-container-high/60 shadow-[0_0_12px_rgba(217,119,54,0.12)]">
+          <span class="material-symbols-outlined text-primary text-xl">graphic_eq</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-widest">ATTUNE</span>
+        </div>
+      </div>
+      <span class="flex items-center gap-1 px-2 py-1 rounded-full bg-surface-container font-label-caps text-label-caps text-outline tracking-widest">
+        <span class="material-symbols-outlined text-xs">lock</span>RESTRICTED
+      </span>
+    </div>
+
+    <!-- hero -->
+    <div class="relative pt-space-md pb-space-lg auth-rise auth-d1">
+      <div class="flex items-center gap-1.5 pb-space-xs">
+        <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+        <span id="auth-kicker" class="font-label-caps text-label-caps text-secondary uppercase tracking-widest">OPERATOR ACCESS &#183; THE AMBER ROOM</span>
+      </div>
+      <h1 id="auth-headline" class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight">Set the <em class="italic text-primary">tone</em>.</h1>
+      <p id="auth-sub" class="font-body-md text-body-md text-on-surface-variant pt-space-xs">Welcome back, operator. Sync the floor, the sound and the cellar in one shift view.</p>
+    </div>
+
+    <!-- form card -->
+    <div class="relative auth-rise auth-d2 rounded-xl bg-surface-container-low/80 backdrop-blur-xl border border-outline-variant/40 shadow-[0_20px_60px_rgba(0,0,0,0.45)] p-space-md">
+      <div id="auth-segments" class="flex p-1 rounded-full bg-surface-container mb-space-md">
+        <button type="button" data-auth-mode="signin" class="flex-1 py-2 rounded-full font-label-caps text-label-caps tracking-widest bg-primary text-on-primary transition-colors">SIGN IN</button>
+        <button type="button" data-auth-mode="register" class="flex-1 py-2 rounded-full font-label-caps text-label-caps tracking-widest text-on-surface-variant transition-colors">REGISTER</button>
+      </div>
+
+      <form id="auth-form" novalidate>
+        <div class="pb-space-sm hidden" data-mode-field="register">
+          <label for="auth-name" class="font-label-caps text-label-caps text-outline tracking-widest block pb-1">OPERATOR NAME</label>
+          <input id="auth-name" name="name" type="text" autocomplete="name" placeholder="Your name"
+                 class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-space-sm py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary/70 transition-colors"/>
+          <p class="hidden pt-1 font-body-sm text-body-sm text-error" data-error="name" role="alert">Tell us your name.</p>
+        </div>
+
+        <div class="pb-space-sm" data-mode-field="signin register forgot">
+          <label for="auth-email" class="font-label-caps text-label-caps text-outline tracking-widest block pb-1">EMAIL</label>
+          <input id="auth-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="operator@amberroom.nyc"
+                 class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-space-sm py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary/70 transition-colors"/>
+          <p class="hidden pt-1 font-body-sm text-body-sm text-error" data-error="email" role="alert">That email doesn&#8217;t look right.</p>
+        </div>
+
+        <div class="pb-space-sm" data-mode-field="signin register">
+          <label for="auth-password" class="font-label-caps text-label-caps text-outline tracking-widest block pb-1">PASSWORD</label>
+          <div class="relative">
+            <input id="auth-password" name="password" type="password" autocomplete="current-password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"
+                   class="w-full pr-11 bg-surface-container border border-outline-variant/50 rounded-lg px-space-sm py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary/70 transition-colors"/>
+            <button type="button" data-eye="auth-password" aria-label="Show password"
+                    class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface">
+              <span class="material-symbols-outlined text-lg">visibility</span>
+            </button>
+          </div>
+          <p class="hidden pt-1 font-body-sm text-body-sm text-error" data-error="password" role="alert">Enter your password.</p>
+        </div>
+
+        <div class="pb-space-sm hidden" data-mode-field="register">
+          <label for="auth-confirm" class="font-label-caps text-label-caps text-outline tracking-widest block pb-1">CONFIRM PASSWORD</label>
+          <div class="relative">
+            <input id="auth-confirm" name="confirm-password" type="password" autocomplete="new-password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"
+                   class="w-full pr-11 bg-surface-container border border-outline-variant/50 rounded-lg px-space-sm py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary/70 transition-colors"/>
+            <button type="button" data-eye="auth-confirm" aria-label="Show password"
+                    class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface">
+              <span class="material-symbols-outlined text-lg">visibility</span>
+            </button>
+          </div>
+          <p class="hidden pt-1 font-body-sm text-body-sm text-error" data-error="confirm" role="alert">Passwords don&#8217;t match.</p>
+        </div>
+
+        <div class="flex items-center justify-between pt-space-xs pb-space-md" data-mode-field="signin register">
+          <button type="button" id="auth-remember" aria-pressed="false" class="flex items-center gap-2">
+            <span class="relative inline-flex h-4 w-8 items-center rounded-full bg-surface-container-highest transition-colors" data-remember-track>
+              <span class="absolute left-0.5 h-3 w-3 rounded-full bg-on-surface-variant transition-transform" data-remember-knob></span>
+            </span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant">Remember this device</span>
+          </button>
+          <button type="button" id="auth-forgot" class="font-body-sm text-body-sm text-primary hover:underline">Forgot password?</button>
+        </div>
+
+        <button type="submit" id="auth-submit"
+                class="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-gradient-to-r from-primary to-secondary text-on-primary font-label-caps text-label-caps tracking-widest font-semibold shadow-[0_10px_30px_rgba(217,119,54,0.30)] hover:brightness-110 active:scale-[0.99] transition-all">
+          <span data-submit-label>CONTINUE</span>
+          <span class="material-symbols-outlined text-base" data-submit-icon>arrow_forward</span>
+        </button>
+
+        <div class="flex items-center gap-2 pt-space-md pb-space-xs" data-mode-field="signin register">
+          <span class="h-px flex-1 bg-outline-variant/50"></span>
+          <span class="font-label-caps text-label-caps text-outline">OR</span>
+          <span class="h-px flex-1 bg-outline-variant/50"></span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-space-xs pt-space-xs" data-mode-field="signin register">
+          <button type="button" data-alt="badge" class="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-colors">
+            <span class="material-symbols-outlined text-base">nfc</span>
+            <span class="font-label-caps text-label-caps tracking-wider">VENUE BADGE</span>
+          </button>
+          <button type="button" data-alt="otp" class="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-colors">
+            <span class="material-symbols-outlined text-base">pin</span>
+            <span class="font-label-caps text-label-caps tracking-wider">ONE-TIME CODE</span>
+          </button>
+        </div>
+      </form>
+
+      <div id="auth-forgot-success" class="hidden">
+        <div class="flex items-start gap-2 rounded-lg bg-tertiary-container/30 border border-tertiary/30 p-space-sm">
+          <span class="material-symbols-outlined text-tertiary text-xl">mark_email_read</span>
+          <div class="min-w-0">
+            <p class="font-body-md text-body-md text-on-surface">Reset code sent</p>
+            <p id="auth-forgot-email" class="font-body-sm text-body-sm text-on-surface-variant">Check your inbox &#8212; the code expires in 10 minutes.</p>
+          </div>
+        </div>
+        <button type="button" id="auth-back-signin" class="w-full mt-space-sm py-2.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-colors font-label-caps text-label-caps tracking-widest">BACK TO SIGN IN</button>
+      </div>
+    </div>
+
+    <div class="relative flex-1"></div>
+
+    <!-- waveform + telemetry footer -->
+    <div class="relative auth-rise auth-d3">
+      <div data-waveform class="flex items-end gap-0.5 h-10 w-full opacity-80"></div>
+      <div class="flex items-center justify-between pt-space-sm">
+        <span class="font-label-caps text-label-caps text-outline tracking-widest">SECURE SESSION &#183; TLS 1.3</span>
+        <span class="font-label-caps text-label-caps text-outline tracking-widest">LATENCY 14MS</span>
+      </div>
+      <p class="font-label-caps text-label-caps text-outline tracking-widest pt-space-xs pb-space-sm text-center">ATTUNE &#183; AMBIENCE INTELLIGENCE</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TOAST ==================== -->
+<div id="toast" class="fixed left-1/2 -translate-x-1/2 bottom-28 z-[90] opacity-0 translate-y-2 pointer-events-none transition-all duration-300" aria-live="polite">
+  <div class="flex items-center gap-2 px-space-md py-2.5 rounded-full bg-inverse-surface text-inverse-on-surface shadow-lg">
+    <span class="material-symbols-outlined text-lg" data-toast-icon>check_circle</span>
+    <span class="font-body-sm text-body-sm font-medium whitespace-nowrap" data-toast-text></span>
+  </div>
+</div>
+
 <main class="flex-1 flex flex-col relative w-full pt-20 pb-24 bg-surface">
 
-  <!-- ==================== SCREEN 1 · THE PLAN (playbook) ==================== -->
-  <section class="screen w-full px-margin pb-12 space-y-space-md" data-screen="playbook" aria-label="The Plan — this week's playbook">
+  <!-- ==================== SCREEN 1 · PLAYBOOK ==================== -->
+  <section class="screen w-full px-margin pb-12 space-y-space-md" data-screen="playbook" aria-label="Week Playbook">
 
     <!-- Top Telemetry Banner -->
-    <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md relative overflow-hidden rt-card">
-      <div class="absolute inset-x-0 top-0 h-px rt-hairline-x" aria-hidden="true"></div>
+    <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md relative overflow-hidden">
       <div class="absolute -right-12 -top-12 w-40 h-40 bg-primary/10 rounded-full blur-2xl pointer-events-none"></div>
-      <div class="absolute -left-16 -bottom-16 w-36 h-36 bg-secondary/10 rounded-full blur-2xl pointer-events-none" aria-hidden="true"></div>
       <div class="flex items-center justify-between pb-space-xs">
         <div class="flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
@@ -246,59 +737,44 @@
       </div>
       <div class="mt-2 pt-2 flex flex-col gap-1">
         <span class="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">Predominant Block Micro-Tribe</span>
-        <h2 class="font-headline-sm text-headline-sm text-on-surface tracking-tight" data-qloo-tribe-hero>Analog Minimalists &amp; Pet-Nat Devotees</h2>
-        <div class="mt-2 w-14 rt-hairline-x" aria-hidden="true"></div>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Analog Minimalists &amp; Pet-Nat Devotees</h2>
       </div>
 
       <!-- Telemetry Metric Triad -->
       <div class="grid grid-cols-3 gap-space-xs mt-space-md pt-space-xs">
-        <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col relative overflow-hidden ring-1 ring-white/5">
-          <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-primary/60 to-transparent" aria-hidden="true"></div>
+        <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
           <span class="font-label-caps text-label-caps text-on-surface-variant">BLOCK HEAT</span>
           <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-primary" data-qloo="block-heat">94.8</span>
+            <span class="font-metric-stat text-metric-stat text-primary">94.8</span>
             <span class="font-label-caps text-label-caps text-outline">/100</span>
           </div>
-          <svg viewBox="0 0 60 14" preserveAspectRatio="none" class="w-full h-3.5 mt-1.5" aria-hidden="true">
-            <polyline points="0,11 10,9.5 20,10 30,7 40,5.5 50,4 60,2.5" fill="none" stroke="#4edea3" stroke-width="1.5" stroke-linecap="round" stroke-opacity="0.85"/>
-          </svg>
           <span class="font-body-sm text-body-sm text-tertiary flex items-center gap-0.5 mt-0.5">
             <span class="material-symbols-outlined text-[14px]">trending_up</span>+6.2%
           </span>
         </div>
-        <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col relative overflow-hidden ring-1 ring-white/5">
-          <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-secondary/60 to-transparent" aria-hidden="true"></div>
+        <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
           <span class="font-label-caps text-label-caps text-on-surface-variant">TASTE SYNERGY</span>
           <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-secondary" data-qloo="taste-synergy">98.2</span>
+            <span class="font-metric-stat text-metric-stat text-secondary">98.2</span>
             <span class="font-label-caps text-label-caps text-outline">%</span>
           </div>
-          <svg viewBox="0 0 60 14" preserveAspectRatio="none" class="w-full h-3.5 mt-1.5" aria-hidden="true">
-            <polyline points="0,4 10,4.5 20,3.5 30,4 40,3 50,3.5 60,3" fill="none" stroke="#f0be7b" stroke-width="1.5" stroke-linecap="round" stroke-opacity="0.85"/>
-          </svg>
           <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">Max Affinity</span>
         </div>
-        <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col relative overflow-hidden ring-1 ring-white/5">
-          <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-primary-container/70 to-transparent" aria-hidden="true"></div>
+        <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
           <span class="font-label-caps text-label-caps text-on-surface-variant">FOOTFALL PEAK</span>
           <div class="flex items-baseline gap-1 mt-1">
             <span class="font-metric-stat text-metric-stat text-on-surface">19:45</span>
           </div>
-          <svg viewBox="0 0 60 14" preserveAspectRatio="none" class="w-full h-3.5 mt-1.5" aria-hidden="true">
-            <polyline points="0,12 12,10 24,8 36,4 46,2.5 52,5 60,7" fill="none" stroke="#d97736" stroke-width="1.5" stroke-linecap="round" stroke-opacity="0.8"/>
-          </svg>
           <span class="font-body-sm text-body-sm text-primary-container mt-0.5 truncate">+44 covers</span>
         </div>
       </div>
     </section>
 
     <!-- JCal Pitch & Pilot Banner -->
-    <section class="w-full rounded-xl bg-gradient-to-r from-secondary-container/90 via-surface-container-high to-surface-container p-space-md shadow-lg relative overflow-hidden rt-card">
-      <div class="absolute inset-x-0 top-0 h-px rt-hairline-x" aria-hidden="true"></div>
-      <div class="absolute -left-12 -bottom-16 w-44 h-44 bg-primary/15 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
+    <section class="w-full rounded-xl bg-gradient-to-r from-secondary-container/90 via-surface-container-high to-surface-container p-space-md shadow-lg relative overflow-hidden">
       <div class="flex items-start justify-between gap-space-sm">
         <div class="flex items-center gap-2">
-          <div class="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0 shadow-[0_0_18px_rgba(255,182,140,0.35)]">
+          <div class="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
             <span class="material-symbols-outlined text-primary text-base">auto_graph</span>
           </div>
           <div>
@@ -306,7 +782,7 @@
             <span class="font-title-editorial text-title-editorial text-on-surface italic">Day 12 of 30 Active</span>
           </div>
         </div>
-        <span class="font-label-caps text-label-caps bg-primary text-on-primary px-2 py-0.5 rounded-full font-semibold shadow-[0_0_16px_rgba(255,182,140,0.4)]">
+        <span class="font-label-caps text-label-caps bg-primary text-on-primary px-2 py-0.5 rounded-full font-semibold">
           +$1,420/WK
         </span>
       </div>
@@ -314,14 +790,14 @@
         <p class="font-body-sm text-body-sm pr-2">
           Projected lift: <span class="text-tertiary font-semibold">+18.4% gross margin</span>. Seamless renewal at <span class="text-on-surface font-medium">$189/mo</span> per door.
         </p>
-        <button type="button" id="pilotMetricsBtn" aria-haspopup="dialog" aria-controls="metricsDrawer" class="group bg-surface-container-highest/80 hover:bg-surface-container-highest text-secondary text-body-sm px-3 py-1.5 rounded-full flex items-center gap-1 flex-shrink-0 transition-all ring-1 ring-white/5 hover:ring-primary/30">
+        <button class="bg-surface-container-highest/80 hover:bg-surface-container-highest text-secondary text-body-sm px-3 py-1.5 rounded-full flex items-center gap-1 flex-shrink-0 transition-colors">
           <span>Metrics</span>
-          <span class="material-symbols-outlined text-[14px] transition-transform group-hover:translate-x-0.5">arrow_forward</span>
+          <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
         </button>
       </div>
       <!-- Mini Progress Line -->
       <div class="w-full bg-surface-container-lowest/60 h-1 rounded-full mt-3 overflow-hidden">
-        <div class="bg-secondary h-full rounded-full w-[40%] rt-shimmer shadow-[0_0_10px_rgba(240,190,123,0.45)]"></div>
+        <div class="bg-secondary h-full rounded-full w-[40%]"></div>
       </div>
     </section>
 
@@ -335,20 +811,18 @@
       </div>
       <div class="grid grid-cols-4 gap-1.5 pt-1" id="daypart-selector">
         <!-- 1: Morning -->
-        <button class="daypart-btn bg-surface-container rounded-lg p-2 text-left transition-all hover:bg-surface-container-high opacity-70 relative overflow-hidden active:scale-[0.97]" data-daypart="morning">
-          <div class="absolute inset-x-0 top-0 h-px bg-outline-variant/30" aria-hidden="true"></div>
+        <button class="daypart-btn bg-surface-container rounded-lg p-2 text-left transition-all hover:bg-surface-container-high opacity-70" data-daypart="morning">
           <span class="font-label-caps text-label-caps text-on-surface-variant block">07-11</span>
           <span class="font-body-sm text-body-sm text-on-surface font-medium truncate block mt-0.5">Roasters</span>
         </button>
         <!-- 2: Daylight -->
-        <button class="daypart-btn bg-surface-container rounded-lg p-2 text-left transition-all hover:bg-surface-container-high opacity-70 relative overflow-hidden active:scale-[0.97]" data-daypart="daylight">
-          <div class="absolute inset-x-0 top-0 h-px bg-outline-variant/30" aria-hidden="true"></div>
+        <button class="daypart-btn bg-surface-container rounded-lg p-2 text-left transition-all hover:bg-surface-container-high opacity-70" data-daypart="daylight">
           <span class="font-label-caps text-label-caps text-on-surface-variant block">11-16</span>
           <span class="font-body-sm text-body-sm text-on-surface font-medium truncate block mt-0.5">Linger</span>
         </button>
         <!-- 3: Golden Hour (Active) -->
-        <button class="daypart-btn bg-surface-container-highest text-on-surface rounded-lg p-2 text-left relative overflow-hidden shadow-[0_0_16px_rgba(217,119,54,0.25)] ring-0 active:scale-[0.97]" data-daypart="golden">
-          <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-primary via-primary to-primary/40"></div>
+        <button class="daypart-btn bg-surface-container-highest text-on-surface rounded-lg p-2 text-left relative overflow-hidden shadow-[0_0_16px_rgba(217,119,54,0.25)] ring-0" data-daypart="golden">
+          <div class="absolute inset-x-0 top-0 h-0.5 bg-primary"></div>
           <span class="font-label-caps text-label-caps text-primary block flex items-center gap-1 font-semibold">
             16-20
             <span class="w-1 h-1 rounded-full bg-primary animate-pulse"></span>
@@ -356,8 +830,7 @@
           <span class="font-body-sm text-body-sm text-secondary-fixed font-semibold truncate block mt-0.5">Golden Hr</span>
         </button>
         <!-- 4: Night Descent -->
-        <button class="daypart-btn bg-surface-container rounded-lg p-2 text-left transition-all hover:bg-surface-container-high opacity-70 relative overflow-hidden active:scale-[0.97]" data-daypart="night">
-          <div class="absolute inset-x-0 top-0 h-px bg-outline-variant/30" aria-hidden="true"></div>
+        <button class="daypart-btn bg-surface-container rounded-lg p-2 text-left transition-all hover:bg-surface-container-high opacity-70" data-daypart="night">
           <span class="font-label-caps text-label-caps text-on-surface-variant block">20-02</span>
           <span class="font-body-sm text-body-sm text-on-surface font-medium truncate block mt-0.5">Descent</span>
         </button>
@@ -372,14 +845,12 @@
              alt="Intimate low-lit bespoke cocktail bar with glowing amber lights, dark soapstone tables, handcrafted ceramic drinkware, and warm wood shelving filled with vinyl records and artisanal spirits in Brooklyn."
              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGxIZmlcgeAYoQNcPqNfcK_58W15QjmU8TASkaL4dwMRfaqaa96T3-Rhd0AUiCXAFCym_7FmA0L7rYx4cNAdnYKF1JOxQ0u81JjNL8RRqn1U7QTASXmlhGZ0mTnVsGFbtyYxIPHmAkYt461OFUtBqCVS44Ed2ZRKgC1CCNKZktiUVFtOUV4Q6uKJsukJs0dkoGP2bVMlQ-lZR8JZQwTHDWxzjYJmwx6XFfPzXyef-ubNuKcNY0wxDbtQ"/>
         <div class="absolute inset-0 bg-gradient-to-t from-surface-container via-surface-container/60 to-transparent"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-primary/15 via-transparent to-transparent mix-blend-screen" aria-hidden="true"></div>
         <div class="absolute bottom-3 left-4 right-4 flex items-end justify-between">
           <div>
-            <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest bg-surface-container-lowest/80 px-2 py-0.5 rounded-full inline-flex items-center gap-1.5 ring-1 ring-primary/20"><span class="w-1 h-1 rounded-full bg-primary animate-pulse" aria-hidden="true"></span>NOW TUNED &#8226; 16:00 - 20:00</span>
+            <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest bg-surface-container-lowest/80 px-2 py-0.5 rounded-full">NOW TUNED &#8226; 16:00 - 20:00</span>
             <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight mt-1">Golden Hour Shift</h3>
           </div>
           <div class="text-right flex flex-col items-end">
-            <div class="rt-eq mb-1.5" aria-hidden="true"><span style="animation-delay:0s"></span><span style="animation-delay:.12s"></span><span style="animation-delay:.24s"></span><span style="animation-delay:.36s"></span><span style="animation-delay:.06s"></span></div>
             <span class="font-label-caps text-label-caps text-on-surface-variant">DECIBEL GOAL</span>
             <span class="font-metric-stat text-metric-stat text-primary">64<span class="font-label-caps text-label-caps text-outline-variant">dB</span></span>
           </div>
@@ -402,12 +873,6 @@
             <span class="font-body-md text-body-md text-on-surface font-medium">Warm Japanese Kanky&#333; Ongaku &amp; Vinyl Jazz</span>
             <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Streaming: <span class="italic text-primary-fixed">Eriko Shimizu Trio &#8212; Midsummer Amber</span></span>
           </div>
-          <!-- Live waveform strip: amber = room spectrum, green = streamed portion + playhead -->
-          <svg viewBox="0 0 220 20" class="w-full h-5 mt-1.5" aria-hidden="true" preserveAspectRatio="none">
-            <path d="M0 10 Q 7 2 14 10 T 28 10 T 42 10 T 56 10 T 70 10 T 84 10 T 98 10 T 112 10 T 126 10 T 140 10 T 154 10 T 168 10 T 182 10 T 196 10 T 210 10" fill="none" stroke="#ffb68c" stroke-opacity="0.28" stroke-width="1.5"/>
-            <path d="M0 10 Q 7 4 14 10 T 28 10 T 42 10 T 56 10 T 70 10 T 84 10 T 98 10 T 112 10 T 126 10" fill="none" stroke="#4edea3" stroke-opacity="0.55" stroke-width="1.5"/>
-            <circle cx="126" cy="10" r="2" fill="#4edea3"/>
-          </svg>
           <!-- Waveform Simulation / Audio Telemetry -->
           <div class="flex items-center justify-between pt-1 gap-2">
             <div class="flex items-center gap-1.5 flex-1 bg-surface-container px-2.5 py-1.5 rounded">
@@ -446,12 +911,12 @@
               <span class="material-symbols-outlined text-primary text-lg">local_bar</span>
               <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Recommended Golden Pairing</span>
             </div>
-            <span class="font-label-caps text-label-caps bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full ring-1 ring-secondary/30">
+            <span class="font-label-caps text-label-caps bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full">
               96% Flavor Synergy
             </span>
           </div>
           <div class="flex gap-space-sm items-center pt-1">
-            <div class="w-16 h-16 rounded-lg bg-surface-container overflow-hidden flex-shrink-0 ring-1 ring-white/10">
+            <div class="w-16 h-16 rounded-lg bg-surface-container overflow-hidden flex-shrink-0">
               <img class="w-full h-full object-cover"
                    alt="Refined Japanese highball cocktail with hand-carved ice sphere, smoked olive oil droplets glistening on top surface with yuzu peel garnish in a crystal glass."
                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG8IHnMriqUvoPdvjrGXlKJqnbBmyNBHshWo_7dHMqSGE6K3-hmXsKsUHslzxV-BZoTVjN9iY-c-DgUf4ulH-JnvuOOPyPVCFh71baKR8zSqb1_Hu9oWMwAJ5-jX5yi_Drqm5l0gtEY8D_5h3VuP5DM7qIxpu15AtcxBpbjEEfOPR2NGMDpUoBFOj2zDCbfHeANOxirAZuX_s0Op2WNbNv7zYtWZ4GWJSXvp2dZLsS_WRCp3hkpb0Zlw"/>
@@ -496,11 +961,10 @@
       </div>
 
       <!-- Saturday Card -->
-      <div class="w-full bg-surface-container rounded-xl p-space-md shadow-md flex flex-col space-y-2 relative overflow-hidden rt-card">
-        <div class="absolute left-0 inset-y-0 w-0.5 bg-gradient-to-b from-primary/60 via-primary/20 to-transparent" aria-hidden="true"></div>
+      <div class="w-full bg-surface-container rounded-xl p-space-md shadow-md flex flex-col space-y-2">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <span class="font-label-caps text-label-caps bg-surface-container-high text-on-surface px-2 py-0.5 rounded-full ring-1 ring-white/5">SATURDAY OCT 26</span>
+            <span class="font-label-caps text-label-caps bg-surface-container-high text-on-surface px-2 py-0.5 rounded">SATURDAY OCT 26</span>
             <span class="font-label-caps text-label-caps text-tertiary font-medium">21:30 PEAK SURGE</span>
           </div>
           <span class="material-symbols-outlined text-on-surface-variant text-lg">wine_bar</span>
@@ -518,11 +982,10 @@
       </div>
 
       <!-- Sunday Card -->
-      <div class="w-full bg-surface-container rounded-xl p-space-md shadow-md flex flex-col space-y-2 relative overflow-hidden rt-card">
-        <div class="absolute left-0 inset-y-0 w-0.5 bg-gradient-to-b from-secondary/60 via-secondary/20 to-transparent" aria-hidden="true"></div>
+      <div class="w-full bg-surface-container rounded-xl p-space-md shadow-md flex flex-col space-y-2">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <span class="font-label-caps text-label-caps bg-surface-container-high text-on-surface px-2 py-0.5 rounded-full ring-1 ring-white/5">SUNDAY OCT 27</span>
+            <span class="font-label-caps text-label-caps bg-surface-container-high text-on-surface px-2 py-0.5 rounded">SUNDAY OCT 27</span>
             <span class="font-label-caps text-label-caps text-secondary font-medium">11:00 - 15:30</span>
           </div>
           <span class="material-symbols-outlined text-on-surface-variant text-lg">palette</span>
@@ -542,16 +1005,16 @@
 
     <!-- Operator Action Suite -->
     <section class="space-y-space-xs pt-space-xs">
-      <button class="w-full h-13 py-3 px-4 rounded-xl bg-primary-container text-on-primary-container hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-[0_10px_30px_-8px_rgba(217,119,54,0.5)] group">
+      <button class="w-full h-13 py-3 px-4 rounded-xl bg-primary-container text-on-primary-container hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-lg group">
         <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">campaign</span>
         <span class="font-label-caps text-label-caps uppercase tracking-wider font-bold">Broadcast Shift Notes to Staff</span>
       </button>
       <div class="grid grid-cols-2 gap-space-xs">
-        <button class="py-2.5 px-3 rounded-lg bg-surface-container-high text-secondary hover:bg-surface-bright transition-colors flex items-center justify-center gap-1.5 shadow-sm ring-1 ring-white/5">
+        <button class="py-2.5 px-3 rounded-lg bg-surface-container-high text-secondary hover:bg-surface-bright transition-colors flex items-center justify-center gap-1.5 shadow-sm">
           <span class="material-symbols-outlined text-base text-secondary">speaker</span>
           <span class="font-label-caps text-label-caps tracking-wider">Push to Sonos</span>
         </button>
-        <button class="py-2.5 px-3 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-colors flex items-center justify-center gap-1.5 shadow-sm ring-1 ring-white/5">
+        <button class="py-2.5 px-3 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-colors flex items-center justify-center gap-1.5 shadow-sm">
           <span class="material-symbols-outlined text-base">picture_as_pdf</span>
           <span class="font-label-caps text-label-caps tracking-wider">Export Ops PDF</span>
         </button>
@@ -559,8 +1022,7 @@
     </section>
 
     <!-- Realtime Telemetry Heartbeat Bar -->
-    <footer class="pt-2 text-center space-y-2">
-      <div class="w-full rt-hairline-x" aria-hidden="true"></div>
+    <footer class="pt-2 text-center">
       <div class="inline-flex items-center gap-2 px-3 py-1 bg-surface-container-low rounded-full">
         <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-ping"></span>
         <span class="font-label-caps text-label-caps text-on-surface-variant tracking-widest">AMBER ROOM TELEMETRY RUNNING &#8226; LATENCY 14MS</span>
@@ -569,8 +1031,8 @@
 
   </section>
 
-  <!-- ==================== SCREEN 2 · THE BLOCK (taste heat) ==================== -->
-  <section class="screen w-full px-margin pb-12 space-y-space-md hidden" data-screen="taste-heat" aria-label="The Block — neighborhood taste radar">
+  <!-- ==================== SCREEN 2 · TASTE HEAT ==================== -->
+  <section class="screen w-full px-margin pb-12 space-y-space-md hidden" data-screen="taste-heat" aria-label="Taste Heat">
 
     <!-- Radar Sweep Hero -->
     <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md relative overflow-hidden">
@@ -580,15 +1042,15 @@
           <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
           <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest">800FT TASTE RADAR</span>
         </div>
-        <span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded-full" id="qlooSweepPill">SWEEP 14s AGO</span>
+        <span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded-full" id="radar-sweep-age">SWEEP LIVE</span>
       </div>
 
       <div class="mt-2 pt-2 flex items-end justify-between gap-space-sm">
         <div class="min-w-0">
           <span class="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">Hyperlocal Affinity Pool</span>
-          <h2 class="font-headline-sm text-headline-sm text-on-surface tracking-tight" data-qloo-tribe-hero>What the Block Craves</h2>
+          <h2 class="font-headline-sm text-headline-sm text-on-surface tracking-tight">What the Block Craves</h2>
         </div>
-        <span class="font-metric-stat text-[13px] text-tertiary whitespace-nowrap" id="qlooPatronCount">312 PATRONS</span>
+        <span class="font-metric-stat text-[13px] text-tertiary whitespace-nowrap" id="radar-pool">312 PATRONS</span>
       </div>
 
       <!-- Radius Selector -->
@@ -596,51 +1058,68 @@
         <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-surface-container text-on-surface-variant" data-radius="200">200FT</button>
         <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-surface-container text-on-surface-variant" data-radius="400">400FT</button>
         <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-primary text-on-primary" data-radius="800">800FT</button>
-        <span class="font-label-caps text-label-caps text-outline-variant ml-auto">SCAN #4412</span>
+        <span class="font-label-caps text-label-caps text-outline-variant ml-auto" id="radar-scan">SCAN #4412</span>
       </div>
 
-      <!-- Radar Visual -->
+      <!-- Radar Visual (live sweep, tap a signal to inspect) -->
       <div class="mt-3 rounded-lg bg-surface-container-lowest/70 p-space-sm">
-        <svg viewBox="0 0 300 300" class="w-full h-auto" role="img" aria-label="Radar sweep showing patron matches around The Amber Room within 800 feet">
+        <svg id="radar-svg" viewBox="0 0 300 300" class="w-full h-auto" role="img" aria-label="Radar sweep showing patron matches around The Amber Room within 800 feet">
           <defs>
             <linearGradient id="radarSweep" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#ffb68c" stop-opacity="0.38"/>
-              <stop offset="1" stop-color="#ffb68c" stop-opacity="0"/>
+              <stop class="radar-beam-stop" offset="0" stop-opacity="0"/>
+              <stop class="radar-beam-stop" offset="1" stop-opacity="0.34"/>
             </linearGradient>
           </defs>
-          <circle cx="150" cy="150" r="112" fill="none" stroke="#554339" stroke-width="1" stroke-dasharray="3 5" opacity="0.9"/>
-          <circle cx="150" cy="150" r="84" fill="none" stroke="#554339" stroke-width="1" opacity="0.55"/>
-          <circle cx="150" cy="150" r="56" fill="none" stroke="#554339" stroke-width="1" opacity="0.45"/>
-          <circle cx="150" cy="150" r="28" fill="none" stroke="#554339" stroke-width="1" opacity="0.35"/>
-          <line x1="150" y1="30" x2="150" y2="270" stroke="#554339" stroke-width="1" opacity="0.35"/>
-          <line x1="30" y1="150" x2="270" y2="150" stroke="#554339" stroke-width="1" opacity="0.35"/>
-          <line x1="65" y1="65" x2="235" y2="235" stroke="#554339" stroke-width="1" opacity="0.18"/>
-          <line x1="235" y1="65" x2="65" y2="235" stroke="#554339" stroke-width="1" opacity="0.18"/>
-          <path d="M150 150 L150 38 A112 112 0 0 1 255 112 Z" fill="url(#radarSweep)"/>
-          <line x1="150" y1="150" x2="255" y2="112" stroke="#ffb68c" stroke-width="1.5" opacity="0.65"/>
-          <text class="font-label-caps" x="150" y="132" text-anchor="middle" font-size="8" fill="#a38c80" letter-spacing="1">200FT</text>
-          <text class="font-label-caps" x="150" y="104" text-anchor="middle" font-size="8" fill="#a38c80" letter-spacing="1">400FT</text>
-          <text class="font-label-caps" x="150" y="76" text-anchor="middle" font-size="8" fill="#a38c80" letter-spacing="1">600FT</text>
-          <text class="font-label-caps" x="150" y="48" text-anchor="middle" font-size="8" fill="#a38c80" letter-spacing="1">800FT</text>
-          <circle cx="196" cy="104" r="9" fill="#ffb68c" opacity="0.18" class="animate-pulse"/>
-          <circle cx="196" cy="104" r="4.5" fill="#ffb68c"/>
-          <circle cx="112" cy="190" r="8" fill="#4edea3" opacity="0.18" class="animate-pulse"/>
-          <circle cx="112" cy="190" r="4" fill="#4edea3"/>
-          <circle cx="214" cy="196" r="3.5" fill="#f0be7b"/>
-          <circle cx="96" cy="112" r="3" fill="#4edea3" opacity="0.85"/>
-          <circle cx="176" cy="228" r="3" fill="#ffb68c" opacity="0.7"/>
-          <circle cx="236" cy="150" r="2.5" fill="#f0be7b" opacity="0.8"/>
-          <circle cx="72" cy="168" r="2.5" fill="#ffb68c" opacity="0.6"/>
-          <rect x="129" y="79" width="8" height="8" transform="rotate(45 133 83)" fill="none" stroke="#6ffbbe" stroke-width="1.5"/>
-          <rect x="199" y="231" width="8" height="8" transform="rotate(45 203 235)" fill="none" stroke="#6ffbbe" stroke-width="1.5"/>
-          <circle cx="150" cy="150" r="14" fill="none" stroke="#ffb68c" stroke-width="1" opacity="0.35" class="animate-pulse"/>
-          <circle cx="150" cy="150" r="6" fill="#ffb68c"/>
-          <circle cx="150" cy="150" r="2.5" fill="#2e3036"/>
+          <g class="radar-grid">
+            <circle class="radar-ring" data-ring="200" cx="150" cy="150" r="28"/>
+            <circle class="radar-ring" data-ring="400" cx="150" cy="150" r="56"/>
+            <circle class="radar-ring" data-ring="600" cx="150" cy="150" r="84"/>
+            <circle class="radar-ring" data-ring="800" cx="150" cy="150" r="112"/>
+            <line class="radar-cross" x1="150" y1="30" x2="150" y2="270"/>
+            <line class="radar-cross" x1="30" y1="150" x2="270" y2="150"/>
+            <line class="radar-cross radar-cross-dim" x1="65" y1="65" x2="235" y2="235"/>
+            <line class="radar-cross radar-cross-dim" x1="235" y1="65" x2="65" y2="235"/>
+            <text class="radar-label font-label-caps" data-ring-label="200" x="150" y="132" text-anchor="middle" font-size="8" letter-spacing="1">200FT</text>
+            <text class="radar-label font-label-caps" data-ring-label="400" x="150" y="104" text-anchor="middle" font-size="8" letter-spacing="1">400FT</text>
+            <text class="radar-label font-label-caps" data-ring-label="600" x="150" y="76" text-anchor="middle" font-size="8" letter-spacing="1">600FT</text>
+            <text class="radar-label font-label-caps" data-ring-label="800" x="150" y="48" text-anchor="middle" font-size="8" letter-spacing="1">800FT</text>
+          </g>
+          <g id="radar-blips"></g>
+          <g class="radar-beam" aria-hidden="true">
+            <path d="M150 150 L150 38 A112 112 0 0 1 224.9 66.8 Z" fill="url(#radarSweep)"/>
+            <line class="radar-beam-edge" x1="150" y1="150" x2="224.9" y2="66.8"/>
+          </g>
+          <circle class="radar-door-pulse animate-pulse" cx="150" cy="150" r="14" fill="none"/>
+          <circle class="radar-door" cx="150" cy="150" r="6"/>
+          <circle cx="150" cy="150" r="2.5" fill="rgb(var(--c-inverse-on-surface))"/>
         </svg>
         <div class="flex items-center justify-center gap-4 pt-2 flex-wrap">
           <span class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>PATRON MATCH</span>
           <span class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-tertiary rotate-45"></span>VENUE</span>
           <span class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-1.5"><span class="w-2 h-2 rounded-full border border-primary"></span>YOUR DOOR</span>
+        </div>
+        <div id="radar-detail" class="hidden mt-2 rounded-lg bg-surface-container/80 border border-outline-variant/40 p-space-sm">
+          <div class="flex items-start gap-2.5">
+            <div class="w-9 h-9 rounded-lg bg-surface-container-high flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-primary" id="radar-detail-icon">person</span>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <p class="font-body-md text-body-md text-on-surface font-medium truncate" id="radar-detail-title">—</p>
+                <button type="button" id="radar-detail-close" aria-label="Close signal detail" class="flex-shrink-0 text-outline hover:text-on-surface transition-colors">
+                  <span class="material-symbols-outlined text-base">close</span>
+                </button>
+              </div>
+              <p class="font-body-sm text-body-sm text-on-surface-variant truncate" id="radar-detail-sub">—</p>
+              <div class="flex items-center gap-2 pt-1.5">
+                <div class="flex-1 h-1 rounded-full bg-surface-container-highest overflow-hidden">
+                  <div class="h-full rounded-full bg-primary transition-all" id="radar-detail-bar" style="width:0%"></div>
+                </div>
+                <span class="font-metric-stat text-[12px] text-primary whitespace-nowrap" id="radar-detail-score">—</span>
+              </div>
+              <p class="font-body-sm text-body-sm text-on-surface-variant pt-1" id="radar-detail-note">—</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -649,7 +1128,7 @@
         <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
           <span class="font-label-caps text-label-caps text-on-surface-variant">BLOCK HEAT</span>
           <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-primary" data-qloo="block-heat">94.8</span>
+            <span class="font-metric-stat text-metric-stat text-primary">94.8</span>
             <span class="font-label-caps text-label-caps text-outline">/100</span>
           </div>
           <span class="font-body-sm text-body-sm text-tertiary flex items-center gap-0.5 mt-0.5">
@@ -659,14 +1138,14 @@
         <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
           <span class="font-label-caps text-label-caps text-on-surface-variant">NEW MATCHES</span>
           <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-secondary" data-qloo="new-matches">37</span>
+            <span class="font-metric-stat text-metric-stat text-secondary">37</span>
           </div>
           <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">+9 today</span>
         </div>
         <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
           <span class="font-label-caps text-label-caps text-on-surface-variant">MATCH RATE</span>
           <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-on-surface" data-qloo="match-rate">12.4</span>
+            <span class="font-metric-stat text-metric-stat text-on-surface">12.4</span>
             <span class="font-label-caps text-label-caps text-outline">%</span>
           </div>
           <span class="font-body-sm text-body-sm text-primary-container mt-0.5 truncate">of active pool</span>
@@ -683,7 +1162,7 @@
         </div>
         <span class="font-label-caps text-label-caps text-on-surface-variant">12 SEGMENTS</span>
       </div>
-      <div class="space-y-3" id="qlooTribeList">
+      <div class="space-y-3">
         <div class="flex flex-col gap-1">
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 min-w-0">
@@ -756,7 +1235,7 @@
         </div>
         <span class="font-label-caps text-label-caps text-primary">800FT POOL</span>
       </div>
-      <div class="space-y-4" id="qlooSignalList">
+      <div class="space-y-4">
         <div class="space-y-2">
           <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Streaming</span>
           <div class="flex items-center gap-2">
@@ -902,11 +1381,12 @@
 
   </section>
 
-  <!-- ==================== SCREEN 3 · THE VIBE (menu &amp; audio) ==================== -->
-  <section class="screen w-full px-margin pb-12 space-y-space-md hidden" data-screen="menu-sound" aria-label="The Vibe — menu and audio">
+  <!-- ==================== SCREEN 3 · MENU &amp; AUDIO ==================== -->
+  <section class="screen w-full px-margin pb-12 space-y-space-md hidden" data-screen="menu-sound" aria-label="Menu and Audio">
 
     <!-- Now Playing Console -->
-    <section class="w-full bg-surface-container rounded-xl shadow-xl overflow-hidden relative">
+    <section class="w-full bg-surface-container rounded-xl shadow-xl overflow-hidden relative" data-audio-player>
+      <audio preload="none" data-audio-element aria-label="Attune music player"></audio>
       <div class="w-full h-32 relative bg-surface-container-high overflow-hidden">
         <img class="w-full h-full object-cover opacity-45 mix-blend-screen"
              alt="Intimate low-lit bespoke cocktail bar with glowing amber lights, dark soapstone tables, handcrafted ceramic drinkware, and warm wood shelving filled with vinyl records and artisanal spirits in Brooklyn."
@@ -918,8 +1398,8 @@
         </div>
         <div class="absolute bottom-3 left-4 right-4 flex items-end justify-between gap-2">
           <div class="min-w-0">
-            <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest bg-surface-container-lowest/80 px-2 py-0.5 rounded-full">NOW TUNED &#8226; 16:00 - 20:00</span>
-            <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight mt-1 truncate">Eriko Shimizu Trio</h3>
+            <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest bg-surface-container-lowest/80 px-2 py-0.5 rounded-full">NOW PLAYING &#8226; PREVIEW</span>
+            <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight mt-1 truncate" data-player-title-hero>Lofi Study</h3>
           </div>
           <div class="text-right flex flex-col items-end flex-shrink-0">
             <span class="font-label-caps text-label-caps text-on-surface-variant">DECIBEL GOAL</span>
@@ -931,33 +1411,31 @@
       <div class="p-space-md space-y-space-sm">
         <div class="flex items-center justify-between">
           <div class="min-w-0">
-            <span class="font-body-md text-body-md text-on-surface font-medium block truncate">Midsummer Amber</span>
-            <span class="font-body-sm text-body-sm text-on-surface-variant">Kanky&#333; Ongaku &#8226; Side B</span>
+            <span class="font-body-md text-body-md text-on-surface font-medium block truncate" data-player-artist>FASSounds</span>
+            <span class="font-body-sm text-on-surface-variant"><a href="https://pixabay.com/music/beats-lofi-study-calm-peaceful-chill-hop-112191/" target="_blank" rel="noopener noreferrer" class="underline decoration-outline-variant underline-offset-2">Calm Peaceful Chill Hop &#8226; Pixabay</a></span>
           </div>
-          <span class="font-label-caps text-label-caps bg-surface-container-high text-secondary-fixed px-2 py-0.5 rounded-full whitespace-nowrap">81 BPM</span>
+          <span class="font-label-caps text-label-caps bg-surface-container-high text-secondary-fixed px-2 py-0.5 rounded-full whitespace-nowrap">CHILL HOP</span>
         </div>
 
-        <!-- Waveform (bars injected deterministically) -->
-        <div class="flex items-end gap-[3px] h-10" data-waveform></div>
+        <!-- Waveform and seek bar reflect actual playback position. -->
+        <div class="flex items-end gap-[3px] h-10" data-waveform data-player-waveform></div>
 
         <div class="flex items-center gap-2">
-          <span class="font-label-caps text-label-caps text-on-surface-variant">1:42</span>
-          <div class="flex-1 h-1 rounded-full bg-surface-container-highest overflow-hidden">
-            <div class="h-full rounded-full bg-primary" style="width:38%"></div>
-          </div>
-          <span class="font-label-caps text-label-caps text-on-surface-variant">4:36</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant" data-player-current>0:00</span>
+          <input type="range" min="0" max="100" value="0" step="0.1" aria-label="Seek within track" data-player-seek class="flex-1 h-1 accent-primary cursor-pointer"/>
+          <span class="font-label-caps text-label-caps text-on-surface-variant" data-player-duration>0:00</span>
         </div>
 
         <div class="flex items-center justify-between gap-2 pt-1">
           <div class="flex items-center gap-4">
-            <button type="button" aria-label="Previous track" class="text-on-surface-variant hover:text-on-surface transition-colors">
-              <span class="material-symbols-outlined text-2xl">skip_previous</span>
+            <button type="button" aria-label="Rewind 10 seconds" data-player-previous class="text-on-surface-variant hover:text-on-surface transition-colors">
+              <span class="material-symbols-outlined text-2xl">replay_10</span>
             </button>
-            <button type="button" aria-label="Pause" class="w-11 h-11 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg hover:brightness-110 transition-all">
-              <span class="material-symbols-outlined text-xl">pause</span>
+            <button type="button" aria-label="Play" data-player-toggle class="w-11 h-11 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg hover:brightness-110 transition-all">
+              <span class="material-symbols-outlined text-xl" data-player-toggle-icon>play_arrow</span>
             </button>
-            <button type="button" aria-label="Next track" class="text-on-surface-variant hover:text-on-surface transition-colors">
-              <span class="material-symbols-outlined text-2xl">skip_next</span>
+            <button type="button" aria-label="Skip forward 10 seconds" data-player-next class="text-on-surface-variant hover:text-on-surface transition-colors">
+              <span class="material-symbols-outlined text-2xl">forward_10</span>
             </button>
           </div>
           <div class="flex items-center gap-1.5" data-chip-group data-active="bg-secondary-container text-on-secondary-container" data-inactive="bg-surface-container text-on-surface-variant">
@@ -969,78 +1447,7 @@
       </div>
     </section>
 
-    <!-- Audio Guardrails -->
-    <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md space-y-3">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-secondary text-lg">graphic_eq</span>
-          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Audio Guardrails</span>
-        </div>
-        <span class="font-label-caps text-label-caps text-tertiary flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span> ENFORCED
-        </span>
-      </div>
 
-      <div class="space-y-1.5">
-        <div class="flex items-center justify-between gap-2">
-          <span class="font-label-caps text-label-caps text-on-surface-variant">DECIBEL CEILING</span>
-          <span class="font-label-caps text-label-caps text-primary">61.7 / 64.0 dB</span>
-        </div>
-        <div class="w-full h-2 rounded-full bg-surface-container-highest relative overflow-hidden">
-          <div class="h-full rounded-full bg-tertiary" style="width:77%"></div>
-          <div class="absolute inset-y-0 w-0.5 bg-primary" style="left:80%"></div>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="font-label-caps text-label-caps text-outline-variant">CURRENT ROOM TONE</span>
-          <span class="font-label-caps text-label-caps text-primary">GOAL 64dB</span>
-        </div>
-      </div>
-
-      <div class="space-y-1.5">
-        <div class="flex items-center justify-between gap-2">
-          <span class="font-label-caps text-label-caps text-on-surface-variant">TEMPO BAND</span>
-          <span class="font-label-caps text-label-caps text-secondary">81 BPM IN BAND</span>
-        </div>
-        <div class="w-full h-2 rounded-full bg-surface-container-highest relative overflow-hidden">
-          <div class="absolute inset-y-0 left-[27%] w-[46%] bg-secondary/70"></div>
-          <div class="absolute inset-y-0 w-0.5 bg-on-surface" style="left:41%"></div>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="font-label-caps text-label-caps text-outline-variant">74 BPM FLOOR</span>
-          <span class="font-label-caps text-label-caps text-outline-variant">96 BPM CEILING</span>
-        </div>
-      </div>
-
-      <div class="pt-1 space-y-2">
-        <div class="flex items-center justify-between gap-3 bg-surface-container/70 rounded-lg px-space-sm py-2">
-          <div class="min-w-0">
-            <span class="font-body-sm text-body-sm text-on-surface font-medium block truncate">Auto-duck on announcements</span>
-            <span class="font-body-sm text-body-sm text-on-surface-variant truncate block">Dip every zone 6dB during staff paging</span>
-          </div>
-          <div class="flex-shrink-0" data-chip-group data-toggle data-active="bg-tertiary/10 text-tertiary" data-inactive="bg-surface-container-highest text-on-surface-variant">
-            <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-tertiary/10 text-tertiary" data-on="true"><span data-state>ON</span></button>
-          </div>
-        </div>
-        <div class="flex items-center justify-between gap-3 bg-surface-container/70 rounded-lg px-space-sm py-2">
-          <div class="min-w-0">
-            <span class="font-body-sm text-body-sm text-on-surface font-medium block truncate">Night descent limiter</span>
-            <span class="font-body-sm text-body-sm text-on-surface-variant truncate block">Hard ceiling of 58dB after 23:00</span>
-          </div>
-          <div class="flex-shrink-0" data-chip-group data-toggle data-active="bg-tertiary/10 text-tertiary" data-inactive="bg-surface-container-highest text-on-surface-variant">
-            <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-tertiary/10 text-tertiary" data-on="true"><span data-state>ON</span></button>
-          </div>
-        </div>
-        <div class="flex items-center justify-between gap-3 bg-surface-container/70 rounded-lg px-space-sm py-2">
-          <div class="min-w-0">
-            <span class="font-body-sm text-body-sm text-on-surface font-medium block truncate">Spoken-word veto</span>
-            <span class="font-body-sm text-body-sm text-on-surface-variant truncate block">Swap any track with vocals above 60%</span>
-          </div>
-          <div class="flex-shrink-0" data-chip-group data-toggle data-active="bg-tertiary/10 text-tertiary" data-inactive="bg-surface-container-highest text-on-surface-variant">
-            <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-surface-container-highest text-on-surface-variant" data-on="false"><span data-state>OFF</span></button>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- Shift Specials / Menu Engine -->
     <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md space-y-space-sm">
@@ -1049,7 +1456,7 @@
           <span class="material-symbols-outlined text-primary text-lg">restaurant</span>
           <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Shift Specials</span>
         </div>
-        <span class="font-label-caps text-label-caps bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full">POS SYNCED</span>
+        <span class="font-label-caps text-label-caps bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full">TONIGHT'S PICKS</span>
       </div>
 
       <div class="flex items-start gap-3 bg-surface-container/70 rounded-lg p-space-sm">
@@ -1058,9 +1465,10 @@
         </div>
         <div class="flex-1 min-w-0">
           <div class="flex items-start justify-between gap-2">
-            <span class="font-body-md text-body-md text-on-surface font-medium leading-tight">Smoked Olive Oil &amp; Yuzu Hi-Ball</span>
-            <span class="font-label-caps text-label-caps text-tertiary whitespace-nowrap flex-shrink-0">96% SYN</span>
+            <span class="font-body-md text-body-md text-on-surface font-medium leading-tight">Yuzu Highball</span>
+            <span class="font-label-caps text-label-caps text-tertiary whitespace-nowrap flex-shrink-0">POPULAR</span>
           </div>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Japanese whisky, fresh yuzu, soda, and a twist of lemon.</p>
           <div class="mt-1 tracking-[0.04em]">
             <div class="flex items-center gap-2">
               <span class="font-label-caps text-label-caps text-on-surface-variant">COST $3.20</span>
@@ -1078,9 +1486,10 @@
         </div>
         <div class="flex-1 min-w-0">
           <div class="flex items-start justify-between gap-2">
-            <span class="font-body-md text-body-md text-on-surface font-medium truncate">Warm Koji Cashews</span>
-            <span class="font-label-caps text-label-caps text-tertiary whitespace-nowrap flex-shrink-0">89% SYN</span>
+            <span class="font-body-md text-body-md text-on-surface font-medium truncate">Koji-Roasted Cashews</span>
+            <span class="font-label-caps text-label-caps text-tertiary whitespace-nowrap flex-shrink-0">BAR SNACK</span>
           </div>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Served warm with brown butter and flaky sea salt.</p>
           <div class="mt-1 tracking-[0.04em]">
             <div class="flex items-center gap-2">
               <span class="font-label-caps text-label-caps text-on-surface-variant">COST $1.10</span>
@@ -1098,9 +1507,10 @@
         </div>
         <div class="flex-1 min-w-0">
           <div class="flex items-start justify-between gap-2">
-            <span class="font-body-md text-body-md text-on-surface font-medium truncate">Skin-Contact Carignan &#8226; 6oz</span>
-            <span class="font-label-caps text-label-caps text-tertiary whitespace-nowrap flex-shrink-0">91% SYN</span>
+            <span class="font-body-md text-body-md text-on-surface font-medium truncate">Skin-Contact Carignan &#8226; 6 oz</span>
+            <span class="font-label-caps text-label-caps text-tertiary whitespace-nowrap flex-shrink-0">BY THE GLASS</span>
           </div>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">A chilled, light-bodied red with tart cherry and a dry finish.</p>
           <div class="mt-1 tracking-[0.04em]">
             <div class="flex items-center gap-2">
               <span class="font-label-caps text-label-caps text-on-surface-variant">COST $4.60</span>
@@ -1117,18 +1527,17 @@
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-1.5 min-w-0">
             <span class="material-symbols-outlined text-primary text-lg flex-shrink-0">auto_awesome</span>
-            <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider truncate">Tonight&#8217;s Hero Pairing</span>
+            <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider truncate">Tonight&#8217;s Pairing</span>
           </div>
-          <span class="font-label-caps text-label-caps bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0">96% Synergy</span>
+          <span class="font-label-caps text-label-caps bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0">STAFF PICK</span>
         </div>
         <div class="flex gap-space-sm items-center">
           <img class="w-16 h-16 rounded-lg object-cover flex-shrink-0"
                alt="Refined Japanese highball cocktail with hand-carved ice sphere, smoked olive oil droplets glistening on top surface with yuzu peel garnish in a crystal glass."
                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG8IHnMriqUvoPdvjrGXlKJqnbBmyNBHshWo_7dHMqSGE6K3-hmXsKsUHslzxV-BZoTVjN9iY-c-DgUf4ulH-JnvuOOPyPVCFh71baKR8zSqb1_Hu9oWMwAJ5-jX5yi_Drqm5l0gtEY8D_5h3VuP5DM7qIxpu15AtcxBpbjEEfOPR2NGMDpUoBFOj2zDCbfHeANOxirAZuX_s0Op2WNbNv7zYtWZ4GWJSXvp2dZLsS_WRCp3hkpb0Zlw"/>
           <div class="flex-1 min-w-0">
-            <h4 class="font-title-editorial text-title-editorial text-on-surface font-medium leading-tight">Smoked Olive Oil &amp; Yuzu Hi-Ball</h4>
-            <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Paired with Warm Koji Cashews</p>
-            <span class="font-body-sm text-body-sm text-tertiary">12 patrons waiting on this pour</span>
+            <h4 class="font-title-editorial text-title-editorial text-on-surface font-medium leading-tight">Yuzu Highball &amp; Koji-Roasted Cashews</h4>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">A bright, citrusy drink with a warm, savory snack.</p>
           </div>
         </div>
         <button class="w-full py-2 rounded-lg bg-secondary-container text-secondary-fixed hover:bg-secondary hover:text-on-secondary transition-colors flex items-center justify-center gap-1.5">
@@ -1139,7 +1548,7 @@
     </section>
 
     <!-- Daypart Queue -->
-    <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md space-y-space-sm">
+    <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md space-y-space-sm" data-player-queue>
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-secondary text-lg">playlist_play</span>
@@ -1148,19 +1557,19 @@
         <span class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded-full">16-20 GOLDEN HR</span>
       </div>
 
-      <div class="flex items-center gap-2.5 bg-surface-container-highest rounded-lg px-2.5 py-2 shadow-[0_0_16px_rgba(217,119,54,0.25)]">
-        <span class="material-symbols-outlined text-primary text-xl animate-pulse">graphic_eq</span>
+      <div class="w-full text-left flex items-center gap-2.5 bg-surface-container-highest rounded-lg px-2.5 py-2 shadow-[0_0_16px_rgba(217,119,54,0.25)]" aria-current="true">
+        <span class="material-symbols-outlined text-primary text-xl animate-pulse" data-queue-current-icon>graphic_eq</span>
         <div class="flex-1 min-w-0">
-          <span class="font-body-sm text-body-sm text-primary font-semibold block truncate">Midsummer Amber</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant">ERIKO SHIMIZU TRIO</span>
+          <span class="font-body-sm text-body-sm text-primary font-semibold block truncate">Lofi Study</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant">FASSOUNDS</span>
         </div>
         <div class="text-right flex-shrink-0">
-          <span class="font-label-caps text-label-caps text-secondary block">81 BPM</span>
-          <span class="font-label-caps text-label-caps text-outline-variant">4:36</span>
+          <span class="font-label-caps text-label-caps text-secondary block">CHILL HOP</span>
+          <span class="font-label-caps text-label-caps text-outline-variant">2:27</span>
         </div>
       </div>
 
-      <div class="flex items-center gap-2.5 bg-surface-container/70 rounded-lg px-2.5 py-2">
+      <div class="w-full text-left flex items-center gap-2.5 bg-surface-container/70 rounded-lg px-2.5 py-2" aria-label="Upcoming track">
         <span class="font-label-caps text-label-caps text-on-surface-variant w-5 flex-shrink-0">02</span>
         <div class="flex-1 min-w-0">
           <span class="font-body-sm text-body-sm text-on-surface block truncate">Async (Piano Version)</span>
@@ -1172,7 +1581,7 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-2.5 bg-surface-container/70 rounded-lg px-2.5 py-2">
+      <div class="w-full text-left flex items-center gap-2.5 bg-surface-container/70 rounded-lg px-2.5 py-2" aria-label="Upcoming track">
         <span class="font-label-caps text-label-caps text-on-surface-variant w-5 flex-shrink-0">03</span>
         <div class="flex-1 min-w-0">
           <span class="font-body-sm text-body-sm text-on-surface block truncate">Open Soil</span>
@@ -1184,7 +1593,7 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-2.5 bg-surface-container/70 rounded-lg px-2.5 py-2">
+      <div class="w-full text-left flex items-center gap-2.5 bg-surface-container/70 rounded-lg px-2.5 py-2" aria-label="Upcoming track">
         <span class="font-label-caps text-label-caps text-on-surface-variant w-5 flex-shrink-0">04</span>
         <div class="flex-1 min-w-0">
           <span class="font-body-sm text-body-sm text-on-surface block truncate">Creek</span>
@@ -1196,7 +1605,7 @@
         </div>
       </div>
 
-      <p class="font-body-sm text-body-sm text-on-surface-variant text-center pt-1">+10 more tracks &#8226; 58 min until descent handoff</p>
+      <p class="font-body-sm text-body-sm text-on-surface-variant text-center pt-1">Ambient sample preview &#8226; 58 min until descent handoff</p>
     </section>
 
     <!-- Menu &amp; Audio Action Suite -->
@@ -1219,8 +1628,8 @@
 
   </section>
 
-  <!-- ==================== SCREEN 4 · THE FLOOR (live pulse) ==================== -->
-  <section class="screen w-full px-margin pb-12 space-y-space-md hidden" data-screen="live-pulse" aria-label="The Floor — live service pulse">
+  <!-- ==================== SCREEN 4 · LIVE PULSE ==================== -->
+  <section class="screen w-full px-margin pb-12 space-y-space-md hidden" data-screen="live-pulse" aria-label="Live Pulse">
 
     <!-- Live Hero -->
     <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md relative overflow-hidden">
@@ -1418,296 +1827,22 @@
   <div class="flex justify-around items-center h-20 px-space-xs">
     <a aria-current="page" class="flex flex-col items-center justify-center w-16 h-14 rounded-xl transition-all gap-1 text-primary bg-surface-container/80" data-path="playbook" href="#">
       <span class="material-symbols-outlined text-2xl">calendar_month</span>
-      <span class="font-label-caps text-label-caps tracking-wider">THE PLAN</span>
+      <span class="font-label-caps text-label-caps tracking-wider">HOME</span>
     </a>
     <a class="flex flex-col items-center justify-center w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all gap-1" data-path="taste-heat" href="#">
       <span class="material-symbols-outlined text-2xl">radar</span>
-      <span class="font-label-caps text-label-caps tracking-wider">THE BLOCK</span>
+      <span class="font-label-caps text-label-caps tracking-wider">DISCOVER</span>
     </a>
     <a class="flex flex-col items-center justify-center w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all gap-1" data-path="menu-sound" href="#">
       <span class="material-symbols-outlined text-2xl">nightlife</span>
-      <span class="font-label-caps text-label-caps tracking-wider">THE VIBE</span>
+      <span class="font-label-caps text-label-caps tracking-wider">MENU</span>
     </a>
     <a class="flex flex-col items-center justify-center w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all gap-1" data-path="live-pulse" href="#">
       <span class="material-symbols-outlined text-2xl">vital_signs</span>
-      <span class="font-label-caps text-label-caps tracking-wider">THE FLOOR</span>
+      <span class="font-label-caps text-label-caps tracking-wider">LIVE</span>
     </a>
   </div>
 </nav>
-
-<!-- ==================== QLOO CONNECT SHEET ==================== -->
-<div id="qlooSheet" class="hidden fixed inset-0 z-[70]" role="dialog" aria-modal="true" aria-label="Connect Qloo Taste AI">
-  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" data-qloo-dismiss></div>
-  <div id="qlooSheetPanel"
-       class="absolute inset-x-0 bottom-0 rounded-t-2xl bg-surface-container-low border-t border-surface-container-high p-space-md pb-10 space-y-space-sm translate-y-full transition-transform duration-300 ease-out shadow-[0_-16px_48px_rgba(0,0,0,0.65)] max-h-[90vh] overflow-y-auto">
-
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <span class="material-symbols-outlined text-primary text-lg">hub</span>
-        <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Taste Intelligence Feed</span>
-      </div>
-      <button type="button" data-qloo-dismiss aria-label="Close"
-              class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors">
-        <span class="material-symbols-outlined text-lg">close</span>
-      </button>
-    </div>
-    <p class="font-body-sm text-body-sm text-on-surface-variant">
-      Wire the dashboard to Qloo's Taste AI&trade; (hackathon base URL). Your key is stored
-      only in this browser &mdash; never committed, never sent anywhere but Qloo.
-    </p>
-
-    <div class="space-y-1">
-      <label for="qlooKeyInput" class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">API Key</label>
-      <div class="relative">
-        <input id="qlooKeyInput" type="password" autocomplete="off" spellcheck="false" placeholder="paste hackathon key"
-               class="w-full bg-surface-container border border-surface-container-high rounded-lg px-space-sm py-2.5 pr-11 font-mono text-body-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:border-primary/60" />
-        <button type="button" id="qlooKeyToggle" aria-label="Show key"
-                class="absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors">
-          <span class="material-symbols-outlined text-lg">visibility</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-space-xs">
-      <div class="space-y-1">
-        <label for="qlooLatInput" class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Venue Lat</label>
-        <input id="qlooLatInput" type="text" inputmode="decimal" placeholder="40.7226"
-               class="w-full bg-surface-container border border-surface-container-high rounded-lg px-space-sm py-2.5 font-mono text-body-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:border-primary/60" />
-      </div>
-      <div class="space-y-1">
-        <label for="qlooLngInput" class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Venue Lng</label>
-        <input id="qlooLngInput" type="text" inputmode="decimal" placeholder="-73.9519"
-               class="w-full bg-surface-container border border-surface-container-high rounded-lg px-space-sm py-2.5 font-mono text-body-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:border-primary/60" />
-      </div>
-    </div>
-
-    <div class="space-y-1">
-      <label for="qlooProxyInput" class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Firebase Backend Base <span class="text-outline-variant normal-case">&middot; optional</span></label>
-      <input id="qlooProxyInput" type="url" autocomplete="off" spellcheck="false" placeholder="auto on *.web.app — or paste a functions URL for dev"
-             class="w-full bg-surface-container border border-surface-container-high rounded-lg px-space-sm py-2.5 font-mono text-body-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:border-primary/60" />
-    </div>
-
-    <p id="qlooSheetStatus" class="font-label-caps text-label-caps text-outline-variant tracking-wider">&nbsp;</p>
-
-    <div class="flex items-center gap-space-xs pt-1">
-      <button type="button" id="qlooSaveBtn"
-              class="flex-1 py-3 rounded-xl bg-primary text-on-primary font-label-caps text-label-caps uppercase tracking-wider font-bold shadow-lg hover:brightness-110 transition-all flex items-center justify-center gap-2">
-        <span class="material-symbols-outlined text-lg">bolt</span> Go Live
-      </button>
-      <button type="button" id="qlooCopyCtxBtn"
-              class="py-3 px-4 rounded-xl bg-surface-container-high text-secondary font-label-caps text-label-caps tracking-wider hover:bg-surface-bright transition-colors flex items-center gap-1.5">
-        <span class="material-symbols-outlined text-base">content_copy</span> Copy LLM Context
-      </button>
-    </div>
-
-    <!-- AI Playbook: LLM grounded on Qloo taste data, served by Firebase functions -->
-    <div class="space-y-1.5 pt-1">
-      <div class="flex items-center justify-between gap-2">
-        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">AI Playbook &middot; LLM Grounded</span>
-        <button type="button" id="qlooGenBtn"
-                class="font-label-caps text-label-caps tracking-wider text-secondary bg-surface-container-high hover:bg-surface-bright px-3 py-1.5 rounded-full transition-colors flex items-center gap-1">
-          <span class="material-symbols-outlined text-[14px]">auto_awesome</span> GENERATE
-        </button>
-      </div>
-      <div id="qlooGenOut" class="hidden rounded-lg bg-surface-container border border-surface-container-high px-space-sm py-2 font-body-sm text-body-sm text-on-surface whitespace-pre-wrap leading-relaxed"></div>
-    </div>
-    <button type="button" id="qlooDisconnectBtn"
-            class="w-full py-2 rounded-lg text-error/90 hover:bg-error-container/30 transition-colors font-label-caps text-label-caps tracking-wider">
-      DISCONNECT &middot; BACK TO DEMO FEED
-    </button>
-  </div>
-</div>
-
-<!-- ==================== PILOT METRICS DRAWER ==================== -->
-<div id="metricsDrawer" class="hidden fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label="30-Day Automated Taste Pilot metrics">
-  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" data-metrics-dismiss></div>
-  <div id="metricsDrawerPanel"
-       class="absolute inset-x-0 bottom-0 rounded-t-2xl bg-surface-container-low border-t border-surface-container-high p-space-md pb-10 space-y-space-sm translate-y-full transition-transform duration-300 ease-out shadow-[0_-16px_48px_rgba(0,0,0,0.65)] max-h-[90vh] overflow-y-auto">
-
-    <!-- Grab handle -->
-    <div class="mx-auto w-10 h-1 rounded-full bg-outline-variant/70" aria-hidden="true"></div>
-
-    <!-- Header -->
-    <div class="flex items-center justify-between pt-1">
-      <div class="flex items-center gap-2">
-        <span class="material-symbols-outlined text-primary text-lg">monitoring</span>
-        <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Pilot Metrics &middot; Day 12 of 30</span>
-      </div>
-      <button type="button" data-metrics-dismiss aria-label="Close metrics"
-              class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors">
-        <span class="material-symbols-outlined text-lg">close</span>
-      </button>
-    </div>
-
-    <!-- Completion strip -->
-    <div class="rounded-lg bg-surface-container p-space-sm">
-      <div class="flex items-center justify-between pb-1.5">
-        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">PILOT PROGRESS</span>
-        <span class="font-mono text-body-sm text-secondary font-semibold">12/30 &middot; 40%</span>
-      </div>
-      <div class="w-full bg-surface-container-lowest/70 h-1 rounded-full overflow-hidden">
-        <div class="bg-secondary h-full rounded-full w-[40%]"></div>
-      </div>
-      <p class="font-body-sm text-body-sm text-on-surface-variant pt-2">On pace for <span class="text-tertiary font-semibold">+18.4% gross margin</span> at week&rsquo;s end &mdash; ahead of the +14% pace target.</p>
-    </div>
-
-    <!-- Metric quad -->
-    <div class="grid grid-cols-2 gap-space-xs">
-      <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
-        <span class="font-label-caps text-label-caps text-on-surface-variant">GROSS MARGIN</span>
-        <div class="flex items-baseline gap-1 mt-1">
-          <span class="font-metric-stat text-metric-stat text-tertiary">+18.4</span>
-          <span class="font-label-caps text-label-caps text-outline">%</span>
-        </div>
-        <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">vs +2.1% baseline &middot; wk 1</span>
-      </div>
-      <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
-        <span class="font-label-caps text-label-caps text-on-surface-variant">WEEKLY GAIN</span>
-        <div class="flex items-baseline gap-1 mt-1">
-          <span class="font-metric-stat text-metric-stat text-primary">+$1,420</span>
-        </div>
-        <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">vs +$640 &middot; wk 1</span>
-      </div>
-      <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
-        <span class="font-label-caps text-label-caps text-on-surface-variant">PEAK COVERS</span>
-        <div class="flex items-baseline gap-1 mt-1">
-          <span class="font-metric-stat text-metric-stat text-on-surface">+44</span>
-        </div>
-        <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">Golden Hr &middot; 19:45</span>
-      </div>
-      <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
-        <span class="font-label-caps text-label-caps text-on-surface-variant">COST PER DOOR</span>
-        <div class="flex items-baseline gap-1 mt-1">
-          <span class="font-metric-stat text-metric-stat text-on-surface">$189</span>
-          <span class="font-label-caps text-label-caps text-outline">/MO</span>
-        </div>
-        <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">seamless renewal</span>
-      </div>
-    </div>
-
-    <!-- Weekly gain trajectory -->
-    <div class="rounded-lg bg-surface-container p-space-sm">
-      <div class="flex items-center justify-between pb-2">
-        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">GAIN TRAJECTORY</span>
-        <span class="font-label-caps text-label-caps text-outline-variant">$/WK</span>
-      </div>
-      <div class="flex items-end justify-between gap-space-sm h-24" aria-hidden="true">
-        <div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
-          <span class="font-mono text-[11px] text-on-surface-variant">$640</span>
-          <div class="w-full rounded-t-md bg-outline-variant/50" style="height:45%"></div>
-        </div>
-        <div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
-          <span class="font-mono text-[11px] text-on-surface-variant">$980</span>
-          <div class="w-full rounded-t-md bg-outline-variant/70" style="height:69%"></div>
-        </div>
-        <div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
-          <span class="font-mono text-[11px] text-primary font-semibold">$1,420</span>
-          <div class="w-full rounded-t-md bg-primary shadow-[0_0_12px_rgba(217,119,54,0.35)]" style="height:100%"></div>
-        </div>
-      </div>
-      <div class="flex items-center justify-between gap-space-sm pt-1.5">
-        <span class="flex-1 text-center font-label-caps text-label-caps text-on-surface-variant">WK 1</span>
-        <span class="flex-1 text-center font-label-caps text-label-caps text-on-surface-variant">WK 2</span>
-        <span class="flex-1 text-center font-label-caps text-label-caps text-primary font-semibold">WK 3 &middot; LIVE</span>
-      </div>
-    </div>
-
-    <!-- Daypart contribution -->
-    <div class="rounded-lg bg-surface-container p-space-sm space-y-2">
-      <div class="flex items-center justify-between">
-        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">CONTRIBUTION BY DAYPART</span>
-        <span class="font-label-caps text-label-caps text-secondary">$1,420/WK TOTAL</span>
-      </div>
-      <div class="space-y-1.5">
-        <div>
-          <div class="flex items-center justify-between pb-0.5">
-            <span class="font-body-sm text-body-sm text-on-surface">Roasters &middot; 07&ndash;11</span>
-            <span class="font-mono text-body-sm text-on-surface-variant">+$210</span>
-          </div>
-          <div class="w-full bg-surface-container-lowest/70 h-1 rounded-full overflow-hidden"><div class="bg-secondary/70 h-full rounded-full" style="width:37.5%"></div></div>
-        </div>
-        <div>
-          <div class="flex items-center justify-between pb-0.5">
-            <span class="font-body-sm text-body-sm text-on-surface">Linger &middot; 11&ndash;16</span>
-            <span class="font-mono text-body-sm text-on-surface-variant">+$310</span>
-          </div>
-          <div class="w-full bg-surface-container-lowest/70 h-1 rounded-full overflow-hidden"><div class="bg-secondary/70 h-full rounded-full" style="width:55%"></div></div>
-        </div>
-        <div>
-          <div class="flex items-center justify-between pb-0.5">
-            <span class="font-body-sm text-body-sm text-on-surface font-semibold">Golden Hr &middot; 16&ndash;20</span>
-            <span class="font-mono text-body-sm text-primary font-semibold">+$560</span>
-          </div>
-          <div class="w-full bg-surface-container-lowest/70 h-1 rounded-full overflow-hidden"><div class="bg-primary h-full rounded-full" style="width:100%"></div></div>
-        </div>
-        <div>
-          <div class="flex items-center justify-between pb-0.5">
-            <span class="font-body-sm text-body-sm text-on-surface">Descent &middot; 20&ndash;02</span>
-            <span class="font-mono text-body-sm text-on-surface-variant">+$340</span>
-          </div>
-          <div class="w-full bg-surface-container-lowest/70 h-1 rounded-full overflow-hidden"><div class="bg-secondary/70 h-full rounded-full" style="width:61%"></div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Renewal footer -->
-    <div class="flex items-center justify-between gap-space-sm pt-1">
-      <p class="font-body-sm text-body-sm text-on-surface-variant pr-1">Auto-renews <span class="text-on-surface font-medium">Oct 28</span> at $189/mo per door.</p>
-      <button type="button" id="pilotRenewBtn"
-              class="flex-1 max-w-[210px] py-2.5 rounded-xl bg-primary text-on-primary font-label-caps text-label-caps uppercase tracking-wider font-bold shadow-lg hover:brightness-110 transition-all flex items-center justify-center gap-1.5">
-        <span class="material-symbols-outlined text-base">lock_open</span> Renew Early &middot; Lock $189
-      </button>
-    </div>
-  </div>
-</div>
-
-<script>
-  /* ---------------- Profile menu: session identity + sign out ---------------- */
-  (function initProfileMenu() {
-    var trigger = document.getElementById('profileTrigger');
-    var menu = document.getElementById('profileMenu');
-    if (!trigger || !menu) return;
-
-    /* Reflect the local session identity in the menu. */
-    try {
-      var raw = localStorage.getItem('roomtone.session') || sessionStorage.getItem('roomtone.session');
-      if (raw) {
-        var session = JSON.parse(raw);
-        if (session && session.name) document.getElementById('profileName').textContent = session.name;
-        if (session && session.email) document.getElementById('profileEmail').textContent = session.email;
-        if (session && session.venue) document.getElementById('profileVenue').textContent = session.venue;
-      }
-    } catch (e) {}
-
-    function closeMenu() {
-      menu.classList.add('hidden');
-      trigger.setAttribute('aria-expanded', 'false');
-    }
-
-    trigger.addEventListener('click', function (event) {
-      event.stopPropagation();
-      var willOpen = menu.classList.contains('hidden');
-      menu.classList.toggle('hidden');
-      trigger.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-    });
-
-    document.addEventListener('click', function (event) {
-      if (!menu.classList.contains('hidden') && !menu.contains(event.target) && event.target !== trigger) closeMenu();
-    });
-
-    document.addEventListener('keydown', function (event) {
-      if (event.key === 'Escape') closeMenu();
-    });
-
-    document.getElementById('signOutBtn').addEventListener('click', function () {
-      try {
-        localStorage.removeItem('roomtone.session');
-        sessionStorage.removeItem('roomtone.session');
-      } catch (e) {}
-      location.replace('auth.html#sign-in');
-    });
-  })();
-</script>
 
 <script>
   (function initPlaybook() {
@@ -1728,7 +1863,7 @@
 <script>
   /* ---------------- Tab router: bottom navbar <-> screens ---------------- */
   (function initRouter() {
-    const links = Array.prototype.slice.call(document.querySelectorAll('nav a[data-path]'));
+    const links = Array.prototype.slice.call(document.querySelectorAll('nav a[data-path], #app-drawer a[data-path]'));
     const screens = Array.prototype.slice.call(document.querySelectorAll('main [data-screen]'));
     if (!links.length || !screens.length) return;
 
@@ -1789,571 +1924,724 @@
     });
   })();
 
-  /* ---------------- Deterministic waveform bars ---------------- */
-  (function initWaveforms() {
+  /* ---------------- Menu audio player ---------------- */
+  (function initAudioPlayer() {
+    const player = document.querySelector('[data-audio-player]');
+    if (!player) return;
+
+    const audio = player.querySelector('[data-audio-element]');
+    const toggle = player.querySelector('[data-player-toggle]');
+    const toggleIcon = player.querySelector('[data-player-toggle-icon]');
+    const seek = player.querySelector('[data-player-seek]');
+    const currentTime = player.querySelector('[data-player-current]');
+    const durationTime = player.querySelector('[data-player-duration]');
+    const waveform = player.querySelector('[data-player-waveform]');
     const heights = [22, 48, 35, 64, 90, 52, 38, 72, 96, 60, 44, 28, 55, 84, 70, 40, 62, 88, 50, 34, 58, 76, 94, 46, 30, 66, 82, 54, 38, 70, 92, 48, 32, 60, 80, 42, 56, 74, 36, 26];
-    const played = 15;
-    document.querySelectorAll('[data-waveform]').forEach(el => {
-      el.innerHTML = heights.map((height, index) =>
-        '<span class="flex-1 rounded-sm ' + (index < played ? 'bg-primary' : 'bg-surface-container-highest') + '" style="height:' + height + '%"></span>'
-      ).join('');
-    });
-  })();
-</script>
+    waveform.innerHTML = heights.map(height => '<span class="flex-1 rounded-sm bg-surface-container-highest" style="height:' + height + '%"></span>').join('');
+    const bars = Array.from(waveform.querySelectorAll('span'));
+    const source = 'audio/lofi-study.mp3';
+    let seeking = false;
+    let playbackIntent = false;
+    let announcementActive = false;
+    const guardrailState = { duck: true, night: true, veto: false };
+    const GUARDRAIL_STORAGE_KEY = 'attune-audio-guardrails';
+    const guardrailSection = document.querySelector('[data-guardrails]');
+    const status = guardrailSection && guardrailSection.querySelector('[data-guardrail-status]');
+    const level = guardrailSection && guardrailSection.querySelector('[data-guardrail-level]');
+    const meter = guardrailSection && guardrailSection.querySelector('[data-guardrail-meter]');
+    const meterFill = guardrailSection && guardrailSection.querySelector('[data-guardrail-meter-fill]');
 
-<script>
-  /* ================================================================
-     QLOO TASTE AI INTEGRATION
-     ----------------------------------------------------------------
-     Pipeline:  venue geo -> /v2/insights (places, artists) + /v2/audiences
-                -> normalized taste metrics -> DOM render
-                -> grounding context JSON for LLM playbook generation.
+    try {
+      const saved = JSON.parse(localStorage.getItem(GUARDRAIL_STORAGE_KEY) || 'null');
+      if (saved && typeof saved === 'object') Object.keys(guardrailState).forEach(key => {
+        if (typeof saved[key] === 'boolean') guardrailState[key] = saved[key];
+      });
+    } catch (error) { /* keep in-memory defaults when storage is unavailable */ }
 
-     Compliance (Qloo LLM Hackathon rules):
-       - Base URL defaults to https://hackathon.api.qloo.com
-       - Key sent in the X-Api-Key header only
-       - filter.type always present on /v2/insights calls
-       - Key + fetched data stay client-side (localStorage/sessionStorage),
-         never hardcoded into this public repo.
-     The dashboard degrades gracefully: no key / failed fetch -> demo feed.
-     ================================================================ */
-  (function initQlooFeed() {
-    var LS_KEY = 'roomtone.qloo.key';
-    var LS_VENUE = 'roomtone.qloo.venue';
-    var LS_PROXY = 'roomtone.qloo.proxy';
-    var DEFAULT_BASE = 'https://hackathon.api.qloo.com';
-    var DEFAULT_VENUE = { lat: 40.7226, lng: -73.9519 }; /* 142 Franklin St, Greenpoint */
-    var FT_TO_M = 0.3048;
-    var CACHE_TTL = 15 * 60 * 1000; /* 15 min, private client-side cache only */
+    audio.src = source;
+    audio.loop = true;
 
-    /* ---- demo DOM captured once, so Disconnect can restore it ---- */
-    var demo = {};
-    ['qlooTribeList', 'qlooSignalList'].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) demo[id] = el.innerHTML;
-    });
-    var demoHeroes = [];
-    document.querySelectorAll('[data-qloo-tribe-hero]').forEach(function (el) {
-      demoHeroes.push({ el: el, text: el.textContent });
-    });
-
-    var state = { radiusFt: 800, lastOk: false, lastData: null };
-
-    /* ---------------- config accessors ----------------
-       backendBase(): the Firebase backend when hosted (web.app / firebaseapp.com
-       rewrites /api/** to the `api` function) or when the operator pastes a
-       custom base. When present, Qloo keys live server-side and the browser
-       needs no key at all. Empty string = direct-to-Qloo mode. */
-    function backendBase() {
-      var p = (localStorage.getItem(LS_PROXY) || '').trim().replace(/\/+$/, '');
-      if (p) return p;
-      var h = location.hostname;
-      if (h.indexOf('web.app') > -1 || h.indexOf('firebaseapp.com') > -1) return '/api';
-      return '';
-    }
-    function getBase() {
-      var b = backendBase();
-      return b ? b + '/qloo' : DEFAULT_BASE;
-    }
-    function getKey() { return (localStorage.getItem(LS_KEY) || '').trim(); }
-    function getVenue() {
-      try {
-        var v = JSON.parse(localStorage.getItem(LS_VENUE) || 'null');
-        if (v && isFinite(v.lat) && isFinite(v.lng)) return v;
-      } catch (e) { /* ignore */ }
-      return DEFAULT_VENUE;
+    function formatTime(seconds) {
+      if (!Number.isFinite(seconds)) return '0:00';
+      const minutes = Math.floor(seconds / 60);
+      const remainder = Math.floor(seconds % 60).toString().padStart(2, '0');
+      return minutes + ':' + remainder;
     }
 
-    /* ---------------- transport ----------------
-       Direct mode: key in the X-Api-Key header (hackathon rules).
-       Backend mode: no key in the browser — the function injects it. */
-    function qlooFetch(path, params) {
-      var key = getKey();
-      if (!key && !backendBase()) return Promise.reject(new Error('NO_KEY'));
-      var url = getBase() + path + '?' + new URLSearchParams(params || {}).toString();
-      var cached = null;
-      try { cached = JSON.parse(sessionStorage.getItem('qloo:' + url) || 'null'); } catch (e) { /* ignore */ }
-      if (cached && Date.now() - cached.t < CACHE_TTL) return Promise.resolve(cached.data);
-      var headers = { 'accept': 'application/json' };
-      if (key) headers['X-Api-Key'] = key;
-      return fetch(url, { headers: headers })
-        .then(function (res) {
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          return res.json();
-        })
-        .then(function (data) {
-          try { sessionStorage.setItem('qloo:' + url, JSON.stringify({ t: Date.now(), data: data })); } catch (e) { /* quota */ }
-          return data;
-        });
+    let shownSecond = -1;
+    function effectiveVolume() {
+      const hour = new Date().getHours();
+      const inNightDescent = hour >= 23 || hour < 6;
+      const nightLimited = guardrailState.night && inNightDescent;
+      return announcementActive && guardrailState.duck ? Math.min(nightLimited ? 0.5 : 1, 0.5) : (nightLimited ? 0.5 : 1);
     }
 
-    /* ---------------- response shape normalizer ---------------- */
-    function entitiesOf(res) {
-      if (!res || !res.results) return [];
-      var r = res.results;
-      if (Array.isArray(r.entities)) return r.entities;
-      if (r.entities && Array.isArray(r.entities.entities)) return r.entities.entities;
-      if (Array.isArray(r.audiences)) return r.audiences;
-      return [];
-    }
-    function affinityOf(e) {
-      var a = e.affinity !== undefined ? e.affinity : (e.score !== undefined ? e.score : 0);
-      return typeof a === 'number' ? a : parseFloat(a) || 0;
-    }
-    function nameOf(e) { return e.name || (e.attributes && e.attributes.name) || e.title || 'Unknown'; }
-    function pct(affinity) { return Math.round(Math.min(1, Math.max(0, affinity)) * 100); }
-    function esc(s) {
-      return String(s).replace(/[&<>"]/g, function (c) {
-        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    function paintGuardrailState() {
+      audio.volume = effectiveVolume();
+      if (level) level.textContent = Math.round(audio.volume * 100) + '%';
+      if (meter) meter.setAttribute('aria-valuenow', String(Math.round(audio.volume * 100)));
+      if (meterFill) meterFill.style.width = Math.round(audio.volume * 100) + '%';
+      guardrailSection && guardrailSection.querySelectorAll('[data-guardrail]').forEach(group => {
+        const key = group.getAttribute('data-guardrail');
+        const button = group.querySelector('button');
+        if (!button || !Object.prototype.hasOwnProperty.call(guardrailState, key)) return;
+        const on = guardrailState[key];
+        button.setAttribute('data-on', String(on));
+        button.setAttribute('aria-pressed', String(on));
+        button.classList.toggle('bg-tertiary/10', on);
+        button.classList.toggle('text-tertiary', on);
+        button.classList.toggle('bg-surface-container-highest', !on);
+        button.classList.toggle('text-on-surface-variant', !on);
+        const state = button.querySelector('[data-state]');
+        if (state) state.textContent = on ? 'ON' : 'OFF';
       });
     }
 
-    /* ---------------- DOM writers ---------------- */
-    function setMetric(name, value) {
-      document.querySelectorAll('[data-qloo="' + name + '"]').forEach(function (el) {
-        el.textContent = value;
-      });
-    }
-    function setSweepPill(text, live) {
-      var el = document.getElementById('qlooSweepPill');
-      if (el) el.textContent = text;
-      var dot = document.getElementById('qlooMenuDot');
-      if (dot) {
-        dot.textContent = live ? 'LIVE' : 'DEMO';
-        dot.className = 'ml-auto font-label-caps text-label-caps ' + (live ? 'text-tertiary' : 'text-outline-variant');
-      }
-    }
-    function setPatronCount(text) {
-      var el = document.getElementById('qlooPatronCount');
-      if (el) el.textContent = text;
-    }
-
-    /* ---------------- loaders ----------------
-       1) Block radar  -> /v2/insights?filter.type=urn:entity:place + geo radius
-       2) Micro-tribes -> /v2/audiences (fallback: place-tag clustering)
-       3) Signals      -> /v2/insights?filter.type=urn:entity:artist (streaming)
-                          + block place tags (palate)                        */
-    function loadRadar() {
-      var venue = getVenue();
-      var radiusM = Math.max(60, Math.round(state.radiusFt * FT_TO_M));
-      return qlooFetch('/v2/insights', {
-        'filter.type': 'urn:entity:place',
-        'filter.location': venue.lat + ',' + venue.lng,
-        'filter.location.radius': String(radiusM),
-        'take': '30'
-      }).then(function (res) {
-        var ents = entitiesOf(res).filter(function (e) { return affinityOf(e) > 0; });
-        if (!ents.length) throw new Error('EMPTY');
-        var top = ents.slice(0, 10);
-        var heat = top.reduce(function (s, e) { return s + affinityOf(e); }, 0) / top.length * 100;
-        var max = ents.reduce(function (m, e) { return Math.max(m, affinityOf(e)); }, 0);
-        var hot = ents.filter(function (e) { return affinityOf(e) >= 0.8; }).length;
-        setMetric('block-heat', heat.toFixed(1));
-        setMetric('taste-synergy', (max * 100).toFixed(1));
-        setMetric('new-matches', String(hot));
-        setMetric('match-rate', (ents.length / 30 * 100).toFixed(1));
-        setPatronCount(ents.length + ' IN POOL');
-        state.lastData = state.lastData || {};
-        state.lastData.places = ents.map(function (e) {
-          return { name: nameOf(e), affinity: affinityOf(e), tags: e.tags || [] };
-        });
-        return ents;
-      });
-    }
-
-    function loadTribes(placeEntities) {
-      return qlooFetch('/v2/audiences', { 'take': '10' }).then(function (res) {
-        var ents = entitiesOf(res);
-        if (!ents.length) throw new Error('EMPTY');
-        return renderTribes(ents.map(function (e, i) {
-          var aff = affinityOf(e) || (0.94 - i * 0.07);
-          return { name: nameOf(e), score: pct(aff) };
-        }).slice(0, 5));
-      }).catch(function () {
-        /* Fallback: cluster the block's place-genre tags into "tribes" */
-        var counts = {};
-        placeEntities.forEach(function (e) {
-          (e.tags || []).forEach(function (t) {
-            var urn = t.id || t.urn || '';
-            if (urn.indexOf('urn:tag:genre:place') !== 0) return;
-            var label = t.name || urn.split(':').pop().replace(/_/g, ' ');
-            if (!label) return;
-            counts[label] = (counts[label] || 0) + 1 + affinityOf(e);
-          });
-        });
-        var ranked = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; }).slice(0, 5);
-        if (!ranked.length) throw new Error('NO_TAGS');
-        var hi = counts[ranked[0]];
-        return renderTribes(ranked.map(function (label, i) {
-          return { name: label, score: Math.max(58, Math.round(counts[label] / hi * 94)) };
-        }));
-      });
-    }
-
-    function renderTribes(rows) {
-      var host = document.getElementById('qlooTribeList');
-      if (!host) return;
-      var tones = ['text-primary', 'text-secondary', 'text-secondary', 'text-tertiary', 'text-tertiary'];
-      var fills = ['bg-primary', 'bg-primary/70', 'bg-secondary', 'bg-secondary/70', 'bg-tertiary/70'];
-      host.innerHTML = rows.map(function (row, i) {
-        return '<div class="flex flex-col gap-1">' +
-          '<div class="flex items-center justify-between gap-2">' +
-            '<div class="flex items-center gap-2 min-w-0">' +
-              '<span class="font-label-caps text-label-caps ' + (i === 0 ? 'text-primary' : 'text-on-surface-variant') + ' w-4 flex-shrink-0">0' + (i + 1) + '</span>' +
-              '<span class="font-body-sm text-body-sm text-on-surface font-medium truncate">' + esc(row.name) + '</span>' +
-            '</div>' +
-            '<span class="font-metric-stat text-[13px] ' + tones[i] + ' flex-shrink-0">' + row.score + '</span>' +
-          '</div>' +
-          '<div class="w-full h-1 rounded-full bg-surface-container-highest overflow-hidden">' +
-            '<div class="h-full rounded-full ' + fills[i] + '" style="width:' + row.score + '%"></div>' +
-          '</div>' +
-        '</div>';
-      }).join('');
-      var first = rows[0];
-      if (first) {
-        document.querySelectorAll('[data-qloo-tribe-hero]').forEach(function (h) { h.textContent = first.name; });
-      }
-    }
-
-    function loadSignals(placeEntities) {
-      var venue = getVenue();
-      var radiusM = Math.max(60, Math.round(state.radiusFt * FT_TO_M));
-      var artists = qlooFetch('/v2/insights', {
-        'filter.type': 'urn:entity:artist',
-        'filter.location': venue.lat + ',' + venue.lng,
-        'filter.location.radius': String(radiusM),
-        'take': '10'
-      }).catch(function () { return null; });
-
-      return artists.then(function (res) {
-        var stream = res ? entitiesOf(res).filter(function (e) { return affinityOf(e) > 0; }).slice(0, 3) : [];
-        var palateTags = {};
-        placeEntities.forEach(function (e) {
-          (e.tags || []).forEach(function (t) {
-            var urn = t.id || t.urn || '';
-            if (urn.indexOf('urn:tag:genre:place:restaurant') !== 0 &&
-                urn.indexOf('urn:tag:genre:place:bar') !== 0 &&
-                urn.indexOf('urn:tag:genre:place:cafe') !== 0) return;
-            var label = t.name || urn.split(':').pop().replace(/_/g, ' ');
-            if (label) palateTags[label] = (palateTags[label] || 0) + 1;
-          });
-        });
-        var palate = Object.keys(palateTags).sort(function (a, b) { return palateTags[b] - palateTags[a]; }).slice(0, 3);
-        if (!stream.length && !palate.length) throw new Error('EMPTY');
-
-        var host = document.getElementById('qlooSignalList');
-        if (!host) return;
-        var bars = ['bg-primary', 'bg-primary/70', 'bg-secondary'];
-        var tones = ['text-primary', 'text-secondary', 'text-secondary'];
-        function row(label, score, i) {
-          return '<div class="flex items-center gap-2">' +
-            '<span class="font-body-sm text-body-sm text-on-surface flex-1 truncate">' + esc(label) + '</span>' +
-            '<div class="w-16 h-1 rounded-full bg-surface-container-highest overflow-hidden flex-shrink-0">' +
-              '<div class="h-full rounded-full ' + bars[i] + '" style="width:' + score + '%"></div>' +
-            '</div>' +
-            '<span class="font-metric-stat text-[12px] ' + tones[i] + ' w-8 text-right flex-shrink-0">' + score + '</span>' +
-          '</div>';
-        }
-        var html = '';
-        if (stream.length) {
-          html += '<div class="space-y-2"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Streaming</span>';
-          html += stream.map(function (e, i) { return row(nameOf(e), pct(affinityOf(e)), i); }).join('');
-          html += '</div>';
-        }
-        if (palate.length) {
-          html += '<div class="space-y-2"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Palate</span>';
-          html += palate.map(function (label, i) { return row(label, [95, 88, 81][i], i); }).join('');
-          html += '</div>';
-        }
-        host.innerHTML = html;
-        state.lastData = state.lastData || {};
-        state.lastData.artists = stream.map(function (e) { return { name: nameOf(e), affinity: affinityOf(e) }; });
-        state.lastData.palate = palate;
-      });
-    }
-
-    /* ---------------- orchestrator ---------------- */
-    var busy = false;
-    function refresh(showStatus) {
-      if (busy) return;
-      if (!getKey() && !backendBase()) { restoreDemo(); return; }
-      busy = true;
-      var status = document.getElementById('qlooSheetStatus');
-      if (showStatus && status) status.textContent = 'SWEEPING THE BLOCK…';
-      loadRadar()
-        .then(function (places) { return loadTribes(places); })
-        .then(function () {
-          /* signal failures must not demote an otherwise live feed */
-          if (state.lastData) {
-            return loadSignals(state.lastData.places || []).catch(function (e) { console.warn('[qloo signals]', e); });
+    if (guardrailSection) {
+      guardrailSection.querySelectorAll('[data-guardrail]').forEach(group => {
+        const key = group.getAttribute('data-guardrail');
+        const button = group.querySelector('button');
+        if (!button || !Object.prototype.hasOwnProperty.call(guardrailState, key)) return;
+        button.addEventListener('click', () => {
+          guardrailState[key] = !guardrailState[key];
+          try { localStorage.setItem(GUARDRAIL_STORAGE_KEY, JSON.stringify(guardrailState)); } catch (error) { /* keep this session's setting */ }
+          if (key === 'veto' && guardrailState.veto && announcementActive) {
+            window.speechSynthesis.cancel();
+            announcementActive = false;
           }
-        })
-        .then(function () {
-          state.lastOk = true;
-          setSweepPill('QLOO LIVE · JUST NOW', true);
-          if (showStatus && status) status.textContent = 'LIVE FEED CONNECTED.';
-        })
-        .catch(function (err) {
-          state.lastOk = false;
-          setSweepPill('DEMO FEED · ' + (err && err.message === 'NO_KEY' ? 'NO KEY' : 'QLOO OFFLINE'), false);
-          if (showStatus && status) status.textContent = 'COULD NOT REACH QLOO — CHECK KEY / PROXY. DEMO FEED KEPT.';
-          console.warn('[qloo]', err);
-        })
-        .finally(function () { busy = false; });
-    }
-
-    function restoreDemo() {
-      Object.keys(demo).forEach(function (id) {
-        var el = document.getElementById(id);
-        if (el) el.innerHTML = demo[id];
-      });
-      setMetric('block-heat', '94.8');
-      setMetric('taste-synergy', '98.2');
-      setMetric('new-matches', '37');
-      setMetric('match-rate', '12.4');
-      setPatronCount('312 PATRONS');
-      setSweepPill('SWEEP 14s AGO', false);
-      demoHeroes.forEach(function (h) { h.el.textContent = h.text; });
-      state.lastData = null;
-      state.lastOk = false;
-    }
-
-    /* ---------------- LLM grounding export (hackathon glue) ---------------- */
-    function groundingContext() {
-      var venue = getVenue();
-      return {
-        app: 'Roomtone OS',
-        venue: { name: 'The Amber Room', address: '142 Franklin St, Greenpoint', lat: venue.lat, lng: venue.lng },
-        block_radius_ft: state.radiusFt,
-        feed: state.lastOk ? 'qloo_live' : 'demo',
-        taste_metrics: {
-          block_heat: document.querySelector('[data-qloo="block-heat"]').textContent,
-          taste_synergy: document.querySelector('[data-qloo="taste-synergy"]').textContent,
-          new_matches: document.querySelector('[data-qloo="new-matches"]').textContent,
-          match_rate: document.querySelector('[data-qloo="match-rate"]').textContent
-        },
-        micro_tribes: (state.lastData ? [] : null), /* filled below from DOM when demo */
-        nearby_place_affinities: (state.lastData && state.lastData.places || []).slice(0, 10),
-        artist_affinities: (state.lastData && state.lastData.artists || []),
-        palate_signals: (state.lastData && state.lastData.palate || []),
-        llm_task_brief: 'You are the playbook writer for this venue. Using ONLY the taste data above, write: (1) a one-line micro-tribe persona, (2) one action per daypart (07-11 Roasters, 11-16 Linger, 16-20 Golden Hr, 20-02 Night), (3) one playlist anchor artist with BPM band, (4) one menu callout. Keep it under 120 words, operator-facing, no fluff.'
-      };
-    }
-
-    /* ---------------- sheet + menu wiring ---------------- */
-    var sheet = document.getElementById('qlooSheet');
-    var panel = document.getElementById('qlooSheetPanel');
-
-    function openSheet() {
-      document.getElementById('qlooKeyInput').value = getKey();
-      var v = getVenue();
-      document.getElementById('qlooLatInput').value = v.lat;
-      document.getElementById('qlooLngInput').value = v.lng;
-      document.getElementById('qlooProxyInput').value = (localStorage.getItem(LS_PROXY) || '');
-      var genOut = document.getElementById('qlooGenOut');
-      if (genOut) { genOut.classList.add('hidden'); genOut.textContent = ''; }
-      var status = document.getElementById('qlooSheetStatus');
-      status.textContent = getKey()
-        ? (state.lastOk ? 'STATUS: LIVE FEED ACTIVE.' : 'STATUS: KEY SAVED — LAST SWEEP FAILED.')
-        : (backendBase() ? 'STATUS: SERVER-SIDE FEED (FIREBASE PROXY).' : 'STATUS: DEMO FEED (NO KEY).');
-      sheet.classList.remove('hidden');
-      requestAnimationFrame(function () { panel.classList.remove('translate-y-full'); });
-    }
-    function closeSheet() {
-      panel.classList.add('translate-y-full');
-      setTimeout(function () { sheet.classList.add('hidden'); }, 300);
-    }
-
-    document.getElementById('qlooConnectBtn').addEventListener('click', function () {
-      var menu = document.getElementById('profileMenu');
-      if (menu) menu.classList.add('hidden');
-      openSheet();
-    });
-    sheet.querySelectorAll('[data-qloo-dismiss]').forEach(function (el) {
-      el.addEventListener('click', closeSheet);
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && !sheet.classList.contains('hidden')) closeSheet();
-    });
-
-    /* ---------------- Pilot metrics drawer ---------------- */
-    (function initMetricsDrawer() {
-      var drawer = document.getElementById('metricsDrawer');
-      var drawerPanel = document.getElementById('metricsDrawerPanel');
-      var openBtn = document.getElementById('pilotMetricsBtn');
-      if (!drawer || !drawerPanel || !openBtn) return;
-
-      function openDrawer() {
-        drawer.classList.remove('hidden');
-        requestAnimationFrame(function () { drawerPanel.classList.remove('translate-y-full'); });
-      }
-      function closeDrawer() {
-        drawerPanel.classList.add('translate-y-full');
-        setTimeout(function () { drawer.classList.add('hidden'); }, 300);
-      }
-
-      openBtn.addEventListener('click', openDrawer);
-      drawer.querySelectorAll('[data-metrics-dismiss]').forEach(function (el) {
-        el.addEventListener('click', closeDrawer);
-      });
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && !drawer.classList.contains('hidden')) closeDrawer();
-      });
-
-      /* Renewal CTA: one-tap inline confirmation (no toast layer in app) */
-      var renewBtn = document.getElementById('pilotRenewBtn');
-      if (renewBtn) {
-        renewBtn.addEventListener('click', function () {
-          if (renewBtn.disabled) return;
-          renewBtn.disabled = true;
-          renewBtn.classList.remove('hover:brightness-110');
-          renewBtn.classList.add('bg-tertiary-container', 'text-on-tertiary-container');
-          renewBtn.innerHTML =
-            '<span class="material-symbols-outlined text-base">check_circle</span> Renewal Queued &middot; Oct 28';
+          if (status) status.textContent = key === 'veto'
+            ? (guardrailState.veto ? 'Spoken announcements are blocked from the menu preview.' : 'Spoken announcements are allowed in the menu preview.')
+            : (key === 'night' && guardrailState.night && (new Date().getHours() >= 23 || new Date().getHours() < 6)
+              ? 'Night descent is active: menu preview output is limited to 50%.'
+              : (key === 'night' ? 'Night descent volume limit updated.' : 'Announcement ducking preference updated.'));
+          paintGuardrailState();
         });
-      }
-    })();
+      });
 
-    document.getElementById('qlooKeyToggle').addEventListener('click', function () {
-      var input = document.getElementById('qlooKeyInput');
-      var show = input.type === 'password';
-      input.type = show ? 'text' : 'password';
-      this.querySelector('.material-symbols-outlined').textContent = show ? 'visibility_off' : 'visibility';
-    });
+      const previewButton = guardrailSection.querySelector('[data-guardrail-preview]');
+      if (previewButton) previewButton.addEventListener('click', () => {
+        if (guardrailState.veto) {
+          if (status) status.textContent = 'Blocked by Spoken-word veto. Turn that option off to preview the announcement.';
+          return;
+        }
+        if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
+          if (status) status.textContent = 'Spoken preview is unavailable in this browser.';
+          return;
+        }
+        if (announcementActive) return;
 
-    document.getElementById('qlooSaveBtn').addEventListener('click', function () {
-      var key = document.getElementById('qlooKeyInput').value.trim();
-      var lat = parseFloat(document.getElementById('qlooLatInput').value);
-      var lng = parseFloat(document.getElementById('qlooLngInput').value);
-      var proxy = document.getElementById('qlooProxyInput').value.trim();
-      var status = document.getElementById('qlooSheetStatus');
-      var effBackend = proxy || backendBase();
-      if (!key && !effBackend) { status.textContent = 'PASTE YOUR HACKATHON API KEY — OR DEPLOY THE FIREBASE PROXY.'; return; }
-      if (!isFinite(lat) || !isFinite(lng)) { status.textContent = 'VENUE LAT/LNG MUST BE DECIMAL COORDINATES.'; return; }
-      localStorage.setItem(LS_KEY, key);
-      localStorage.setItem(LS_VENUE, JSON.stringify({ lat: lat, lng: lng }));
-      if (proxy) { localStorage.setItem(LS_PROXY, proxy); } else { localStorage.removeItem(LS_PROXY); }
-      try { sessionStorage.clear(); } catch (e) { /* ignore */ }
-      refresh(true);
-    });
+        const announcement = new SpeechSynthesisUtterance('Attention, guests. Please enjoy your evening. Thank you for joining us.');
+        announcement.lang = 'en-US';
+        announcement.rate = 0.92;
+        announcementActive = true;
+        paintGuardrailState();
+        if (status) status.textContent = guardrailState.duck
+          ? 'Staff announcement playing; menu music is ducked by 6 dB.'
+          : 'Staff announcement playing; auto-duck is off.';
 
-    document.getElementById('qlooDisconnectBtn').addEventListener('click', function () {
-      [LS_KEY, LS_VENUE, LS_PROXY].forEach(function (k) { localStorage.removeItem(k); });
-      try { sessionStorage.clear(); } catch (e) { /* ignore */ }
-      restoreDemo();
-      var genOut = document.getElementById('qlooGenOut');
-      if (genOut) { genOut.classList.add('hidden'); genOut.textContent = ''; }
-      var status = document.getElementById('qlooSheetStatus');
-      if (status) status.textContent = 'DISCONNECTED — DEMO FEED RESTORED.';
-    });
-
-    /* Shared snapshot used by both the copy button and the AI generator */
-    function buildContext() {
-      var ctx = groundingContext();
-      ctx.micro_tribes = Array.prototype.map.call(
-        document.querySelectorAll('#qlooTribeList .font-body-sm'),
-        function (el) { return el.textContent; }
-      );
-      return ctx;
+        let finished = false;
+        const finishAnnouncement = () => {
+          if (finished) return;
+          finished = true;
+          announcementActive = false;
+          paintGuardrailState();
+          if (status) status.textContent = 'Announcement finished; menu player level restored.';
+        };
+        announcement.onend = finishAnnouncement;
+        announcement.onerror = finishAnnouncement;
+        window.speechSynthesis.speak(announcement);
+        if (guardrailState.duck) {
+          announcementActive = true;
+          paintGuardrailState();
+        }
+        setTimeout(finishAnnouncement, 12000);
+      });
     }
 
-    document.getElementById('qlooCopyCtxBtn').addEventListener('click', function () {
-      var json = JSON.stringify(buildContext(), null, 2);
-      var btn = this;
-      function done() {
-        btn.querySelector('.material-symbols-outlined').textContent = 'check';
-        setTimeout(function () { btn.querySelector('.material-symbols-outlined').textContent = 'content_copy'; }, 1600);
+    document.addEventListener('visibilitychange', () => {
+      if (guardrailState.night) paintGuardrailState();
+    });
+    setInterval(() => {
+      if (guardrailState.night) paintGuardrailState();
+    }, 60000);
+    paintGuardrailState();
+
+    function paintProgress() {
+      const duration = audio.duration;
+      const progress = Number.isFinite(duration) && duration > 0 ? audio.currentTime / duration : 0;
+      if (!seeking) seek.value = String(progress * 100);
+      const elapsedSecond = Math.floor(audio.currentTime);
+      if (elapsedSecond !== shownSecond) {
+        currentTime.textContent = formatTime(audio.currentTime);
+        shownSecond = elapsedSecond;
       }
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(json).then(done).catch(function () { window.prompt('Copy LLM context:', json); });
-      } else {
-        window.prompt('Copy LLM context:', json);
+      if (Number.isFinite(duration)) durationTime.textContent = formatTime(duration);
+      bars.forEach((bar, index) => {
+        const active = (index + 1) / bars.length <= progress;
+        bar.classList.toggle('bg-primary', active);
+        bar.classList.toggle('bg-surface-container-highest', !active);
+      });
+    }
+
+    function paintPlayback() {
+      const playing = !audio.paused && !audio.ended;
+      toggleIcon.textContent = playing ? 'pause' : 'play_arrow';
+      toggle.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+      const queueIcon = player.querySelector('[data-queue-current-icon]');
+      if (queueIcon) queueIcon.textContent = playing ? 'graphic_eq' : 'music_note';
+    }
+
+    async function play() {
+      playbackIntent = true;
+      try {
+        await audio.play();
+        if (!playbackIntent) audio.pause();
+      } catch (error) {
+        playbackIntent = false;
+        paintPlayback();
+        durationTime.textContent = 'Audio unavailable';
+        console.warn('[audio] playback failed:', error && error.message);
       }
+    }
+
+    function pause() {
+      playbackIntent = false;
+      audio.pause();
+    }
+
+    toggle.addEventListener('click', () => {
+      if (audio.paused) play();
+      else pause();
     });
 
-    /* AI Playbook: POST the grounding context to the Firebase function, show the copy */
-    document.getElementById('qlooGenBtn').addEventListener('click', function () {
-      var out = document.getElementById('qlooGenOut');
-      var base = backendBase();
-      out.classList.remove('hidden');
-      if (!base) {
-        out.textContent = 'AI PLAYBOOK NEEDS THE FIREBASE BACKEND. Deploy functions/ (see repo) or paste the backend base URL above.';
+    player.addEventListener('click', event => {
+      if (event.target === player.querySelector('[data-queue-current-icon]')) play();
+    });
+
+    player.querySelector('[data-player-previous]').addEventListener('click', async () => {
+      if (audio.readyState < 1) return;
+      const resume = playbackIntent && !audio.paused;
+      pause();
+      audio.currentTime = Math.max(0, audio.currentTime - 10);
+      paintProgress();
+      if (resume) await play();
+    });
+    player.querySelector('[data-player-next]').addEventListener('click', async () => {
+      if (audio.readyState < 1 || !Number.isFinite(audio.duration)) return;
+      const resume = playbackIntent && !audio.paused;
+      pause();
+      audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+      paintProgress();
+      if (resume) await play();
+    });
+
+    seek.addEventListener('input', () => {
+      seeking = true;
+      if (Number.isFinite(audio.duration)) currentTime.textContent = formatTime(audio.duration * Number(seek.value) / 100);
+    });
+    seek.addEventListener('change', async () => {
+      if (audio.readyState < 1 || !Number.isFinite(audio.duration)) {
+        seeking = false;
+        paintProgress();
         return;
       }
-      var btn = this;
-      var orig = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = '<span class="material-symbols-outlined text-[14px] animate-pulse">hourglass_top</span> WRITING';
-      fetch(base + '/llm/playbook', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(buildContext())
-      })
-        .then(function (r) {
-          return r.json().then(function (j) { return { ok: r.ok, j: j }; });
-        })
-        .then(function (res) {
-          out.textContent = (res.ok && res.j.playbook)
-            ? res.j.playbook
-            : 'AI ERROR: ' + ((res.j && res.j.error) || 'HTTP ' + res.ok + ' ' + JSON.stringify(res.j));
-        })
-        .catch(function (e) {
-          out.textContent = 'NETWORK ERROR — is the backend deployed? (' + e.message + ')';
-        })
-        .finally(function () {
-          btn.disabled = false;
-          btn.innerHTML = orig;
-        });
+      currentTime.textContent = formatTime(audio.duration * Number(seek.value) / 100);
+      shownSecond = Math.floor(audio.duration * Number(seek.value) / 100);
+      const resume = playbackIntent && !audio.paused;
+      pause();
+      audio.currentTime = audio.duration * Number(seek.value) / 100;
+      seeking = false;
+      paintProgress();
+      if (resume) await play();
     });
 
-    /* Radius chips (200/400/800FT) re-sweep the block when live */
-    document.querySelectorAll('[data-radius]').forEach(function (chip) {
-      chip.addEventListener('click', function () {
-        state.radiusFt = parseInt(chip.getAttribute('data-radius'), 10) || 800;
-        if (getKey() || backendBase()) {
-          setSweepPill('SWEEPING…', state.lastOk);
-          refresh(false);
-        }
-      });
+    audio.addEventListener('loadedmetadata', paintProgress);
+    audio.addEventListener('timeupdate', () => {
+      if (guardrailState.night) paintGuardrailState();
     });
-
-    /* Auto-connect on load when a key exists (or a backend proxy is present) */
-    if (getKey() || backendBase()) refresh(false);
+    audio.addEventListener('durationchange', paintProgress);
+    audio.addEventListener('timeupdate', paintProgress);
+    audio.addEventListener('play', paintPlayback);
+    audio.addEventListener('pause', paintPlayback);
+    audio.addEventListener('ended', paintPlayback);
+    audio.addEventListener('error', () => {
+      durationTime.textContent = 'Audio unavailable';
+      paintPlayback();
+    });
+    paintPlayback();
+    paintProgress();
   })();
-</script>
 
-<script type="module">
-  /* ----------------------------------------------------------------
-     FIREBASE (project: qloo-api-1)
-     Lazy, guarded init — analytics only for now; window.RoomtoneFirebase
-     is exposed for the next phases (Auth swap, Firestore caching).
-     Firebase web config is public by design; lock the key down with
-     HTTP-referrer restrictions + App Check in the Firebase console.
-     ---------------------------------------------------------------- */
-  (function () {
-    var firebaseConfig = {
-      apiKey: "AIzaSyA_5jutEQbIfmc8S3BFKZKeLRNw6Y5AsYc",
-      authDomain: "qloo-api-1.firebaseapp.com",
-      projectId: "qloo-api-1",
-      storageBucket: "qloo-api-1.firebasestorage.app",
-      messagingSenderId: "128364649920",
-      appId: "1:128364649920:web:3e131dc7493dc2de89bc25",
-      measurementId: "G-2W56KTZ42L"
-    };
-    var V = 'https://www.gstatic.com/firebasejs/10.14.1/';
-    Promise.all([
-      import(V + 'firebase-app.js'),
-      import(V + 'firebase-analytics.js')
-    ]).then(function (mods) {
-      var app = mods[0].initializeApp(firebaseConfig);
-      return mods[1].isSupported().then(function (ok) {
-        if (ok) mods[1].getAnalytics(app);
-        window.RoomtoneFirebase = app;
-        window.RoomtoneFirebaseConfig = firebaseConfig;
+  /* ---------------- Live radar: beam-synced blips, radius, telemetry ---------------- */
+  (function initRadar() {
+    const svg = document.getElementById('radar-svg');
+    const blipLayer = document.getElementById('radar-blips');
+    if (!svg || !blipLayer) return;
+
+    const PERIOD = 4000;              // matches .radar-beam / .blip-core CSS animation
+    const SCALE = 112 / 800;          // 800FT ring = 112 SVG units, center (150,150)
+    const COMPASS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+
+    const signals = [
+      { id: 'p1',  kind: 'patron', label: 'Analog Minimalist',        tribe: 'Pet-Nat Devotee',        dist: 240, bearing: 37,  affinity: 94, hot: true,  note: 'Sakamoto on repeat \u00B7 two doors down' },
+      { id: 'p2',  kind: 'patron', label: 'Pet-Nat Devotee',          tribe: 'Skin-Contact Circle',    dist: 610, bearing: 118, affinity: 91, hot: true,  note: 'Crossing over from the Loft reception' },
+      { id: 'p3',  kind: 'patron', label: 'K\u014Dji Kitchen Regular', tribe: 'Umami Pairings',         dist: 320, bearing: 205, affinity: 88, hot: true,  note: 'Orders the smoked-oil hi-ball 2:1' },
+      { id: 'p4',  kind: 'patron', label: 'Dark-Wave Night Owl',      tribe: 'Post-Punk Set',          dist: 760, bearing: 262, affinity: 83, hot: false, note: 'After 22:00 only \u00B7 110 BPM zone' },
+      { id: 'p5',  kind: 'patron', label: 'Risograph Designer',       tribe: 'Print Swap Crew',        dist: 450, bearing: 310, affinity: 86, hot: false, note: 'Sunday co-promotion organizer' },
+      { id: 'p6',  kind: 'patron', label: 'Amaro Spritz Lover',       tribe: 'Digestif-First',         dist: 180, bearing: 155, affinity: 92, hot: true,  note: 'Brunch cadence \u00B7 high margin' },
+      { id: 'p7',  kind: 'patron', label: 'ECM Ambient Head',         tribe: 'Vinyl-Only Listeners',   dist: 520, bearing: 72,  affinity: 89, hot: true,  note: 'Era-appropriate pressing collector' },
+      { id: 'p8',  kind: 'patron', label: 'Espresso Cadence Runner',  tribe: 'Pre-Shift Regulars',     dist: 390, bearing: 233, affinity: 81, hot: false, note: '07:00\u201309:00 window \u00B7 amaro spritz' },
+      { id: 'p9',  kind: 'patron', label: 'Pioneer Works Member',     tribe: 'Cultural Programming',   dist: 700, bearing: 12,  affinity: 87, hot: false, note: 'Gallery-night spillover affinity' },
+      { id: 'p10', kind: 'patron', label: 'Kardamom Bun Seeker',      tribe: 'Pastry-Led',             dist: 260, bearing: 300, affinity: 78, hot: false, note: 'Pairs with batch brew \u00B7 low cost' },
+      { id: 'v1',  kind: 'venue',  label: 'Greenpoint Loft',          tribe: 'Gallery \u00B7 event space',  dist: 350, bearing: 48,  affinity: 90, hot: true,  note: 'Dual openings tonight \u00B7 +85 footfall' },
+      { id: 'v2',  kind: 'venue',  label: 'Pioneer Works',            tribe: 'Culture center',         dist: 780, bearing: 15,  affinity: 85, hot: false, note: 'Programming sync \u00B7 radar edge' },
+      { id: 'v3',  kind: 'venue',  label: 'Frankly Natural Wine',     tribe: 'Retail shop',            dist: 420, bearing: 190, affinity: 82, hot: false, note: 'Pet-nat cross-sell partner' }
+    ];
+    const poolByRadius = { 200: 48, 400: 137, 800: 312 };
+
+    const sweepPill = document.getElementById('radar-sweep-age');
+    const scanPill = document.getElementById('radar-scan');
+    const poolEl = document.getElementById('radar-pool');
+    const detail = document.getElementById('radar-detail');
+    const detailIcon = document.getElementById('radar-detail-icon');
+    const detailTitle = document.getElementById('radar-detail-title');
+    const detailSub = document.getElementById('radar-detail-sub');
+    const detailBar = document.getElementById('radar-detail-bar');
+    const detailScore = document.getElementById('radar-detail-score');
+    const detailNote = document.getElementById('radar-detail-note');
+
+    let radius = 800;
+    let selected = null;
+    let scans = 0;
+
+    function bearingLabel(bearing) {
+      return COMPASS[Math.round(((bearing % 360) + 360) % 360 / 45) % 8];
+    }
+
+    function renderBlips() {
+      const visible = signals.filter(s => s.dist <= radius);
+      blipLayer.innerHTML = visible.map(s => {
+        const r = s.dist * SCALE;
+        const a = s.bearing * Math.PI / 180;
+        const x = (150 + r * Math.sin(a)).toFixed(1);
+        const y = (150 - r * Math.cos(a)).toFixed(1);
+        const delay = (s.bearing / 360 * PERIOD / 1000).toFixed(2);
+        const size = s.kind === 'venue' ? 4 : 2.4 + (s.affinity - 70) / 30 * 2.2;
+        const tone = s.kind === 'venue' ? 'venue' : (s.hot ? 'patron' : 'patron-warm');
+        const halo = '<circle class="blip-core" cx="' + x + '" cy="' + y + '" r="' + (size * 2.3).toFixed(1) + '" fill="currentColor" opacity="0.16"/>';
+        const core = s.kind === 'venue'
+          ? '<rect class="blip-core" x="' + (x - size).toFixed(1) + '" y="' + (y - size).toFixed(1) + '" width="' + (size * 2).toFixed(1) + '" height="' + (size * 2).toFixed(1) + '" transform="rotate(45 ' + x + ' ' + y + ')" fill="none" stroke="currentColor" stroke-width="1.5"/>'
+          : '<circle class="blip-core" cx="' + x + '" cy="' + y + '" r="' + size.toFixed(1) + '" fill="currentColor"/>';
+        const selRing = '<circle class="sel-ring" cx="' + x + '" cy="' + y + '" r="' + (size + 5).toFixed(1) + '" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="3 3"/>';
+        return '<g class="blip blip-' + tone + (selected === s.id ? ' blip-sel' : '') + '" data-id="' + s.id + '" style="--blip-delay:' + delay + 's" tabindex="0" role="button" aria-label="' + s.label + ', ' + s.dist + ' feet ' + bearingLabel(s.bearing) + ', ' + s.affinity + ' percent match">' + halo + core + selRing + '</g>';
+      }).join('');
+    }
+
+    function paintRings() {
+      svg.querySelectorAll('.radar-ring').forEach(ring => {
+        ring.classList.toggle('radar-ring-active', ring.getAttribute('data-ring') === String(radius));
       });
-    }).catch(function (e) {
-      console.warn('[firebase] init skipped:', e && e.message);
+      svg.querySelectorAll('.radar-label').forEach(label => {
+        label.classList.toggle('radar-label-active', label.getAttribute('data-ring-label') === String(radius));
+      });
+    }
+
+    function setRadius(next) {
+      radius = next;
+      if (poolEl) poolEl.textContent = poolByRadius[radius] + ' PATRONS';
+      svg.setAttribute('aria-label', 'Radar sweep showing patron matches around The Amber Room within ' + radius + ' feet');
+      paintRings();
+      if (selected && !signals.some(s => s.id === selected && s.dist <= radius)) {
+        clearSelection();
+      } else {
+        renderBlips();
+      }
+    }
+
+    function clearSelection() {
+      selected = null;
+      if (detail) detail.classList.add('hidden');
+      renderBlips();
+    }
+
+    function selectSignal(id) {
+      const s = signals.find(sig => sig.id === id);
+      if (!s) return;
+      selected = id;
+      renderBlips();
+      if (detail) {
+        detailIcon.textContent = s.kind === 'venue' ? 'storefront' : 'person';
+        detailTitle.textContent = s.label;
+        detailSub.textContent = s.tribe + ' \u00B7 ' + s.dist + 'FT ' + bearingLabel(s.bearing);
+        detailBar.style.width = s.affinity + '%';
+        detailScore.textContent = s.affinity + '% MATCH';
+        detailNote.textContent = s.note;
+        detail.classList.remove('hidden');
+      }
+    }
+
+    blipLayer.addEventListener('click', event => {
+      const target = event.target.closest('.blip');
+      if (target) selectSignal(target.getAttribute('data-id'));
     });
+    blipLayer.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      const target = event.target.closest('.blip');
+      if (target) {
+        event.preventDefault();
+        selectSignal(target.getAttribute('data-id'));
+      }
+    });
+    const closeBtn = document.getElementById('radar-detail-close');
+    if (closeBtn) closeBtn.addEventListener('click', clearSelection);
+
+    document.querySelectorAll('[data-radius]').forEach(chip => {
+      chip.addEventListener('click', () => setRadius(parseInt(chip.getAttribute('data-radius'), 10)));
+    });
+
+    if (sweepPill && scanPill) {
+      let age = 0;
+      setInterval(() => {
+        age += 1;
+        if (age >= PERIOD / 1000) {
+          age = 0;
+          scans += 1;
+          scanPill.textContent = 'SCAN #' + (4412 + scans);
+        }
+        sweepPill.textContent = age === 0 ? 'SWEEP LIVE' : 'SWEEP ' + age + 'S AGO';
+      }, 1000);
+    }
+
+    setRadius(800);
+  })();
+
+  /* ---------------- App drawer: appbar trigger <-> slide-out menu ---------------- */
+  (function initDrawer() {
+    const root = document.getElementById('app-drawer');
+    const trigger = document.getElementById('drawer-trigger');
+    if (!root || !trigger) return;
+
+    const closeBtn = root.querySelector('[data-drawer-close]');
+    const backdrop = root.querySelector('.drawer-backdrop');
+
+    function setOpen(open) {
+      root.classList.toggle('drawer-open', open);
+      root.setAttribute('aria-hidden', open ? 'false' : 'true');
+      trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      document.body.style.overflow = open ? 'hidden' : '';
+      if (open) {
+        if (closeBtn) closeBtn.focus();
+      } else {
+        trigger.focus();
+      }
+    }
+
+    trigger.addEventListener('click', () => setOpen(!root.classList.contains('drawer-open')));
+    if (closeBtn) closeBtn.addEventListener('click', () => setOpen(false));
+    if (backdrop) backdrop.addEventListener('click', () => setOpen(false));
+    Array.prototype.slice.call(root.querySelectorAll('a[data-path]')).forEach(link => {
+      link.addEventListener('click', () => setOpen(false));
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && root.classList.contains('drawer-open')) setOpen(false);
+    });
+  })();
+
+  /* ---------------- Theme toggle: drawer Light/Dark switch ---------------- */
+  (function initTheme() {
+    const root = document.documentElement;
+    const toggle = document.getElementById('theme-toggle');
+    if (!toggle) return;
+
+    const icon = toggle.querySelector('[data-theme-icon]');
+    const label = toggle.querySelector('[data-theme-label]');
+    const track = toggle.querySelector('[data-theme-track]');
+    const knob = toggle.querySelector('[data-theme-knob]');
+
+    function apply(light, persist) {
+      root.classList.toggle('light', light);
+      if (persist) {
+        try { localStorage.setItem('roomtone-theme', light ? 'light' : 'dark'); } catch (e) { /* ignore */ }
+      }
+      toggle.setAttribute('aria-pressed', light ? 'false' : 'true');
+      if (icon) icon.textContent = light ? 'light_mode' : 'dark_mode';
+      if (label) label.textContent = light ? 'Light Mode' : 'Dark Mode';
+      if (track) {
+        track.classList.toggle('bg-primary', !light);
+        track.classList.toggle('bg-surface-container-highest', light);
+      }
+      if (knob) {
+        knob.classList.toggle('translate-x-4', !light);
+        knob.classList.toggle('bg-on-primary', !light);
+        knob.classList.toggle('bg-on-surface-variant', light);
+      }
+    }
+
+    let stored = 'dark';
+    try { stored = localStorage.getItem('roomtone-theme') || 'dark'; } catch (e) { /* ignore */ }
+    apply(stored === 'light', false);
+    toggle.addEventListener('click', () => apply(!root.classList.contains('light'), true));
+  })();
+
+  /* ---------------- Auth: drawer Sign Out -> operator authentication ---------------- */
+  (function initAuth() {
+    const shell = document.getElementById('auth-shell');
+    const signOutBtn = document.getElementById('drawer-signout');
+    if (!shell || !signOutBtn) return;
+
+    const kicker = document.getElementById('auth-kicker');
+    const headline = document.getElementById('auth-headline');
+    const sub = document.getElementById('auth-sub');
+    const segments = document.getElementById('auth-segments');
+    const form = document.getElementById('auth-form');
+    const submitBtn = document.getElementById('auth-submit');
+    if (!kicker || !headline || !sub || !segments || !form || !submitBtn) return;
+
+    const submitLabel = submitBtn.querySelector('[data-submit-label]');
+    const submitIcon = submitBtn.querySelector('[data-submit-icon]');
+    const inputs = {
+      name: document.getElementById('auth-name'),
+      email: document.getElementById('auth-email'),
+      password: document.getElementById('auth-password'),
+      confirm: document.getElementById('auth-confirm')
+    };
+    const forgotSuccess = document.getElementById('auth-forgot-success');
+    const forgotEmailLine = document.getElementById('auth-forgot-email');
+    const toast = document.getElementById('toast');
+    const toastText = toast ? toast.querySelector('[data-toast-text]') : null;
+    const toastIcon = toast ? toast.querySelector('[data-toast-icon]') : null;
+    const baseBorder = 'border-outline-variant/50';
+    const errorBorder = ['border-error', 'ring-2', 'ring-error/20'];
+
+    const copy = {
+      signin: {
+        kicker: 'OPERATOR ACCESS \u00B7 THE AMBER ROOM',
+        head: 'Set the <em class="italic text-primary">tone</em>.',
+        sub: 'Welcome back, operator. Sync the floor, the sound and the cellar in one shift view.',
+        cta: 'CONTINUE'
+      },
+      register: {
+        kicker: 'NEW OPERATOR \u00B7 VENUE 142-FRANKLIN',
+        head: 'Join the <em class="italic text-primary">room</em>.',
+        sub: 'Create your operator pass to run tonight\u2019s playbook, taste radar and sound architecture.',
+        cta: 'CREATE PASS'
+      },
+      forgot: {
+        kicker: 'ACCOUNT RECOVERY',
+        head: 'Recover <em class="italic text-primary">access</em>.',
+        sub: 'Enter your operator email and we\u2019ll send a secure six-digit reset code.',
+        cta: 'SEND RESET CODE'
+      },
+      'forgot-success': {
+        kicker: 'ACCOUNT RECOVERY',
+        head: 'Recover <em class="italic text-primary">access</em>.',
+        sub: 'Enter your operator email and we\u2019ll send a secure six-digit reset code.',
+        cta: 'SEND RESET CODE'
+      }
+    };
+
+    let mode = 'signin';
+    let busy = false;
+    let toastTimer;
+
+    function showToast(message, icon) {
+      if (!toast) return;
+      toastText.textContent = message;
+      toastIcon.textContent = icon || 'check_circle';
+      toast.classList.remove('opacity-0', 'translate-y-2');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.add('opacity-0', 'translate-y-2'), 2600);
+    }
+
+    function paintSegments() {
+      shell.querySelectorAll('#auth-segments [data-auth-mode]').forEach(btn => {
+        const active = btn.getAttribute('data-auth-mode') === mode;
+        btn.classList.toggle('bg-primary', active);
+        btn.classList.toggle('text-on-primary', active);
+        btn.classList.toggle('text-on-surface-variant', !active);
+      });
+    }
+
+    function clearErrors() {
+      Object.keys(inputs).forEach(key => {
+        const input = inputs[key];
+        if (!input) return;
+        input.classList.remove.apply(input.classList, errorBorder);
+        input.classList.add(baseBorder);
+        input.removeAttribute('aria-invalid');
+        const note = shell.querySelector('[data-error="' + key + '"]');
+        if (note) note.classList.add('hidden');
+      });
+    }
+
+    function setError(key, message) {
+      const input = inputs[key];
+      if (!input) return;
+      input.classList.remove(baseBorder);
+      input.classList.add.apply(input.classList, errorBorder);
+      input.setAttribute('aria-invalid', 'true');
+      const note = shell.querySelector('[data-error="' + key + '"]');
+      if (note) {
+        note.textContent = message;
+        note.classList.remove('hidden');
+      }
+    }
+
+    function setMode(next) {
+      mode = next;
+      const c = copy[next];
+      kicker.textContent = c.kicker;
+      headline.innerHTML = c.head;
+      sub.textContent = c.sub;
+      submitLabel.textContent = c.cta;
+      shell.querySelectorAll('[data-mode-field]').forEach(el => {
+        el.classList.toggle('hidden', el.getAttribute('data-mode-field').split(/\s+/).indexOf(mode) === -1);
+      });
+      segments.classList.toggle('hidden', mode === 'forgot' || mode === 'forgot-success');
+      form.classList.toggle('hidden', mode === 'forgot-success');
+      forgotSuccess.classList.toggle('hidden', mode !== 'forgot-success');
+      clearErrors();
+      paintSegments();
+    }
+
+    function validate() {
+      let ok = true;
+      clearErrors();
+      if (mode === 'register' && inputs.name.value.trim().length < 2) {
+        setError('name', 'Tell us your name.');
+        ok = false;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputs.email.value.trim())) {
+        setError('email', 'That email doesn\u2019t look right.');
+        ok = false;
+      }
+      if (mode !== 'forgot') {
+        const min = mode === 'register' ? 8 : 4;
+        if (inputs.password.value.length < min) {
+          setError('password', mode === 'register' ? 'Use at least 8 characters.' : 'Enter your password.');
+          ok = false;
+        }
+        if (mode === 'register') {
+          if (!inputs.confirm.value) {
+            setError('confirm', 'Re-enter your password.');
+            ok = false;
+          } else if (inputs.confirm.value !== inputs.password.value) {
+            setError('confirm', 'Passwords don\u2019t match.');
+            ok = false;
+          }
+        }
+      }
+      return ok;
+    }
+
+    function showAuth() {
+      shell.classList.add('auth-visible');
+      shell.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      shell.querySelectorAll('.auth-rise').forEach(el => {
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+      });
+      setTimeout(() => { if (mode !== 'forgot-success' && inputs.email) inputs.email.focus(); }, 340);
+    }
+
+    function hideAuth() {
+      shell.classList.remove('auth-visible');
+      shell.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    signOutBtn.addEventListener('click', () => {
+      const backdrop = document.querySelector('#app-drawer .drawer-backdrop');
+      if (backdrop) backdrop.click();
+      setMode('signin');
+      form.reset();
+      showAuth();
+    });
+
+    shell.querySelectorAll('#auth-segments [data-auth-mode]').forEach(btn => {
+      btn.addEventListener('click', () => setMode(btn.getAttribute('data-auth-mode')));
+    });
+
+    document.getElementById('auth-forgot').addEventListener('click', () => setMode('forgot'));
+    document.getElementById('auth-back-signin').addEventListener('click', () => setMode('signin'));
+
+    shell.querySelectorAll('[data-eye]').forEach(btn => {
+      const target = document.getElementById(btn.getAttribute('data-eye'));
+      if (!target) return;
+      btn.addEventListener('click', () => {
+        const masked = target.type === 'password';
+        target.type = masked ? 'text' : 'password';
+        btn.querySelector('.material-symbols-outlined').textContent = masked ? 'visibility_off' : 'visibility';
+        btn.setAttribute('aria-label', masked ? 'Hide password' : 'Show password');
+      });
+    });
+
+    const rememberBtn = document.getElementById('auth-remember');
+    if (rememberBtn) {
+      const rememberTrack = rememberBtn.querySelector('[data-remember-track]');
+      const rememberKnob = rememberBtn.querySelector('[data-remember-knob]');
+      let remember = false;
+      try { remember = localStorage.getItem('roomtone-remember') === 'true'; } catch (e) { /* ignore */ }
+      const paintRemember = () => {
+        rememberBtn.setAttribute('aria-pressed', remember ? 'true' : 'false');
+        rememberTrack.classList.toggle('bg-primary', remember);
+        rememberTrack.classList.toggle('bg-surface-container-highest', !remember);
+        rememberKnob.classList.toggle('translate-x-4', remember);
+        rememberKnob.classList.toggle('bg-on-primary', remember);
+        rememberKnob.classList.toggle('bg-on-surface-variant', !remember);
+      };
+      rememberBtn.addEventListener('click', () => {
+        remember = !remember;
+        try { localStorage.setItem('roomtone-remember', remember ? 'true' : 'false'); } catch (e) { /* ignore */ }
+        paintRemember();
+      });
+      paintRemember();
+    }
+
+    shell.querySelectorAll('[data-alt]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const message = btn.getAttribute('data-alt') === 'badge'
+          ? 'Venue badge SSO pairs from the back-of-house reader.'
+          : 'One-time codes are issued at the door terminal.';
+        showToast(message, 'info');
+      });
+    });
+
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      if (busy || !validate()) return;
+      busy = true;
+      submitBtn.classList.add('opacity-80', 'pointer-events-none');
+      submitBtn.setAttribute('aria-busy', 'true');
+      submitIcon.textContent = 'progress_activity';
+      submitIcon.classList.add('animate-spin');
+      submitLabel.textContent = mode === 'register' ? 'CREATING PASS\u2026'
+        : (mode === 'forgot' ? 'SENDING\u2026' : 'AUTHENTICATING\u2026');
+
+      setTimeout(() => {
+        busy = false;
+        submitBtn.classList.remove('opacity-80', 'pointer-events-none');
+        submitBtn.removeAttribute('aria-busy');
+        submitIcon.textContent = 'arrow_forward';
+        submitIcon.classList.remove('animate-spin');
+        if (mode === 'forgot') {
+          forgotEmailLine.textContent = 'Check ' + inputs.email.value.trim() + ' \u2014 the code expires in 10 minutes.';
+          setMode('forgot-success');
+        } else {
+          const message = mode === 'register'
+            ? 'Operator pass created \u2014 welcome aboard'
+            : 'Signed in \u2014 Amber Room shift synced';
+          hideAuth();
+          form.reset();
+          setMode('signin');
+          showToast(message);
+        }
+      }, 900);
+    });
+
+    setMode('signin');
   })();
 </script>
 

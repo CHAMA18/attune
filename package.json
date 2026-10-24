@@ -1,8 +1,8 @@
 {
-  "name": "roomtone-os",
+  "name": "attune",
   "version": "1.0.0",
   "private": true,
-  "description": "Roomtone OS — static single-file mobile web app (open index.html, no build step)",
+  "description": "Attune — ambience intelligence for hospitality venues. Static single-file mobile web app (open index.html, no build step)",
   "scripts": {
     "dev": "npx --yes serve -l 3000 ."
   }
