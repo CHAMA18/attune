@@ -8,6 +8,12 @@
 <script>
   try {
     if (localStorage.getItem('roomtone-theme') === 'light') document.documentElement.classList.add('light');
+    /* Auth gate — sessions are minted by auth.html (one-tap demo login for judges). */
+    (function () {
+      var session = null;
+      try { session = localStorage.getItem('roomtone.session') || sessionStorage.getItem('roomtone.session'); } catch (e) { /* storage blocked */ }
+      if (!session) location.replace('auth.html');
+    })();
   } catch (e) { /* storage unavailable: stay dark */ }
 </script>
 <title>Attune</title>
@@ -371,19 +377,7 @@
       <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-widest">ATTUNE</span>
     </div>
 
-    <div class="flex-1 flex flex-col items-center justify-center px-space-xs min-w-0">
-      <button class="w-full max-w-[210px] py-1 px-space-sm rounded-full bg-surface-container/70 flex flex-col items-center justify-center hover:bg-surface-container-high transition-colors">
-        <div class="flex items-center gap-1.5 w-full justify-center">
-          <span class="w-1.5 h-1.5 rounded-full bg-secondary animate-radar-dot flex-shrink-0"></span>
-          <span class="font-body-sm text-body-sm text-on-surface font-medium truncate text-center">The Amber Room</span>
-        </div>
-        <div class="flex items-center gap-1 w-full justify-center">
-          <span class="font-label-caps text-label-caps text-on-surface-variant truncate">142 Franklin St, Greenpoint</span>
-          <span class="text-outline-variant text-[9px]">&#8226;</span>
-          <span class="font-label-caps text-label-caps text-secondary-fixed-dim whitespace-nowrap">800ft RADAR</span>
-        </div>
-      </button>
-    </div>
+    <div class="flex-1"></div>
 
     <div class="flex items-center gap-space-xs flex-shrink-0">
       <button class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container-high/60 transition-colors">
@@ -731,13 +725,13 @@
           <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
           <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest">WEEK 42 PLAYBOOK</span>
         </div>
-        <span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded-full">
+        <span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded-full" id="playbook-feed-pill">
           800FT BLOCK RADAR
         </span>
       </div>
       <div class="mt-2 pt-2 flex flex-col gap-1">
         <span class="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">Predominant Block Micro-Tribe</span>
-        <h2 class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Analog Minimalists &amp; Pet-Nat Devotees</h2>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface tracking-tight" data-qloo-tribe-hero>Analog Minimalists &amp; Pet-Nat Devotees</h2>
       </div>
 
       <!-- Telemetry Metric Triad -->
@@ -745,7 +739,7 @@
         <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
           <span class="font-label-caps text-label-caps text-on-surface-variant">BLOCK HEAT</span>
           <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-primary">94.8</span>
+            <span class="font-metric-stat text-metric-stat text-primary" data-qloo="block-heat">94.8</span>
             <span class="font-label-caps text-label-caps text-outline">/100</span>
           </div>
           <span class="font-body-sm text-body-sm text-tertiary flex items-center gap-0.5 mt-0.5">
@@ -755,7 +749,7 @@
         <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
           <span class="font-label-caps text-label-caps text-on-surface-variant">TASTE SYNERGY</span>
           <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-secondary">98.2</span>
+            <span class="font-metric-stat text-metric-stat text-secondary" data-qloo="taste-synergy">98.2</span>
             <span class="font-label-caps text-label-caps text-outline">%</span>
           </div>
           <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">Max Affinity</span>
@@ -847,8 +841,8 @@
         <div class="absolute inset-0 bg-gradient-to-t from-surface-container via-surface-container/60 to-transparent"></div>
         <div class="absolute bottom-3 left-4 right-4 flex items-end justify-between">
           <div>
-            <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest bg-surface-container-lowest/80 px-2 py-0.5 rounded-full">NOW TUNED &#8226; 16:00 - 20:00</span>
-            <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight mt-1">Golden Hour Shift</h3>
+            <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest bg-surface-container-lowest/80 px-2 py-0.5 rounded-full" id="daypart-window">NOW TUNED &#8226; 16:00 - 20:00</span>
+            <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight mt-1" id="daypart-title">Golden Hour Shift</h3>
           </div>
           <div class="text-right flex flex-col items-end">
             <span class="font-label-caps text-label-caps text-on-surface-variant">DECIBEL GOAL</span>
@@ -870,15 +864,15 @@
             </span>
           </div>
           <div class="flex flex-col">
-            <span class="font-body-md text-body-md text-on-surface font-medium">Warm Japanese Kanky&#333; Ongaku &amp; Vinyl Jazz</span>
-            <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Streaming: <span class="italic text-primary-fixed">Eriko Shimizu Trio &#8212; Midsummer Amber</span></span>
+            <span class="font-body-md text-body-md text-on-surface font-medium" id="daypart-audio-title">Warm Japanese Kanky&#333; Ongaku &amp; Vinyl Jazz</span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Streaming: <span class="italic text-primary-fixed" id="daypart-audio-stream">Eriko Shimizu Trio &#8212; Midsummer Amber</span></span>
           </div>
           <!-- Waveform Simulation / Audio Telemetry -->
           <div class="flex items-center justify-between pt-1 gap-2">
             <div class="flex items-center gap-1.5 flex-1 bg-surface-container px-2.5 py-1.5 rounded">
               <span class="material-symbols-outlined text-primary text-sm">speed</span>
               <span class="font-label-caps text-label-caps text-on-surface-variant">TEMPO:</span>
-              <span class="font-metric-stat text-[13px] text-on-surface">81 BPM</span>
+              <span class="font-metric-stat text-[13px] text-on-surface" id="daypart-bpm">81 BPM</span>
             </div>
             <div class="flex items-center gap-1.5 flex-1 bg-surface-container px-2.5 py-1.5 rounded">
               <span class="material-symbols-outlined text-secondary text-sm">multicooker</span>
@@ -895,12 +889,30 @@
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between">
-              <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Hyperlocal Driver</span>
-              <span class="font-label-caps text-label-caps text-primary font-bold">93% OVERLAP</span>
+              <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider" id="daypart-action-label">Daypart Play</span>
+              <span class="font-label-caps text-label-caps text-primary font-bold" id="daypart-overlap">93% OVERLAP</span>
             </div>
-            <p class="font-body-sm text-body-sm text-on-surface mt-1">
+            <p class="font-body-sm text-body-sm text-on-surface font-medium mt-1" id="daypart-action">
+              Queue side-B kanky&#333; ongaku for the 16-20 swell; run the hi-ball feature tray to garden tables from 17:30.
+            </p>
+            <p class="font-body-sm text-body-sm text-on-surface mt-1" id="daypart-driver">
               Active patrons within 800ft heavily index on <span class="text-secondary font-medium">Ryuichi Sakamoto</span> streaming &amp; frequent <span class="text-secondary font-medium">Pioneer Works</span> cultural programming.
             </p>
+            <!-- LLM traceability strip: shows WHICH Qloo entities ground the playbook -->
+            <div class="mt-2 pt-2 border-t border-outline-variant/30 flex items-start justify-between gap-2" id="grounding-strip">
+              <div class="min-w-0">
+                <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block mb-1">Grounded by Qloo</span>
+                <p class="font-body-sm text-body-sm text-on-surface-variant italic leading-snug" id="llm-persona">&#8220;Analog-leaning night owls who treat listening as the main event.&#8221;</p>
+                <div class="flex flex-wrap gap-1 mt-1.5" id="grounding-chips">
+                  <span class="font-label-caps text-label-caps text-secondary bg-secondary-container/40 px-1.5 py-0.5 rounded">Ryuichi Sakamoto &#183; 0.96</span>
+                  <span class="font-label-caps text-label-caps text-secondary bg-secondary-container/40 px-1.5 py-0.5 rounded">Pioneer Works &#183; 0.91</span>
+                </div>
+              </div>
+              <button type="button" id="grounding-export" aria-label="Export grounding JSON" title="Export grounding JSON"
+                      class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-surface-container-high/70 hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-colors">
+                <span class="material-symbols-outlined text-base">data_object</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -922,8 +934,8 @@
                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG8IHnMriqUvoPdvjrGXlKJqnbBmyNBHshWo_7dHMqSGE6K3-hmXsKsUHslzxV-BZoTVjN9iY-c-DgUf4ulH-JnvuOOPyPVCFh71baKR8zSqb1_Hu9oWMwAJ5-jX5yi_Drqm5l0gtEY8D_5h3VuP5DM7qIxpu15AtcxBpbjEEfOPR2NGMDpUoBFOj2zDCbfHeANOxirAZuX_s0Op2WNbNv7zYtWZ4GWJSXvp2dZLsS_WRCp3hkpb0Zlw"/>
             </div>
             <div class="flex-1 min-w-0">
-              <h4 class="font-title-editorial text-title-editorial text-on-surface font-medium truncate">Smoked Olive Oil &amp; Yuzu Hi-Ball</h4>
-              <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">Paired with Warm Koji Cashews</p>
+              <h4 class="font-title-editorial text-title-editorial text-on-surface font-medium truncate" id="daypart-menu">Smoked Olive Oil &amp; Yuzu Hi-Ball</h4>
+              <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate" id="daypart-menu-sub">Paired with Warm Koji Cashews</p>
               <div class="flex items-center gap-2 mt-1">
                 <span class="font-label-caps text-label-caps text-tertiary">Cost: $3.20</span>
                 <span class="font-label-caps text-label-caps text-outline-variant">&#8226;</span>
@@ -1128,7 +1140,7 @@
         <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
           <span class="font-label-caps text-label-caps text-on-surface-variant">BLOCK HEAT</span>
           <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-primary">94.8</span>
+            <span class="font-metric-stat text-metric-stat text-primary" data-qloo="block-heat">94.8</span>
             <span class="font-label-caps text-label-caps text-outline">/100</span>
           </div>
           <span class="font-body-sm text-body-sm text-tertiary flex items-center gap-0.5 mt-0.5">
@@ -1138,14 +1150,14 @@
         <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
           <span class="font-label-caps text-label-caps text-on-surface-variant">NEW MATCHES</span>
           <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-secondary">37</span>
+            <span class="font-metric-stat text-metric-stat text-secondary" data-qloo="new-matches">37</span>
           </div>
           <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">+9 today</span>
         </div>
         <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
           <span class="font-label-caps text-label-caps text-on-surface-variant">MATCH RATE</span>
           <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-on-surface">12.4</span>
+            <span class="font-metric-stat text-metric-stat text-on-surface" data-qloo="match-rate">12.4</span>
             <span class="font-label-caps text-label-caps text-outline">%</span>
           </div>
           <span class="font-body-sm text-body-sm text-primary-container mt-0.5 truncate">of active pool</span>
@@ -1160,9 +1172,9 @@
           <span class="material-symbols-outlined text-secondary text-lg">groups</span>
           <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Micro-Tribe Index</span>
         </div>
-        <span class="font-label-caps text-label-caps text-on-surface-variant">12 SEGMENTS</span>
+        <span class="font-label-caps text-label-caps text-on-surface-variant" id="tribe-segment-count">12 SEGMENTS</span>
       </div>
-      <div class="space-y-3">
+      <div class="space-y-3" id="qlooTribeList">
         <div class="flex flex-col gap-1">
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 min-w-0">
@@ -1235,7 +1247,7 @@
         </div>
         <span class="font-label-caps text-label-caps text-primary">800FT POOL</span>
       </div>
-      <div class="space-y-4">
+      <div class="space-y-4" id="qlooSignalList">
         <div class="space-y-2">
           <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Streaming</span>
           <div class="flex items-center gap-2">
@@ -2308,7 +2320,10 @@
           scans += 1;
           scanPill.textContent = 'SCAN #' + (4412 + scans);
         }
-        sweepPill.textContent = age === 0 ? 'SWEEP LIVE' : 'SWEEP ' + age + 'S AGO';
+        /* Live-feed badge owns the sweep pill once Qloo connects */
+        if (!window.__attuneLiveBadge) {
+          sweepPill.textContent = age === 0 ? 'SWEEP LIVE' : 'SWEEP ' + age + 'S AGO';
+        }
       }, 1000);
     }
 
@@ -2643,6 +2658,460 @@
 
     setMode('signin');
   })();
+</script>
+
+<script>
+/* ================================================================
+   ATTUNE LIVE FEED — Qloo Taste AI + LLM playbook
+   ----------------------------------------------------------------
+   Pipeline:  venue geo -> GET /api/qloo/v2/insights (places, artists)
+              + /v2/audiences (micro-tribes) -> normalized metrics -> DOM
+              -> grounding JSON -> POST /api/llm/playbook -> daypart copy.
+
+   Compliance (Qloo LLM Hackathon rules):
+     - The browser NEVER holds a Qloo key. The Firebase `api` function
+       injects X-Api-Key server-side (defineSecret vault).
+     - Same-origin /api/** (Hosting rewrite). Override for local dev:
+       localStorage.setItem('roomtone.apiBase', 'https://<region>-qloo-api-1.cloudfunctions.net/api')
+     - 15-min client cache (sessionStorage) keeps us gentle on quota.
+     - No network / key unset / any error -> curated DEMO FEED, clearly
+       badged. The app never dead-ends.
+   ================================================================ */
+(function initLiveFeed() {
+  var API_BASE = '/api';
+  try {
+    var override = (localStorage.getItem('roomtone.apiBase') || '').trim().replace(/\/+$/, '');
+    if (override) API_BASE = override;
+  } catch (e) { /* storage blocked */ }
+
+  var VENUE = { name: 'The Amber Room', address: '142 Franklin St, Greenpoint', lat: 40.7226, lng: -73.9519 };
+  var RADIUS_FT = 800, FT_TO_M = 0.3048, CACHE_TTL = 15 * 60 * 1000;
+
+  var state = {
+    live: false,       /* Qloo feed reached */
+    llmLive: false,    /* LLM playbook rendered */
+    provider: null, model: null,
+    places: [], artists: [], palate: [], tribes: [],
+    llm: null          /* parsed playbook */
+  };
+
+  /* ----------------------- tiny helpers ----------------------- */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  function pct(aff) { return Math.round(Math.min(1, Math.max(0, Number(aff) || 0)) * 100); }
+  function affinityOf(e) {
+    var a = e.affinity !== undefined ? e.affinity : (e.score !== undefined ? e.score : 0);
+    return typeof a === 'number' ? a : parseFloat(a) || 0;
+  }
+  function nameOf(e) { return e.name || (e.attributes && e.attributes.name) || e.title || 'Unknown'; }
+  function entitiesOf(res) {
+    if (!res || !res.results) return [];
+    var r = res.results;
+    if (Array.isArray(r.entities)) return r.entities;
+    if (r.entities && Array.isArray(r.entities.entities)) return r.entities.entities;
+    if (Array.isArray(r.audiences)) return r.audiences;
+    return [];
+  }
+
+  /* ----------------------- transport ----------------------- */
+  function qlooFetch(path, params) {
+    var url = API_BASE + '/qloo' + path + '?' + new URLSearchParams(params || {}).toString();
+    var cached = null;
+    try { cached = JSON.parse(sessionStorage.getItem('qloo:' + url) || 'null'); } catch (e) { /* quota */ }
+    if (cached && Date.now() - cached.t < CACHE_TTL) return Promise.resolve(cached.data);
+
+    var ctrl = ('AbortController' in window) ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 8000) : null;
+    return fetch(url, {
+      headers: { 'accept': 'application/json' },
+      signal: ctrl ? ctrl.signal : undefined
+    }).then(function (res) {
+      if (!res.ok) throw new Error('QLOO_HTTP_' + res.status);
+      var ct = res.headers.get('content-type') || '';
+      if (ct.indexOf('json') === -1) throw new Error('QLOO_NOT_JSON');
+      return res.json();
+    }).then(function (data) {
+      if (timer) clearTimeout(timer);
+      try { sessionStorage.setItem('qloo:' + url, JSON.stringify({ t: Date.now(), data: data })); } catch (e) { /* quota */ }
+      return data;
+    }).catch(function (err) {
+      if (timer) clearTimeout(timer);
+      throw err;
+    });
+  }
+
+  /* ----------------------- DOM writers ----------------------- */
+  function setMetric(name, value) {
+    document.querySelectorAll('[data-qloo="' + name + '"]').forEach(function (el) { el.textContent = value; });
+  }
+  function setText(id, text) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+  function setHtml(id, html) {
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+  }
+  function setBadges(feedLive) {
+    window.__attuneLiveBadge = !!feedLive; /* silences the demo sweep-age ticker */
+    var sweep = document.getElementById('radar-sweep-age');
+    if (sweep) {
+      sweep.textContent = feedLive ? 'QLOO LIVE · JUST NOW' : 'DEMO FEED · OFFLINE';
+    }
+    var pill = document.getElementById('playbook-feed-pill');
+    if (pill) {
+      pill.textContent = feedLive ? 'LIVE · GROUNDED BY QLOO' : 'DEMO FEED · 800FT RADAR';
+      pill.classList.toggle('text-tertiary', !!feedLive);
+      pill.classList.toggle('text-on-surface-variant', !feedLive);
+    }
+  }
+  function setChips(rows) {
+    var host = document.getElementById('grounding-chips');
+    if (!host) return;
+    host.innerHTML = rows.slice(0, 3).map(function (r) {
+      return '<span class="font-label-caps text-label-caps text-secondary bg-secondary-container/40 px-1.5 py-0.5 rounded">' +
+        esc(r.name) + ' &#183; ' + r.affinity.toFixed(2) + '</span>';
+    }).join('');
+  }
+
+  /* ----------------------- loaders ----------------------- */
+  function loadRadar() {
+    var radiusM = Math.max(60, Math.round(RADIUS_FT * FT_TO_M));
+    return qlooFetch('/v2/insights', {
+      'filter.type': 'urn:entity:place',
+      'filter.location': VENUE.lat + ',' + VENUE.lng,
+      'filter.location.radius': String(radiusM),
+      'take': '30'
+    }).then(function (res) {
+      var ents = entitiesOf(res).filter(function (e) { return affinityOf(e) > 0; });
+      if (!ents.length) throw new Error('EMPTY');
+      var top = ents.slice(0, 10);
+      var heat = top.reduce(function (s, e) { return s + affinityOf(e); }, 0) / top.length * 100;
+      var max = ents.reduce(function (m, e) { return Math.max(m, affinityOf(e)); }, 0);
+      var hot = ents.filter(function (e) { return affinityOf(e) >= 0.8; }).length;
+      setMetric('block-heat', heat.toFixed(1));
+      setMetric('taste-synergy', (max * 100).toFixed(1));
+      setMetric('new-matches', String(hot));
+      setMetric('match-rate', (ents.length / 30 * 100).toFixed(1));
+      setText('radar-pool', ents.length + ' IN POOL');
+      state.places = ents.map(function (e) {
+        return { name: nameOf(e), affinity: affinityOf(e), tags: e.tags || [] };
+      });
+      return ents;
+    });
+  }
+
+  function renderTribes(rows) {
+    var host = document.getElementById('qlooTribeList');
+    if (host && rows.length) {
+      var tones = ['text-primary', 'text-secondary', 'text-secondary', 'text-tertiary', 'text-tertiary'];
+      var fills = ['bg-primary', 'bg-primary/70', 'bg-secondary', 'bg-secondary/70', 'bg-tertiary/70'];
+      host.innerHTML = rows.map(function (row, i) {
+        return '<div class="flex flex-col gap-1">' +
+          '<div class="flex items-center justify-between gap-2">' +
+            '<div class="flex items-center gap-2 min-w-0">' +
+              '<span class="font-label-caps text-label-caps ' + (i === 0 ? 'text-primary' : 'text-on-surface-variant') + ' w-4 flex-shrink-0">0' + (i + 1) + '</span>' +
+              '<span class="font-body-sm text-body-sm text-on-surface font-medium truncate">' + esc(row.name) + '</span>' +
+            '</div>' +
+            '<span class="font-metric-stat text-[13px] ' + tones[i] + ' flex-shrink-0">' + row.score + '</span>' +
+          '</div>' +
+          '<div class="w-full h-1 rounded-full bg-surface-container-highest overflow-hidden">' +
+            '<div class="h-full rounded-full ' + fills[i] + '" style="width:' + row.score + '%"></div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+      setText('tribe-segment-count', rows.length + ' SEGMENTS');
+      if (rows[0]) {
+        document.querySelectorAll('[data-qloo-tribe-hero]').forEach(function (h) { h.textContent = rows[0].name; });
+      }
+    }
+    state.tribes = rows;
+  }
+
+  function loadTribes(placeEntities) {
+    return qlooFetch('/v2/audiences', { 'take': '10' }).then(function (res) {
+      var ents = entitiesOf(res);
+      if (!ents.length) throw new Error('EMPTY');
+      renderTribes(ents.map(function (e, i) {
+        var aff = affinityOf(e) || (0.94 - i * 0.07);
+        return { name: nameOf(e), score: pct(aff) };
+      }).slice(0, 5));
+    }).catch(function () {
+      /* Fallback: cluster the block's place-genre tags into tribes */
+      var counts = {};
+      (placeEntities || []).forEach(function (e) {
+        (e.tags || []).forEach(function (t) {
+          var urn = t.id || t.urn || '';
+          if (urn.indexOf('urn:tag:genre:place') !== 0) return;
+          var label = t.name || urn.split(':').pop().replace(/_/g, ' ');
+          if (!label) return;
+          counts[label] = (counts[label] || 0) + 1 + affinityOf(e);
+        });
+      });
+      var ranked = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; }).slice(0, 5);
+      if (!ranked.length) throw new Error('NO_TAGS');
+      var hi = counts[ranked[0]];
+      renderTribes(ranked.map(function (label, i) {
+        return { name: label, score: Math.max(58, Math.round(counts[label] / hi * 94)) };
+      }));
+    });
+  }
+
+  function renderSignals(stream, palate) {
+    var host = document.getElementById('qlooSignalList');
+    if (host) {
+      var bars = ['bg-primary', 'bg-primary/70', 'bg-secondary'];
+      var tones = ['text-primary', 'text-secondary', 'text-secondary'];
+      function row(label, score, i) {
+        return '<div class="flex items-center gap-2">' +
+          '<span class="font-body-sm text-body-sm text-on-surface flex-1 truncate">' + esc(label) + '</span>' +
+          '<div class="w-16 h-1 rounded-full bg-surface-container-highest overflow-hidden flex-shrink-0">' +
+            '<div class="h-full rounded-full ' + bars[i] + '" style="width:' + score + '%"></div>' +
+          '</div>' +
+          '<span class="font-metric-stat text-[12px] ' + tones[i] + ' w-8 text-right flex-shrink-0">' + score + '</span>' +
+        '</div>';
+      }
+      var html = '';
+      if (stream.length) {
+        html += '<div class="space-y-2"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Streaming</span>';
+        html += stream.map(function (e, i) { return row(nameOf(e), pct(affinityOf(e)), i); }).join('') + '</div>';
+      }
+      if (palate.length) {
+        html += '<div class="space-y-2"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Palate</span>';
+        html += palate.map(function (label, i) { return row(label, [95, 88, 81][i], i); }).join('') + '</div>';
+      }
+      if (html) host.innerHTML = html;
+    }
+    /* Traceability sentence — real entity names, real affinities */
+    var topArtist = stream[0] ? nameOf(stream[0]) : null;
+    var topPlace = (state.places && state.places[0]) ? state.places[0].name : null;
+    if (topArtist || topPlace) {
+      var htmlDriver = 'Active patrons within ' + RADIUS_FT + 'ft index on ' +
+        '<span class="text-secondary font-medium">' + esc(topArtist || 'local favourites') + '</span> streaming' +
+        (topPlace ? ' &amp; frequent <span class="text-secondary font-medium">' + esc(topPlace) + '</span> programming.' : '.');
+      setHtml('daypart-driver', htmlDriver);
+      if (topArtist) setText('daypart-overlap', pct(affinityOf(stream[0])) + '% OVERLAP');
+    }
+  }
+
+  function loadSignals(placeEntities) {
+    var radiusM = Math.max(60, Math.round(RADIUS_FT * FT_TO_M));
+    return qlooFetch('/v2/insights', {
+      'filter.type': 'urn:entity:artist',
+      'filter.location': VENUE.lat + ',' + VENUE.lng,
+      'filter.location.radius': String(radiusM),
+      'take': '10'
+    }).then(function (res) {
+      var stream = entitiesOf(res).filter(function (e) { return affinityOf(e) > 0; }).slice(0, 3);
+      var palateTags = {};
+      (placeEntities || []).forEach(function (e) {
+        (e.tags || []).forEach(function (t) {
+          var urn = t.id || t.urn || '';
+          if (urn.indexOf('urn:tag:genre:place:restaurant') !== 0 &&
+              urn.indexOf('urn:tag:genre:place:bar') !== 0 &&
+              urn.indexOf('urn:tag:genre:place:cafe') !== 0) return;
+          var label = t.name || urn.split(':').pop().replace(/_/g, ' ');
+          if (label) palateTags[label] = (palateTags[label] || 0) + 1;
+        });
+      });
+      var palate = Object.keys(palateTags).sort(function (a, b) { return palateTags[b] - palateTags[a]; }).slice(0, 3);
+      if (!stream.length && !palate.length) throw new Error('EMPTY');
+      state.artists = stream.map(function (e) { return { name: nameOf(e), affinity: affinityOf(e) }; });
+      state.palate = palate;
+      renderSignals(stream, palate);
+    });
+  }
+
+  /* ----------------------- grounding context ----------------------- */
+  function groundingContext() {
+    var trace = [];
+    state.artists.slice(0, 3).forEach(function (a, i) {
+      trace.push({ entity: a.name, kind: 'artist', affinity: Number(a.affinity.toFixed(2)), surfaces: i === 0 ? ['driver sentence', 'playlist anchor'] : ['affinity signals'] });
+    });
+    state.places.slice(0, 3).forEach(function (p, i) {
+      trace.push({ entity: p.name, kind: 'place', affinity: Number(p.affinity.toFixed(2)), surfaces: i === 0 ? ['driver sentence'] : ['block heat'] });
+    });
+    state.tribes.slice(0, 3).forEach(function (t) {
+      trace.push({ entity: t.name, kind: 'audience', affinity: Number((t.score / 100).toFixed(2)), surfaces: ['micro-tribe index', 'tribe hero'] });
+    });
+    return {
+      app: 'Attune',
+      venue: VENUE,
+      block_radius_ft: RADIUS_FT,
+      feed: state.live ? 'qloo_live' : 'demo',
+      taste_metrics: {
+        block_heat: (document.querySelector('[data-qloo="block-heat"]') || {}).textContent || null,
+        taste_synergy: (document.querySelector('[data-qloo="taste-synergy"]') || {}).textContent || null,
+        new_matches: (document.querySelector('[data-qloo="new-matches"]') || {}).textContent || null,
+        match_rate: (document.querySelector('[data-qloo="match-rate"]') || {}).textContent || null
+      },
+      micro_tribes: state.tribes.map(function (t) { return { name: t.name, affinity: Number((t.score / 100).toFixed(2)) }; }),
+      nearby_place_affinities: state.places.slice(0, 10).map(function (p) { return { name: p.name, affinity: Number(p.affinity.toFixed(2)) }; }),
+      artist_affinities: state.artists.map(function (a) { return { name: a.name, affinity: Number(a.affinity.toFixed(2)) }; }),
+      palate_signals: state.palate,
+      trace: trace,
+      llm: state.llmLive ? { provider: state.provider, model: state.model } : null,
+      llm_task_brief: 'Using ONLY the taste data above, write: (1) a one-line micro-tribe persona, (2) one action per daypart (07-11 Roasters, 11-16 Linger, 16-20 Golden, 20-02 Night), (3) one playlist anchor artist with BPM band, (4) one menu callout. Operator-facing, no fluff, under 120 words.'
+    };
+  }
+
+  /* ----------------------- LLM playbook ----------------------- */
+  function loadPlaybook() {
+    var persona = document.getElementById('llm-persona');
+    if (persona) persona.textContent = 'LLM writing playbook from Qloo grounding\u2026';
+    var ctrl = ('AbortController' in window) ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 25000) : null;
+    return fetch(API_BASE + '/llm/playbook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(groundingContext()),
+      signal: ctrl ? ctrl.signal : undefined
+    }).then(function (res) {
+      if (timer) clearTimeout(timer);
+      if (!res.ok) throw new Error('LLM_HTTP_' + res.status);
+      return res.json();
+    }).then(function (data) {
+      var text = (data && data.playbook) || '';
+      var parsed = parsePlaybook(text);
+      if (!parsed.actions) throw new Error('LLM_PARSE');
+      state.llm = parsed;
+      state.llmLive = true;
+      state.provider = data.provider || null;
+      state.model = data.model || null;
+      if (persona) persona.textContent = '\u201C' + parsed.persona + '\u201D';
+      setText('daypart-action-label', 'Daypart Play \u00B7 LLM');
+      applyDaypart(currentDaypart);
+    }).catch(function (err) {
+      if (timer) clearTimeout(timer);
+      state.llmLive = false;
+      if (persona) persona.textContent = 'LLM offline \u2014 curated persona shown. (' + String(err && err.message || err) + ')';
+    });
+  }
+
+  function parsePlaybook(text) {
+    var out = { persona: '', actions: null, anchor: null, bpm: null, menu: null };
+    String(text).split(/\r?\n/).forEach(function (line) {
+      var m;
+      if ((m = line.match(/^PERSONA:\s*(.+)$/i))) out.persona = m[1].trim();
+      else if ((m = line.match(/^ROASTERS[^:]*:\s*(.+)$/i))) (out.actions = out.actions || {}).morning = m[1].trim();
+      else if ((m = line.match(/^LINGER[^:]*:\s*(.+)$/i))) (out.actions = out.actions || {}).daylight = m[1].trim();
+      else if ((m = line.match(/^GOLDEN[^:]*:\s*(.+)$/i))) (out.actions = out.actions || {}).golden = m[1].trim();
+      else if ((m = line.match(/^NIGHT[^:]*:\s*(.+)$/i))) (out.actions = out.actions || {}).night = m[1].trim();
+      else if ((m = line.match(/^PLAYLIST:\s*(.+)$/i))) {
+        var pl = m[1].trim();
+        var pm = pl.match(/^(.*?)\s*[-~\u2014]?\s*(\d{2,3})(?:\s*[-\u2013]\s*\d{2,3})?\s*BPM\s*\.?$/i);
+        out.anchor = (pm ? pm[1] : pl).trim() || null;
+        out.bpm = pm ? Number(pm[2]) : null;
+      }
+      else if ((m = line.match(/^MENU:\s*(.+)$/i))) out.menu = m[1].trim();
+    });
+    return out;
+  }
+
+  /* ----------------------- daypart switching ----------------------- */
+  var DP_DEMO = {
+    morning: { title: 'Roasters Shift', window: 'NOW TUNED \u2022 07:00 - 11:00',
+      action: 'Crack windows at 07:30; slow-filter rotation on bar; pastry case warm-out at 07:45.' },
+    daylight: { title: 'Midday Linger', window: 'NOW TUNED \u2022 11:00 - 16:00',
+      action: 'Hold 3000K task light; espresso flight feature; keep vinyl jazz under 68dB.' },
+    golden: { title: 'Golden Hour Shift', window: 'NOW TUNED \u2022 16:00 - 20:00',
+      action: 'Queue side-B kanky\u014D ongaku for the 16-20 swell; run the hi-ball feature tray to garden tables from 17:30.' },
+    night: { title: 'Night Descent', window: 'NOW TUNED \u2022 20:00 - 02:00',
+      action: 'Drop to candlelight 2200K; natural-wine feature by the glass; low-slow descent mix after 23:00.' }
+  };
+  var currentDaypart = 'golden';
+
+  function applyDaypart(dp) {
+    if (!DP_DEMO[dp]) dp = 'golden';
+    currentDaypart = dp;
+    var demo = DP_DEMO[dp];
+    setText('daypart-title', demo.title);
+    setText('daypart-window', demo.window);
+    setText('daypart-action', (state.llmLive && state.llm.actions && state.llm.actions[dp]) || demo.action);
+    if (state.llmLive && state.llm.anchor) {
+      setText('daypart-audio-title', state.llm.anchor);
+      setText('daypart-audio-stream', 'Streaming: Qloo block anchor \u00B7 ' + (state.llm.bpm ? state.llm.bpm + ' BPM zone' : 'BPM per block tempo'));
+    }
+    if (state.llmLive && state.llm.menu && dp === 'golden') {
+      setText('daypart-menu', state.llm.menu);
+      setText('daypart-menu-sub', 'LLM pairing \u00B7 palate: ' + (state.palate[0] || 'block signals'));
+    }
+  }
+
+  document.querySelectorAll('.daypart-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () { applyDaypart(btn.getAttribute('data-daypart')); });
+  });
+
+  /* ----------------------- grounding export ----------------------- */
+  var exportBtn = document.getElementById('grounding-export');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', function () {
+      try {
+        var blob = new Blob([JSON.stringify(groundingContext(), null, 2)], { type: 'application/json' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'attune-grounding.json';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 400);
+        var icon = exportBtn.querySelector('.material-symbols-outlined');
+        if (icon) {
+          icon.textContent = 'check';
+          setTimeout(function () { icon.textContent = 'data_object'; }, 1200);
+        }
+      } catch (e) { /* export is best-effort */ }
+    });
+  }
+
+  /* ----------------------- avatar sign-out ----------------------- */
+  (function initSignOut() {
+    var avatarImg = document.querySelector('header img[alt="Operator profile"]');
+    var btn = avatarImg ? avatarImg.closest('button') : null;
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      if (!window.confirm('Sign out of Attune?')) return;
+      try {
+        localStorage.removeItem('roomtone.session');
+        sessionStorage.removeItem('roomtone.session');
+      } catch (e) { /* ignore */ }
+      location.href = 'auth.html';
+    });
+  })();
+
+  /* ----------------------- orchestrator ----------------------- */
+  var busy = false;
+  function refresh() {
+    if (busy) return;
+    busy = true;
+    loadRadar()
+      .then(function (places) { return loadTribes(places); })
+      .then(function () { return loadSignals(state.places).catch(function (e) { console.warn('[attune signals]', e); }); })
+      .then(function () {
+        state.live = true;
+        setBadges(true);
+        var chips = state.artists.slice(0, 2).map(function (a) { return { name: a.name, affinity: a.affinity }; })
+          .concat(state.places.slice(0, 1).map(function (p) { return { name: p.name, affinity: p.affinity }; }));
+        if (chips.length) setChips(chips);
+        return loadPlaybook();
+      })
+      .catch(function (err) {
+        state.live = false;
+        setBadges(false);
+        var persona = document.getElementById('llm-persona');
+        if (persona && !state.llmLive) {
+          persona.textContent = '\u201CAnalog-leaning night owls who treat listening as the main event.\u201D \u2014 curated demo feed (' + String(err && err.message || err) + ')';
+        }
+        console.warn('[attune feed]', err);
+      })
+      .finally(function () { busy = false; });
+  }
+
+  window.AttuneGrounding = { context: groundingContext, refresh: refresh };
+  refresh();
+})();
 </script>
 
 </body>
