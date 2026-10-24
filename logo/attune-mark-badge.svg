@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="384" height="384" fill="none">
+  <title>Attune app badge</title>
+  <defs>
+    <linearGradient id="bgd" x1="0" y1="0" x2="96" y2="96" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1d2025"/>
+      <stop offset="1" stop-color="#0b0e13"/>
+    </linearGradient>
+    <linearGradient id="amb" x1="28" y1="14" x2="66" y2="82" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffc9a3"/>
+      <stop offset="1" stop-color="#d97736"/>
+    </linearGradient>
+  </defs>
+  <rect width="96" height="96" rx="24" fill="url(#bgd)"/>
+  <rect x="0.75" y="0.75" width="94.5" height="94.5" rx="23.25" stroke="#ffffff" stroke-opacity="0.10" stroke-width="1.5"/>
+  <circle cx="48" cy="48" r="30" stroke="#ffb68c" stroke-opacity="0.14"/>
+  <circle cx="48" cy="48" r="40" stroke="#ffb68c" stroke-opacity="0.07"/>
+  <g transform="translate(19.2 19.2) scale(2.4)">
+    <path d="M9 3.5 V10" stroke="url(#amb)" stroke-width="1.9" stroke-linecap="round"/>
+    <path d="M15 3.5 V10" stroke="url(#amb)" stroke-width="1.9" stroke-linecap="round"/>
+    <path d="M9 10 C9 13.4 15 13.4 15 10" stroke="url(#amb)" stroke-width="1.9" stroke-linecap="round"/>
+    <path d="M12 12.4 V16.9" stroke="url(#amb)" stroke-width="1.9" stroke-linecap="round"/>
+    <circle cx="12" cy="6.6" r="1.2" fill="#ffb68c"/>
+  </g>
+</svg>

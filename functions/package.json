@@ -1,0 +1,13 @@
+{
+  "name": "attune-functions",
+  "description": "Firebase backend for Attune: Qloo proxy + LLM playbook generator",
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "private": true,
+  "dependencies": {
+    "firebase-admin": "^12.1.0",
+    "firebase-functions": "^5.1.0"
+  }
+}

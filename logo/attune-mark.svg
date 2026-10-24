@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="192" height="192" fill="none">
+  <title>Attune mark</title>
+  <defs>
+    <linearGradient id="am" x1="6" y1="3" x2="18" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffc9a3"/>
+      <stop offset="1" stop-color="#d97736"/>
+    </linearGradient>
+  </defs>
+  <path d="M9 3.5 V10" stroke="url(#am)" stroke-width="1.9" stroke-linecap="round"/>
+  <path d="M15 3.5 V10" stroke="url(#am)" stroke-width="1.9" stroke-linecap="round"/>
+  <path d="M9 10 C9 13.4 15 13.4 15 10" stroke="url(#am)" stroke-width="1.9" stroke-linecap="round"/>
+  <path d="M12 12.4 V16.9" stroke="url(#am)" stroke-width="1.9" stroke-linecap="round"/>
+  <circle cx="12" cy="6.6" r="1.2" fill="#ffb68c"/>
+</svg>
