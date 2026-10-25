@@ -397,13 +397,6 @@
   nav a[data-path][aria-current="page"],
   nav a[data-path][aria-current="page"]:hover { color: #ffb68c; }
 
-  /* App drawer. Same plain-rule pattern as the bottom nav above so the active
-     item stays amber even while a touch device keeps :hover latched. */
-  .drawer-root a[data-path] { color: #dbc1b4; }
-  .drawer-root a[data-path]:hover { color: #e1e2e9; }
-  .drawer-root a[data-path][aria-current="page"],
-  .drawer-root a[data-path][aria-current="page"]:hover { color: #ffb68c; }
-
   /* Slide-out motion. The rail mirrors the appbar's centered 390px column on
      desktop; the panel slides inside it, so the two transforms never fight. */
   .drawer-rail {
@@ -432,6 +425,28 @@
     transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .drawer-root.drawer-open .drawer-panel { transform: translateX(0); }
+
+  /* Legal bottom sheet: slide-up reader for Terms / Privacy / Credits.
+     Same motion pattern as the drawer (visibility delay + transform). */
+  .legal-root {
+    visibility: hidden;
+    transition: visibility 0s linear 0.32s;
+  }
+  .legal-root.legal-open { visibility: visible; transition-delay: 0s; }
+  .legal-backdrop {
+    opacity: 0;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .legal-root.legal-open .legal-backdrop { opacity: 1; }
+  .legal-panel {
+    transform: translateY(100%);
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .legal-root.legal-open .legal-panel { transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) {
+    .legal-panel { transition: none; }
+    .legal-backdrop { transition: none; }
+  }
 
   @media (min-width: 481px) {
     html {
@@ -559,10 +574,6 @@
   html.light nav a[data-path]:hover { color: #211d15; }
   html.light nav a[data-path][aria-current="page"],
   html.light nav a[data-path][aria-current="page"]:hover { color: #8f4a00; }
-  html.light .drawer-root a[data-path] { color: #6b5d4b; }
-  html.light .drawer-root a[data-path]:hover { color: #211d15; }
-  html.light .drawer-root a[data-path][aria-current="page"],
-  html.light .drawer-root a[data-path][aria-current="page"]:hover { color: #8f4a00; }
   html.light body > header[class] { box-shadow: 0 1px 12px rgba(87, 66, 27, 0.16); }
   html.light .nav-dock { box-shadow: inset 0 0 0 1px rgba(61, 44, 21, 0.10), 0 22px 44px -18px rgba(87, 66, 27, 0.4); }
   html.light .drawer-panel { box-shadow: 8px 0 48px rgba(87, 66, 27, 0.22); }
@@ -1096,30 +1107,6 @@
 
       <!-- Drawer body -->
       <div class="px-space-md flex-1 overflow-y-auto pt-space-sm">
-        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">NAVIGATE</p>
-        <div class="flex flex-col gap-1">
-          <a data-path="playbook" aria-current="page" href="#"
-             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg bg-surface-container/80 text-primary">
-            <span class="material-symbols-outlined text-xl">calendar_month</span>
-            <span class="font-body-md text-body-md font-medium">Home</span>
-          </a>
-          <a data-path="taste-heat" href="#"
-             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
-            <span class="material-symbols-outlined text-xl">radar</span>
-            <span class="font-body-md text-body-md">Discover</span>
-          </a>
-          <a data-path="menu-sound" href="#"
-             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
-            <span class="material-symbols-outlined text-xl">nightlife</span>
-            <span class="font-body-md text-body-md">Menu</span>
-          </a>
-          <a data-path="live-pulse" href="#"
-             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
-            <span class="material-symbols-outlined text-xl">vital_signs</span>
-            <span class="font-body-md text-body-md">Live</span>
-          </a>
-        </div>
-
         <section class="mt-space-lg mb-space-md rounded-xl bg-surface-container p-space-sm" aria-label="Your venue" data-venue-panel>
           <div class="flex items-center gap-1.5 px-1 pb-1.5">
             <span class="material-symbols-outlined text-secondary text-base">storefront</span>
@@ -1189,23 +1176,28 @@
           <p class="font-body-sm text-body-sm text-on-surface-variant px-1 pt-2" data-guardrail-status aria-live="polite">These settings shape the in-app preview only &#8212; house speakers keep their own volume.</p>
         </section>
 
-        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">VENUE</p>
+        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">SUPPORT &amp; LEGAL</p>
         <div class="flex flex-col gap-1 pb-space-md">
-          <button type="button"
+          <button type="button" data-legal-open="terms"
                   class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">tune</span>
-            <span class="font-body-md text-body-md">Venue Settings</span>
+            <span class="material-symbols-outlined text-xl">description</span>
+            <span class="font-body-md text-body-md">Terms &amp; Conditions</span>
           </button>
-          <button type="button"
+          <button type="button" data-legal-open="privacy"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">privacy_tip</span>
+            <span class="font-body-md text-body-md">Privacy Policy</span>
+          </button>
+          <button type="button" data-legal-open="credits"
                   class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
             <span class="material-symbols-outlined text-xl">library_music</span>
-            <span class="font-body-md text-body-md">Sound Library</span>
+            <span class="font-body-md text-body-md">Music &amp; Data Credits</span>
           </button>
-          <button type="button"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">summarize</span>
-            <span class="font-body-md text-body-md">Nightly Report</span>
-          </button>
+          <a href="https://github.com/CHAMA18/roomtone-os/issues" target="_blank" rel="noopener noreferrer"
+             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">support_agent</span>
+            <span class="font-body-md text-body-md">Feedback &amp; Support</span>
+          </a>
         </div>
 
         <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">PREFERENCES</p>
@@ -1232,6 +1224,25 @@
       </div>
 
     </aside>
+  </div>
+</div>
+
+<!-- ==================== LEGAL SHEET (terms / privacy / credits) ==================== -->
+<div id="legal-sheet" class="legal-root fixed inset-0 z-[65]" aria-hidden="true">
+  <div class="legal-backdrop absolute inset-0 bg-black/60 backdrop-blur-[2px]" data-legal-dismiss></div>
+  <div class="legal-panel absolute inset-x-0 bottom-0 top-[7%] mx-auto w-full max-w-[390px] flex flex-col rounded-t-2xl bg-surface-container-low shadow-[0_-12px_48px_rgba(0,0,0,0.55)] overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="legal-title">
+    <div class="flex items-center justify-between gap-2 px-space-md h-16 flex-shrink-0 border-b border-surface-container-high/70">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="material-symbols-outlined text-secondary text-xl flex-shrink-0" data-legal-icon>description</span>
+        <h2 id="legal-title" class="font-title-editorial text-title-editorial text-on-surface truncate">Terms &amp; Conditions</h2>
+      </div>
+      <button type="button" data-legal-close aria-label="Close document"
+              class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container-high/60 transition-colors flex-shrink-0">
+        <span class="material-symbols-outlined text-on-surface-variant text-2xl">close</span>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto px-space-md py-space-md space-y-5" data-legal-body></div>
+    <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-md py-3 flex-shrink-0 border-t border-surface-container-high/70">ATTUNE &#183; V1.0.0 &#183; UPDATED OCTOBER 2026</p>
   </div>
 </div>
 
@@ -3564,7 +3575,158 @@
       link.addEventListener('click', () => setOpen(false));
     });
     document.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && root.classList.contains('drawer-open')) setOpen(false);
+      const sheet = document.getElementById('legal-sheet');
+      if (event.key === 'Escape' && root.classList.contains('drawer-open') && !(sheet && sheet.classList.contains('legal-open'))) setOpen(false);
+    });
+  })();
+
+  /* ---------------- Legal sheet: terms / privacy / credits ---------------- */
+  (function initLegal() {
+    const root = document.getElementById('legal-sheet');
+    if (!root) return;
+    const body = root.querySelector('[data-legal-body]');
+    const titleEl = document.getElementById('legal-title');
+    const iconEl = root.querySelector('[data-legal-icon]');
+    const closeBtn = root.querySelector('[data-legal-close]');
+    const backdrop = root.querySelector('.legal-backdrop');
+    let lastTrigger = null;
+
+    function sectionsHtml(sections) {
+      return sections.map(function (s) {
+        return '<div class="space-y-2">' +
+          '<h3 class="font-label-caps text-label-caps uppercase tracking-widest text-secondary-fixed">' + s.h + '</h3>' +
+          s.p.map(function (par) { return '<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">' + par + '</p>'; }).join('') +
+          (s.list ? '<ul class="space-y-1.5 pt-1">' + s.list.map(function (li) {
+            return '<li class="flex gap-2 font-body-sm text-body-sm text-on-surface-variant leading-relaxed"><span class="text-primary flex-shrink-0" aria-hidden="true">\u2022</span><span>' + li + '</span></li>';
+          }).join('') + '</ul>' : '') +
+          '</div>';
+      }).join('');
+    }
+
+    var LINK_CLS = 'underline decoration-outline-variant underline-offset-2 text-secondary-fixed';
+    var DOCS = {
+      terms: {
+        title: 'Terms & Conditions',
+        icon: 'description',
+        html: sectionsHtml([
+          { h: 'The short version', p: [
+            'Attune is an operating console for hospitality venues. It reads the taste of your block through Qloo and turns it into playbooks, crowd radar, and daypart music previews. These terms apply the moment you create an account or open the app, including the demo room.'
+          ] },
+          { h: 'Your account', p: [
+            'Attune is built for venue operators and their authorized staff. You confirm that you operate the venue you register, that the details you enter (venue name, neighborhood) are accurate, and that you keep your sign-in credentials safe. You are responsible for activity under your account. The demo room requires no account and uses illustrative block data.'
+          ] },
+          { h: 'What Attune is \u2014 and is not', p: [
+            'Attune provides decision support: suggested plays, pairing ideas, crowd patterns, and music programming previews. Recommendations are advisory and grounded in the taste data available to the service at the time. You remain responsible for your operating decisions, including pricing, staffing, food safety, and licensing compliance.'
+          ] },
+          { h: 'Music previews and licensing', p: [
+            'Audio inside Attune is short preview material for evaluating a daypart program. Playing music at a public venue requires the licenses your jurisdiction expects, such as performing-rights and neighboring-rights agreements. Attune is not a music licensing service and does not clear public-performance rights on your behalf.'
+          ] },
+          { h: 'Acceptable use', p: [
+            'Use Attune lawfully and for your own venue operations. Do not scrape, resell, or bulk-download data; do not attempt to reverse engineer the service; do not probe, overload, or interfere with its infrastructure; and do not misrepresent your identity or venue.'
+          ] },
+          { h: 'Availability and changes', p: [
+            'Attune is evolving quickly and features, data sources, and copy may change without notice during this period. We may suspend accounts that break these terms or put the service at risk.'
+          ] },
+          { h: 'Warranty and liability', p: [
+            'The service is provided \u201Cas is\u201D and \u201Cas available\u201D without warranties of any kind. To the maximum extent permitted by law, Attune\u2019s operators are not liable for indirect or consequential losses arising from use of the service, and decisions made with Attune\u2019s guidance remain yours.'
+          ] },
+          { h: 'Changes to these terms', p: [
+            'We update this document as the product changes; the date below always reflects the current version. Continuing to use Attune after a change means you accept the updated terms.'
+          ] },
+          { h: 'Contact', p: [
+            'Questions, corrections, or concerns: open an issue at <a class="' + LINK_CLS + '" href="https://github.com/CHAMA18/roomtone-os/issues" target="_blank" rel="noopener noreferrer">github.com/CHAMA18/roomtone-os</a>.'
+          ] }
+        ])
+      },
+      privacy: {
+        title: 'Privacy Policy',
+        icon: 'privacy_tip',
+        html: sectionsHtml([
+          { h: 'The short version', p: [
+            'Attune collects the minimum needed to tune your room. No ads, no data selling, and nothing about your patrons as individuals.'
+          ] },
+          { h: 'What we collect', list: [
+            'Your work email and authentication identifiers, handled by Firebase Authentication when you sign in.',
+            'The venue name and neighborhood you type in, used to ground taste lookups.',
+            'Your in-app preferences \u2014 theme and sound guardrails \u2014 stored locally in your browser.',
+            'Basic technical logs (such as request timing) needed to run and debug the service.'
+          ], p: [] },
+          { h: 'What we never collect', p: [
+            'We do not collect your patrons\u2019 identities, faces, contact details, or locations, and we do not buy ad identifiers or track your device across other apps. The Discover radar paints block-level taste patterns \u2014 crowds, genres, affinities \u2014 never dossiers on identifiable people. In the demo room those signals are illustrative; in the live product they come from Qloo\u2019s aggregate cultural data.'
+          ] },
+          { h: 'How your data is used', p: [
+            'To authenticate you, to resolve your neighborhood into taste anchors, to draft operator-facing copy for your playbooks, and to remember your settings between visits. That is the whole list.'
+          ] },
+          { h: 'Third parties we rely on', list: [
+            'Firebase (Google) \u2014 account sign-in and storage of your operator profile.',
+            'Qloo \u2014 cultural affinity data about places, artists, and audiences; we send venue- and neighborhood-level queries, never your patrons\u2019 personal data.',
+            'Pixabay \u2014 hosting of the preview track linked in the player.',
+            'A hosted language model \u2014 drafts the playbook wording from the taste data Attune gathers.'
+          ], p: [
+            'Each processor handles data under its own privacy terms. None of them receive your patrons\u2019 personal information from us, because we never collect it.'
+          ] },
+          { h: 'Storage and retention', p: [
+            'Account data lives in Firebase until you ask us to delete it. Preferences stay in your browser\u2019s local storage \u2014 clearing site data wipes them. Technical logs are kept only as long as needed to operate the service.'
+          ] },
+          { h: 'Your controls', p: [
+            'You can sign out from this menu at any time, and every sound guardrail on this screen is device-local. To request account deletion or a copy of the data associated with your venue, open an issue at <a class="' + LINK_CLS + '" href="https://github.com/CHAMA18/roomtone-os/issues" target="_blank" rel="noopener noreferrer">github.com/CHAMA18/roomtone-os</a> and we will process it promptly.'
+          ] },
+          { h: 'Changes to this policy', p: [
+            'Material changes will be reflected here with an updated date. Continuing to use Attune after a change means you accept the updated policy.'
+          ] }
+        ])
+      },
+      credits: {
+        title: 'Music & Data Credits',
+        icon: 'library_music',
+        html: sectionsHtml([
+          { h: 'Taste intelligence', p: [
+            'Every playbook, crowd pattern, and artist signal in Attune is grounded in <a class="' + LINK_CLS + '" href="https://www.qloo.com" target="_blank" rel="noopener noreferrer">Qloo</a>, the cultural AI that maps taste across places, music, food, and audiences. Attune\u2019s agent queries Qloo server-side for your block and composes the results into tonight\u2019s decisions.'
+          ] },
+          { h: 'Preview audio', list: [
+            '\u201CLofi Study\u201D \u2014 FASSounds, via <a class="' + LINK_CLS + '" href="https://pixabay.com/music/beats-lofi-study-calm-peaceful-chill-hop-112191/" target="_blank" rel="noopener noreferrer">Pixabay Music</a>.',
+            '\u201CAsync (Piano Version)\u201D, \u201COpen Soil\u201D and \u201CCreek\u201D name the editorial daypart program; the audio previews playing for those rows are original ambient sessions generated for Attune and labeled \u201CAmbient preview sample\u201D on the player.'
+          ], p: [
+            'Queue rows describe the programming Attune would license for the daypart; the player auditions short preview material so you can hear the intended energy without any licensing in place.'
+          ] },
+          { h: 'Type and icons', p: [
+            'Set in <a class="' + LINK_CLS + '" href="https://www.fontshare.com/fonts/satoshi" target="_blank" rel="noopener noreferrer">Satoshi</a> (Indian Type Foundry, via Fontshare) with <a class="' + LINK_CLS + '" href="https://fonts.google.com/icons" target="_blank" rel="noopener noreferrer">Material Symbols</a> by Google.'
+          ] },
+          { h: 'Built for', p: [
+            'The Qloo Agentic Hackathon \u2014 \u201CAgents, but with taste\u201D \u2014 October 2026. Source and issue tracker: <a class="' + LINK_CLS + '" href="https://github.com/CHAMA18/roomtone-os" target="_blank" rel="noopener noreferrer">github.com/CHAMA18/roomtone-os</a>.'
+          ] }
+        ])
+      }
+    };
+
+    function setOpen(open) {
+      root.classList.toggle('legal-open', open);
+      root.setAttribute('aria-hidden', open ? 'false' : 'true');
+      document.body.style.overflow = open ? 'hidden' : '';
+    }
+
+    Array.prototype.slice.call(document.querySelectorAll('[data-legal-open]')).forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const doc = DOCS[btn.getAttribute('data-legal-open')];
+        if (!doc || !body) return;
+        lastTrigger = btn;
+        if (titleEl) titleEl.textContent = doc.title;
+        if (iconEl) iconEl.textContent = doc.icon;
+        body.innerHTML = doc.html;
+        if (body.firstChild && body.firstChild.scrollIntoView) body.scrollTop = 0;
+        setOpen(true);
+        if (closeBtn) closeBtn.focus();
+      });
+    });
+
+    function dismiss() {
+      setOpen(false);
+      if (lastTrigger) lastTrigger.focus();
+    }
+    if (closeBtn) closeBtn.addEventListener('click', dismiss);
+    if (backdrop) backdrop.addEventListener('click', dismiss);
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && root.classList.contains('legal-open')) dismiss();
     });
   })();
 
