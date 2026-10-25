@@ -1,0 +1,50 @@
+# Attune — Caddyfile (single-origin production shape)
+# ---------------------------------------------------------------------
+# Serves the static app and proxies the Qloo API on one port, mirroring
+# the firebase hosting + functions layout:
+#
+#   /                     static app (index.html, auth.html, assets)
+#   /api/qloo/v2/...   -> https://hackathon.api.qloo.com  (prefix stripped,
+#                          X-Api-Key injected from $QLOO_API_KEY — the key
+#                          never touches the browser or this file)
+#   /api/llm/playbook  -> 501 until an LLM upstream is configured
+#
+# Run:  scripts/serve.sh     (sources .env.local for QLOO_API_KEY)
+
+{
+        admin off
+        auto_https off
+}
+
+:3000 {
+        encode zstd gzip
+
+        # --- LLM playbook -------------------------------------------------
+        # Same 501 contract as functions/index.js when the key is unset.
+        handle /api/llm/playbook {
+                header Content-Type "application/json"
+                respond `{"error":"LLM_API_KEY not configured — add it to .env.local (or run: firebase functions:secrets:set LLM_API_KEY)"}` 501
+        }
+
+        # --- Qloo Taste AI proxy ------------------------------------------
+        handle_path /api/qloo/* {
+                header Cache-Control "public, max-age=300"
+                reverse_proxy https://hackathon.api.qloo.com {
+                        header_up Host hackathon.api.qloo.com
+                        header_up X-Api-Key {env.QLOO_API_KEY}
+                        transport http {
+                                tls
+                                tls_server_name hackathon.api.qloo.com
+                        }
+                }
+        }
+
+        # --- Static app ----------------------------------------------------
+        handle {
+                root * /home/z/my-project/roomtone-os
+                try_files {path} {path}/ /index.html
+                header /audio/* Cache-Control "public, max-age=86400"
+                header /logo/*  Cache-Control "public, max-age=86400"
+                file_server
+        }
+}

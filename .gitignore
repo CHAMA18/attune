@@ -7,3 +7,4 @@ functions/.env
 firebase-debug.log
 ui-debug.log
 .env.local
+caddy-bin/
