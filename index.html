@@ -255,7 +255,7 @@
   html.light .drawer-root a[data-path][aria-current="page"],
   html.light .drawer-root a[data-path][aria-current="page"]:hover { color: #8f4a00; }
   html.light body > header[class] { box-shadow: 0 1px 12px rgba(87, 66, 27, 0.16); }
-  html.light body > nav[class] { box-shadow: 0 -4px 18px rgba(87, 66, 27, 0.12); }
+  html.light .nav-dock { box-shadow: inset 0 0 0 1px rgba(61, 44, 21, 0.10), 0 22px 44px -18px rgba(87, 66, 27, 0.4); }
   html.light .drawer-panel { box-shadow: 8px 0 48px rgba(87, 66, 27, 0.22); }
 
   @media (min-width: 481px) {
@@ -390,10 +390,135 @@
   .a-tls-lock { animation: tls-pulse 3.2s ease-in-out infinite; }
   #latency-ms { transition: opacity 0.18s ease; display: inline-block; }
 
+  /* ================================================================
+     ATTUNE DESIGN SYSTEM — "The Amber Standard"
+     Precision-instrument detailing for the playbook experience.
+     ================================================================ */
+
+  /* Tabular numerals so live values never shift their columns */
+  .tnum { font-variant-numeric: tabular-nums lining-nums; font-feature-settings: "tnum" 1, "lnum" 1; }
+
+  /* Hairline inset ring that adapts to both themes */
+  .hairline { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07); }
+  html.light .hairline { box-shadow: inset 0 0 0 1px rgba(61, 44, 21, 0.10); }
+  .hairline-strong { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14); }
+
+  /* Micro-caps: 9px instrument labels */
+  .micro-caps { font-size: 9px; line-height: 12px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+
+  /* Film grain — material warmth on feature surfaces */
+  .grain { pointer-events: none; }
+  .grain::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+  }
+  html.light .grain::before { opacity: 0.045; mix-blend-mode: multiply; }
+
+  /* Entrance choreography — staggered rise, replays on screen switch */
+  @keyframes attune-rise {
+    from { opacity: 0; transform: translateY(18px) scale(0.992); }
+    to { opacity: 1; transform: none; }
+  }
+  .reveal {
+    opacity: 0;
+    animation: attune-rise 0.72s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0s) both;
+  }
+
+  /* Ambient glow breathing */
+  @keyframes attune-breathe {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.9; transform: scale(1.07); }
+  }
+  .breathe { animation: attune-breathe 7s ease-in-out infinite; }
+  .breathe-slow { animation: attune-breathe 11s ease-in-out infinite; }
+
+  /* Live-dot halo ping */
+  @keyframes halo-ping {
+    0% { transform: scale(1); opacity: 0.55; }
+    75%, 100% { transform: scale(2.6); opacity: 0; }
+  }
+  .halo { position: relative; }
+  .halo::after {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: 9999px;
+    background: currentColor;
+    animation: halo-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  /* Shimmer sweep for progress fills */
+  @keyframes attune-shimmer {
+    0% { transform: translateX(-120%); }
+    55%, 100% { transform: translateX(320%); }
+  }
+  .shimmer { position: relative; overflow: hidden; }
+  .shimmer::after {
+    content: '';
+    position: absolute; top: 0; bottom: 0; left: 0;
+    width: 34%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    animation: attune-shimmer 2.8s cubic-bezier(0.4, 0, 0.2, 1) 1.6s infinite;
+  }
+
+  /* Equalizer bars (audio telemetry, heartbeat footer) */
+  @keyframes attune-eq {
+    0%, 100% { transform: scaleY(0.3); }
+    50% { transform: scaleY(1); }
+  }
+  .eq { display: flex; align-items: flex-end; gap: 2px; }
+  .eq > span {
+    width: 2.5px; height: 100%;
+    border-radius: 2px;
+    background: currentColor;
+    transform-origin: bottom;
+    animation: attune-eq 1.05s ease-in-out infinite;
+  }
+
+  /* Pilot ring gauge draw-in */
+  @keyframes ring-draw { from { stroke-dashoffset: 125.66; } }
+  .ring-draw { animation: ring-draw 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both; }
+
+  /* Progress bar grow-in */
+  @keyframes bar-grow { from { width: 0; } }
+  .bar-grow { animation: bar-grow 1.3s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both; }
+
+  /* Tactile press + arrow-slide micro-interactions */
+  .press { transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease, background-color 0.2s ease, color 0.2s ease; }
+  .press:active { transform: scale(0.965); }
+  .arrow-slide .material-symbols-outlined { transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1); }
+  .arrow-slide:hover .material-symbols-outlined { transform: translateX(3px); }
+
+  /* Floating dock nav */
+  .nav-dock {
+    border-radius: 1.15rem;
+    background: rgb(var(--c-surface-container-lowest) / 0.88);
+    -webkit-backdrop-filter: blur(24px) saturate(1.35);
+    backdrop-filter: blur(24px) saturate(1.35);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 22px 48px -18px rgba(0, 0, 0, 0.72);
+  }
+  html.light .nav-dock {
+    box-shadow: inset 0 0 0 1px rgba(61, 44, 21, 0.10), 0 22px 44px -18px rgba(87, 66, 27, 0.4);
+  }
+  .nav-tab { position: relative; }
+  .nav-tab[aria-current="page"]::before {
+    content: '';
+    position: absolute; top: 5px; left: 50%; transform: translateX(-50%);
+    width: 18px; height: 2.5px; border-radius: 2px;
+    background: rgb(var(--c-primary));
+    box-shadow: 0 0 10px rgb(var(--c-primary) / 0.65);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .aurora, .a-sheen, .field-enter, .a-tls-lock { animation: none !important; }
     #auth-thumb { transition: none !important; }
     #latency-ms { transition: none !important; }
+    .reveal, .breathe, .breathe-slow, .ring-draw, .bar-grow { animation: none !important; opacity: 1 !important; }
+    .halo::after, .shimmer::after, .eq > span { animation: none !important; }
+    .press:active { transform: none; }
   }
 </style>
 
@@ -500,9 +625,13 @@
     <div class="flex-1"></div>
 
     <div class="flex items-center gap-space-xs flex-shrink-0">
-      <button class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container-high/60 transition-colors">
-        <img alt="Operator profile" class="w-8 h-8 rounded-full object-cover"
-             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffb68c'/%3E%3Cstop offset='0.55' stop-color='%23d97736'/%3E%3Cstop offset='1' stop-color='%23753400'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' fill='url(%23g)'/%3E%3Ccircle cx='20' cy='15.5' r='6.5' fill='%23532200' opacity='0.92'/%3E%3Cpath d='M6.5 41c1.3-8.6 7-13.2 13.5-13.2S32.2 32.4 33.5 41z' fill='%23532200' opacity='0.92'/%3E%3C/svg%3E"/>
+      <button type="button" aria-label="Operator profile — tap to sign out"
+              class="relative w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container-high/60 transition-colors">
+        <span class="relative block w-9 h-9 rounded-full p-[1.5px] bg-gradient-to-br from-primary/70 via-primary-container/50 to-secondary/70 shadow-[0_4px_14px_-4px_rgba(217,119,54,0.55)]">
+          <img alt="Operator profile" class="w-full h-full rounded-full object-cover"
+               src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffb68c'/%3E%3Cstop offset='0.55' stop-color='%23d97736'/%3E%3Cstop offset='1' stop-color='%23753400'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' fill='url(%23g)'/%3E%3Ccircle cx='20' cy='15.5' r='6.5' fill='%23532200' opacity='0.92'/%3E%3Cpath d='M6.5 41c1.3-8.6 7-13.2 13.5-13.2S32.2 32.4 33.5 41z' fill='%23532200' opacity='0.92'/%3E%3C/svg%3E"/>
+          <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-tertiary ring-2 ring-surface-container-lowest" aria-hidden="true"></span>
+        </span>
       </button>
     </div>
   </div>
@@ -832,296 +961,377 @@
   </div>
 </div>
 
-<main class="flex-1 flex flex-col relative w-full pt-20 pb-24 bg-surface">
+<main class="flex-1 flex flex-col relative w-full pt-20 pb-36 bg-surface">
 
   <!-- ==================== SCREEN 1 · PLAYBOOK ==================== -->
-  <section class="screen w-full px-margin pb-12 space-y-space-md" data-screen="playbook" aria-label="Week Playbook">
+  <section class="screen w-full px-margin pb-12 space-y-5" data-screen="playbook" aria-label="Week Playbook">
 
-    <!-- Top Telemetry Banner -->
-    <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md relative overflow-hidden">
-      <div class="absolute -right-12 -top-12 w-40 h-40 bg-primary/10 rounded-full blur-2xl pointer-events-none"></div>
-      <div class="flex items-center justify-between pb-space-xs">
-        <div class="flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
-          <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest">WEEK 42 PLAYBOOK</span>
-        </div>
-        <span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded-full" id="playbook-feed-pill">
-          800FT BLOCK RADAR
-        </span>
-      </div>
-      <div class="mt-2 pt-2 flex flex-col gap-1">
-        <span class="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">Predominant Block Micro-Tribe</span>
-        <h2 class="font-headline-sm text-headline-sm text-on-surface tracking-tight" data-qloo-tribe-hero>Analog Minimalists &amp; Pet-Nat Devotees</h2>
-      </div>
+    <!-- ── The Instrument · block telemetry ── -->
+    <section class="reveal relative overflow-hidden rounded-2xl bg-surface-container-low hairline shadow-[0_24px_50px_-30px_rgba(0,0,0,0.65)]" style="--d:.05s">
+      <div class="pointer-events-none absolute -top-24 -right-16 w-64 h-64 rounded-full bg-primary/[0.13] blur-3xl breathe" aria-hidden="true"></div>
+      <div class="pointer-events-none absolute -bottom-28 -left-24 w-56 h-56 rounded-full bg-secondary/[0.09] blur-3xl breathe-slow" aria-hidden="true"></div>
+      <div class="grain absolute inset-0" aria-hidden="true"></div>
 
-      <!-- Telemetry Metric Triad -->
-      <div class="grid grid-cols-3 gap-space-xs mt-space-md pt-space-xs">
-        <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
-          <span class="font-label-caps text-label-caps text-on-surface-variant">BLOCK HEAT</span>
-          <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-primary" data-qloo="block-heat">94.8</span>
-            <span class="font-label-caps text-label-caps text-outline">/100</span>
+      <div class="relative p-5">
+        <!-- status row -->
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="relative w-2 h-2 text-tertiary flex-shrink-0">
+              <span class="halo absolute inset-0 rounded-full bg-tertiary"></span>
+              <span class="absolute inset-0 rounded-full bg-tertiary"></span>
+            </span>
+            <span class="font-label-caps text-label-caps text-secondary uppercase tracking-[0.06em] whitespace-nowrap">WEEK 42 PLAYBOOK</span>
           </div>
-          <span class="font-body-sm text-body-sm text-tertiary flex items-center gap-0.5 mt-0.5">
-            <span class="material-symbols-outlined text-[14px]">trending_up</span>+6.2%
+          <span id="playbook-feed-pill" class="font-label-caps text-label-caps uppercase tracking-[0.1em] text-tertiary hairline rounded-full px-2.5 py-1 bg-surface-container/60 backdrop-blur-sm flex-shrink-0">
+            LIVE &#183; GROUNDED BY QLOO
           </span>
         </div>
-        <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
-          <span class="font-label-caps text-label-caps text-on-surface-variant">TASTE SYNERGY</span>
-          <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-secondary" data-qloo="taste-synergy">98.2</span>
-            <span class="font-label-caps text-label-caps text-outline">%</span>
-          </div>
-          <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">Max Affinity</span>
+
+        <!-- venue rail -->
+        <div class="mt-4 flex items-center gap-2 micro-caps text-outline">
+          <span class="material-symbols-outlined text-[13px]" aria-hidden="true">location_on</span>
+          <span class="truncate">THE AMBER ROOM &#183; 142 FRANKLIN ST</span>
+          <span class="flex-1 h-px bg-outline-variant/40" aria-hidden="true"></span>
         </div>
-        <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
-          <span class="font-label-caps text-label-caps text-on-surface-variant">FOOTFALL PEAK</span>
-          <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-on-surface">19:45</span>
+
+        <!-- tribe hero -->
+        <div class="mt-3.5">
+          <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-[0.24em]">Predominant Block Micro-Tribe</span>
+          <h2 class="mt-1.5 text-[30px] leading-[35px] font-bold tracking-[-0.02em] text-on-surface [text-wrap:balance]" data-qloo-tribe-hero>Analog Minimalists &amp; Pet-Nat Devotees</h2>
+        </div>
+
+        <!-- metric triad · hairline instrument columns -->
+        <div class="mt-5 grid grid-cols-3 rounded-xl bg-surface-container/60 hairline divide-x divide-outline-variant/25 overflow-hidden">
+          <div class="px-3 py-3.5 flex flex-col min-w-0">
+            <span class="micro-caps text-on-surface-variant">BLOCK HEAT</span>
+            <div class="mt-2 flex items-baseline gap-1">
+              <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-primary" data-qloo="block-heat">94.8</span>
+              <span class="micro-caps text-outline/80">/100</span>
+            </div>
+            <span class="mt-1 inline-flex items-center gap-0.5 font-label-caps text-label-caps text-tertiary">
+              <span class="material-symbols-outlined text-[13px]" aria-hidden="true">trending_up</span>+6.2%
+            </span>
           </div>
-          <span class="font-body-sm text-body-sm text-primary-container mt-0.5 truncate">+44 covers</span>
+          <div class="px-3 py-3.5 flex flex-col min-w-0">
+            <span class="micro-caps text-on-surface-variant" style="letter-spacing:.12em">SYNERGY</span>
+            <div class="mt-2 flex items-baseline gap-0.5">
+              <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-secondary" data-qloo="taste-synergy">98.2</span>
+              <span class="micro-caps text-outline/80">%</span>
+            </div>
+            <span class="mt-1 font-label-caps text-label-caps text-on-surface-variant/80 truncate">Max Affinity</span>
+          </div>
+          <div class="px-3 py-3.5 flex flex-col min-w-0">
+            <span class="micro-caps text-on-surface-variant" style="letter-spacing:.12em">FOOTFALL</span>
+            <div class="mt-2 flex items-baseline">
+              <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-on-surface">19:45</span>
+            </div>
+            <span class="mt-1 font-label-caps text-label-caps text-primary truncate">+44 covers</span>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- JCal Pitch & Pilot Banner -->
-    <section class="w-full rounded-xl bg-gradient-to-r from-secondary-container/90 via-surface-container-high to-surface-container p-space-md shadow-lg relative overflow-hidden">
-      <div class="flex items-start justify-between gap-space-sm">
-        <div class="flex items-center gap-2">
-          <div class="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
-            <span class="material-symbols-outlined text-primary text-base">auto_graph</span>
-          </div>
-          <div>
-            <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider block">30-Day Automated Taste Pilot</span>
-            <span class="font-title-editorial text-title-editorial text-on-surface italic">Day 12 of 30 Active</span>
+    <!-- ── The Engine · 30-day pilot ── -->
+    <section class="reveal relative overflow-hidden rounded-2xl p-5 shadow-[0_28px_56px_-26px_rgba(0,0,0,0.75)]" style="--d:.12s; background: linear-gradient(140deg, #33200a 0%, #46290c 42%, #261705 100%);">
+      <div class="pointer-events-none absolute inset-0 rounded-2xl hairline-strong" aria-hidden="true"></div>
+      <div class="pointer-events-none absolute -top-24 -right-10 w-60 h-60 rounded-full bg-primary/25 blur-3xl breathe-slow" aria-hidden="true"></div>
+      <div class="grain absolute inset-0" aria-hidden="true"></div>
+
+      <div class="relative flex items-center gap-4">
+        <!-- ring gauge · day 12 of 30 -->
+        <div class="relative w-[52px] h-[52px] flex-shrink-0" role="img" aria-label="Pilot day 12 of 30">
+          <svg viewBox="0 0 48 48" class="w-[52px] h-[52px] -rotate-90">
+            <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="3"/>
+            <circle cx="24" cy="24" r="20" fill="none" stroke="url(#attune-g)" stroke-width="3" stroke-linecap="round"
+                    stroke-dasharray="125.66" stroke-dashoffset="75.4" class="ring-draw"/>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="tnum text-[15px] leading-none font-bold text-[#ffd9ae]">12</span>
+            <span class="micro-caps text-[#cdbba2] mt-0.5" style="letter-spacing:.08em">OF 30</span>
           </div>
         </div>
-        <span class="font-label-caps text-label-caps bg-primary text-on-primary px-2 py-0.5 rounded-full font-semibold">
-          +$1,420/WK
-        </span>
+
+        <div class="min-w-0 flex-1">
+          <span class="font-label-caps text-label-caps uppercase text-[#cdbba2] tracking-[0.08em] block truncate">30-Day Taste Pilot</span>
+          <div class="mt-1 flex items-baseline gap-2 whitespace-nowrap">
+            <span class="tnum text-[21px] leading-6 font-bold text-[#f7ecdc]">Day 12</span>
+            <span class="font-body-sm text-body-sm text-[#cdbba2] italic">in motion</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col items-end flex-shrink-0">
+          <span class="tnum inline-flex items-baseline rounded-full px-2.5 py-1 text-[15px] leading-5 font-bold text-[#241503] shadow-[0_6px_18px_-6px_rgba(255,182,140,0.55)]" style="background:linear-gradient(135deg,#ffd9ae,#ea9a5b)">
+            +$<span data-countup="1420" data-commas="1">1,420</span><span class="text-[10px] font-bold opacity-70">/WK</span>
+          </span>
+          <span class="micro-caps text-[#cdbba2] mt-1.5" style="letter-spacing:.12em">RUN-RATE</span>
+        </div>
       </div>
-      <div class="mt-space-sm flex items-center justify-between text-on-surface-variant">
-        <p class="font-body-sm text-body-sm pr-2">
-          Projected lift: <span class="text-tertiary font-semibold">+18.4% gross margin</span>. Seamless renewal at <span class="text-on-surface font-medium">$189/mo</span> per door.
+
+      <div class="relative mt-4 flex items-center justify-between gap-3">
+        <p class="font-body-sm text-body-sm leading-snug text-[#d8c8b2] min-w-0">
+          <span class="text-[#6fe3b0] font-semibold">+18.4% gross margin</span> projected lift &#183; renews at <span class="text-white/90 font-semibold">$189/mo</span> per door
         </p>
-        <button class="bg-surface-container-highest/80 hover:bg-surface-container-highest text-secondary text-body-sm px-3 py-1.5 rounded-full flex items-center gap-1 flex-shrink-0 transition-colors">
-          <span>Metrics</span>
-          <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+        <button type="button" class="arrow-slide press flex-shrink-0 inline-flex items-center gap-1 rounded-full hairline-strong px-3 py-1.5 font-label-caps text-label-caps uppercase tracking-[0.12em] text-[#ffd9ae] hover:bg-white/[0.07] transition-colors">
+          Metrics <span class="material-symbols-outlined text-[14px]" aria-hidden="true">arrow_forward</span>
         </button>
       </div>
-      <!-- Mini Progress Line -->
-      <div class="w-full bg-surface-container-lowest/60 h-1 rounded-full mt-3 overflow-hidden">
-        <div class="bg-secondary h-full rounded-full w-[40%]"></div>
+
+      <!-- progress rail -->
+      <div class="relative mt-4 flex items-center gap-3">
+        <div class="relative flex-1 h-1 rounded-full bg-white/10 overflow-hidden">
+          <div class="absolute inset-y-0 left-0 rounded-full bar-grow shimmer" style="width:40%; background:linear-gradient(90deg,#c65f1f,#ffcf9e)"></div>
+        </div>
+        <span class="tnum micro-caps text-[#cdbba2] flex-shrink-0" style="letter-spacing:.1em">40% COMPLETE</span>
       </div>
     </section>
 
-    <!-- Deep Dive Golden Hour Card -->
-    <section class="w-full bg-surface-container rounded-xl shadow-xl overflow-hidden relative">
-      <!-- Atmospheric Header Glow -->
-      <div class="w-full h-32 relative bg-surface-container-high overflow-hidden">
-        <img class="w-full h-full object-cover opacity-45 mix-blend-screen"
+    <!-- ── The Stage · golden hour direction ── -->
+    <section class="reveal relative overflow-hidden rounded-2xl bg-surface-container hairline shadow-[0_30px_64px_-30px_rgba(0,0,0,0.7)]" style="--d:.19s">
+      <!-- cinematic header -->
+      <div class="relative h-[184px] bg-surface-container-high overflow-hidden">
+        <img class="absolute inset-0 w-full h-full object-cover opacity-90"
              alt="Intimate low-lit bespoke cocktail bar with glowing amber lights, dark soapstone tables, handcrafted ceramic drinkware, and warm wood shelving filled with vinyl records and artisanal spirits in Brooklyn."
              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGxIZmlcgeAYoQNcPqNfcK_58W15QjmU8TASkaL4dwMRfaqaa96T3-Rhd0AUiCXAFCym_7FmA0L7rYx4cNAdnYKF1JOxQ0u81JjNL8RRqn1U7QTASXmlhGZ0mTnVsGFbtyYxIPHmAkYt461OFUtBqCVS44Ed2ZRKgC1CCNKZktiUVFtOUV4Q6uKJsukJs0dkoGP2bVMlQ-lZR8JZQwTHDWxzjYJmwx6XFfPzXyef-ubNuKcNY0wxDbtQ"/>
-        <div class="absolute inset-0 bg-gradient-to-t from-surface-container via-surface-container/60 to-transparent"></div>
-        <div class="absolute bottom-3 left-4 right-4 flex items-end justify-between">
-          <div>
-            <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest bg-surface-container-lowest/80 px-2 py-0.5 rounded-full" id="daypart-window">NOW TUNED &#8226; 16:00 - 20:00</span>
-            <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight mt-1" id="daypart-title">Golden Hour Shift</h3>
+        <div class="absolute inset-0" style="background:linear-gradient(180deg, rgba(17,19,25,0.22) 0%, rgba(17,19,25,0.16) 38%, rgba(17,19,25,0.62) 74%, rgb(var(--c-surface-container)) 99%)" aria-hidden="true"></div>
+        <div class="grain absolute inset-0" aria-hidden="true"></div>
+
+        <!-- live window chip -->
+        <div class="absolute top-4 left-4 inline-flex items-center gap-2 rounded-full px-3 py-1.5 bg-black/35 backdrop-blur-md hairline-strong">
+          <span class="relative w-1.5 h-1.5 text-tertiary flex-shrink-0">
+            <span class="halo absolute inset-0 rounded-full bg-tertiary"></span>
+            <span class="absolute inset-0 rounded-full bg-tertiary"></span>
+          </span>
+          <span id="daypart-window" class="tnum font-label-caps text-label-caps uppercase tracking-[0.14em] text-white">NOW TUNED &#8226; 16:00 - 20:00</span>
+        </div>
+
+        <!-- decibel instrument cluster -->
+        <div class="absolute top-4 right-4 flex flex-col items-end gap-1.5 rounded-2xl px-3 py-2 bg-black/35 backdrop-blur-md hairline-strong">
+          <span class="micro-caps text-white/55" style="letter-spacing:.14em">DECIBEL GOAL</span>
+          <div class="flex items-end gap-2">
+            <span class="eq h-4 text-secondary-fixed" aria-hidden="true">
+              <span style="animation-delay:0s"></span>
+              <span style="animation-delay:.28s"></span>
+              <span style="animation-delay:.12s"></span>
+              <span style="animation-delay:.4s"></span>
+            </span>
+            <span class="tnum text-[21px] leading-none font-bold text-white">64<span class="micro-caps text-white/55 ml-1">dB</span></span>
           </div>
-          <div class="text-right flex flex-col items-end">
-            <span class="font-label-caps text-label-caps text-on-surface-variant">DECIBEL GOAL</span>
-            <span class="font-metric-stat text-metric-stat text-primary">64<span class="font-label-caps text-label-caps text-outline-variant">dB</span></span>
-          </div>
+        </div>
+
+        <!-- title block -->
+        <div class="absolute bottom-4 left-5 right-5">
+          <span class="font-label-caps text-label-caps uppercase tracking-[0.22em] text-white/60">Live Direction</span>
+          <h3 id="daypart-title" class="text-[28px] leading-8 font-bold tracking-[-0.02em] text-white [text-shadow:0_2px_18px_rgba(0,0,0,0.45)]">Golden Hour Shift</h3>
         </div>
       </div>
 
-      <div class="p-space-md space-y-space-md">
-        <!-- Acoustic Direction Module -->
-        <div class="bg-surface-container-low rounded-lg p-space-sm space-y-2">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-secondary text-lg">graphic_eq</span>
-              <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Acoustic Architecture</span>
+      <div class="p-4 pt-3 space-y-3">
+        <!-- Acoustic architecture · instrument panel -->
+        <div class="rounded-xl bg-surface-container-low hairline p-3.5">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="material-symbols-outlined text-secondary text-[18px]" aria-hidden="true">graphic_eq</span>
+              <span class="font-label-caps text-label-caps uppercase text-secondary-fixed tracking-[0.08em] truncate">Acoustic Architecture</span>
             </div>
-            <span class="font-label-caps text-label-caps text-tertiary flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span> SONOS LINKED
+            <span class="font-label-caps text-label-caps uppercase text-tertiary inline-flex items-center gap-1.5 flex-shrink-0">
+              <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>SONOS LINKED
             </span>
           </div>
-          <div class="flex flex-col">
-            <span class="font-body-md text-body-md text-on-surface font-medium" id="daypart-audio-title">Warm Japanese Kanky&#333; Ongaku &amp; Vinyl Jazz</span>
-            <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Streaming: <span class="italic text-primary-fixed" id="daypart-audio-stream">Eriko Shimizu Trio &#8212; Midsummer Amber</span></span>
+          <p id="daypart-audio-title" class="mt-2.5 font-body-md text-body-md font-medium text-on-surface">Warm Japanese Kanky&#333; Ongaku &amp; Vinyl Jazz</p>
+          <p class="mt-0.5 font-body-sm text-body-sm text-on-surface-variant">Streaming &#183; <span id="daypart-audio-stream" class="italic text-primary-fixed">Eriko Shimizu Trio &#8212; Midsummer Amber</span></p>
+
+          <!-- instrument cells -->
+          <div class="mt-3 grid grid-cols-3 rounded-lg bg-surface-container/60 hairline divide-x divide-outline-variant/25 overflow-hidden">
+            <div class="px-2.5 py-2 min-w-0">
+              <span class="micro-caps text-outline block">TEMPO</span>
+              <span id="daypart-bpm" class="tnum block mt-1 text-[13px] leading-4 font-bold text-on-surface">81 BPM</span>
+            </div>
+            <div class="px-2.5 py-2 min-w-0">
+              <span class="micro-caps text-outline block">ROOM TONE</span>
+              <span class="block mt-1 text-[13px] leading-4 font-bold text-secondary truncate">Low Warmth</span>
+            </div>
+            <div class="px-2.5 py-2 min-w-0">
+              <span class="micro-caps text-outline block">LIGHTS</span>
+              <span class="tnum block mt-1 text-[13px] leading-4 font-bold text-on-surface truncate tracking-[-0.01em]">2800K&#183;35%</span>
+            </div>
           </div>
-          <!-- Waveform Simulation / Audio Telemetry -->
-          <div class="flex items-center justify-between pt-1 gap-2">
-            <div class="flex items-center gap-1.5 flex-1 bg-surface-container px-2.5 py-1.5 rounded">
-              <span class="material-symbols-outlined text-primary text-sm">speed</span>
-              <span class="font-label-caps text-label-caps text-on-surface-variant">TEMPO:</span>
-              <span class="font-metric-stat text-[13px] text-on-surface" id="daypart-bpm">81 BPM</span>
-            </div>
-            <div class="flex items-center gap-1.5 flex-1 bg-surface-container px-2.5 py-1.5 rounded">
-              <span class="material-symbols-outlined text-secondary text-sm">multicooker</span>
-              <span class="font-label-caps text-label-caps text-on-surface-variant">ROOM TONE:</span>
-              <span class="font-metric-stat text-[13px] text-secondary">Low Warmth</span>
-            </div>
+
+          <div class="mt-2.5 flex items-center justify-between gap-2">
+            <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug min-w-0">
+              <span class="material-symbols-outlined text-[14px] text-secondary align-[-2px] mr-1" aria-hidden="true">candle</span>Candlewells on soapstone at dusk to soften the perimeter
+            </p>
+            <span class="micro-caps text-outline flex-shrink-0">LUTRON SYNCED</span>
           </div>
         </div>
 
-        <!-- Block Taste Heat Driver -->
-        <div class="bg-surface-container-low rounded-lg p-space-sm flex items-start gap-3">
-          <div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center flex-shrink-0 mt-0.5">
-            <span class="material-symbols-outlined text-primary text-lg">radar</span>
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center justify-between">
-              <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider" id="daypart-action-label">Daypart Play</span>
-              <span class="font-label-caps text-label-caps text-primary font-bold" id="daypart-overlap">93% OVERLAP</span>
+        <!-- Daypart play · grounded in Qloo -->
+        <div class="rounded-xl bg-surface-container-low hairline p-3.5">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="w-7 h-7 rounded-lg bg-primary/[0.14] ring-1 ring-inset ring-primary/25 flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-primary text-[16px]" aria-hidden="true">radar</span>
+              </span>
+              <span id="daypart-action-label" class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-[0.16em] truncate">Daypart Play</span>
             </div>
-            <p class="font-body-sm text-body-sm text-on-surface font-medium mt-1" id="daypart-action">
-              Queue side-B kanky&#333; ongaku for the 16-20 swell; run the hi-ball feature tray to garden tables from 17:30.
-            </p>
-            <p class="font-body-sm text-body-sm text-on-surface mt-1" id="daypart-driver">
-              Active patrons within 800ft heavily index on <span class="text-secondary font-medium">Ryuichi Sakamoto</span> streaming &amp; frequent <span class="text-secondary font-medium">Pioneer Works</span> cultural programming.
-            </p>
-            <!-- LLM traceability strip: shows WHICH Qloo entities ground the playbook -->
-            <div class="mt-2 pt-2 border-t border-outline-variant/30 flex items-start justify-between gap-2" id="grounding-strip">
-              <div class="min-w-0">
-                <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block mb-1">Grounded by Qloo</span>
-                <p class="font-body-sm text-body-sm text-on-surface-variant italic leading-snug" id="llm-persona">&#8220;Analog-leaning night owls who treat listening as the main event.&#8221;</p>
-                <div class="flex flex-wrap gap-1 mt-1.5" id="grounding-chips">
-                  <span class="font-label-caps text-label-caps text-secondary bg-secondary-container/40 px-1.5 py-0.5 rounded">Ryuichi Sakamoto &#183; 0.96</span>
-                  <span class="font-label-caps text-label-caps text-secondary bg-secondary-container/40 px-1.5 py-0.5 rounded">Pioneer Works &#183; 0.91</span>
-                </div>
+            <span id="daypart-overlap" class="tnum font-label-caps text-label-caps font-bold text-primary flex-shrink-0">93% OVERLAP</span>
+          </div>
+          <p id="daypart-action" class="mt-2.5 font-body-md text-body-md text-on-surface leading-relaxed">
+            Queue side-B kanky&#333; ongaku for the 16-20 swell; run the hi-ball feature tray to garden tables from 17:30.
+          </p>
+          <p id="daypart-driver" class="mt-2 font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+            Active patrons within 800ft heavily index on <span class="text-secondary font-medium">Ryuichi Sakamoto</span> streaming &amp; frequent <span class="text-secondary font-medium">Pioneer Works</span> cultural programming.
+          </p>
+
+          <!-- LLM traceability strip: shows WHICH Qloo entities ground the playbook -->
+          <div class="mt-3.5 pt-3 border-t border-outline-variant/30" id="grounding-strip">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-[0.2em] truncate">Grounded by Qloo</span>
+                <span id="llm-mode" class="micro-caps px-1.5 py-0.5 rounded bg-tertiary/10 text-tertiary flex-shrink-0" style="letter-spacing:.1em">CURATED</span>
               </div>
               <button type="button" id="grounding-export" aria-label="Export grounding JSON" title="Export grounding JSON"
-                      class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-surface-container-high/70 hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-colors">
-                <span class="material-symbols-outlined text-base">data_object</span>
+                      class="press flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-surface-container/70 hairline hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors">
+                <span class="material-symbols-outlined text-base" data-export-icon>data_object</span>
               </button>
+            </div>
+            <p id="llm-persona" class="mt-2 font-body-sm text-body-sm italic text-on-surface-variant leading-relaxed">&#8220;Analog-leaning night owls who treat listening as the main event.&#8221;</p>
+            <div class="mt-2 flex flex-wrap gap-1.5" id="grounding-chips">
+              <span class="font-label-caps text-label-caps text-secondary bg-secondary-container/40 ring-1 ring-inset ring-secondary/25 px-2 py-1 rounded-md">Ryuichi Sakamoto &#183; 0.96</span>
+              <span class="font-label-caps text-label-caps text-secondary bg-secondary-container/40 ring-1 ring-inset ring-secondary/25 px-2 py-1 rounded-md">Pioneer Works &#183; 0.91</span>
             </div>
           </div>
         </div>
 
-        <!-- Curated Micro-Menu Addition -->
-        <div class="bg-surface-container-low rounded-lg p-space-sm space-y-2">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-primary text-lg">local_bar</span>
-              <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Recommended Golden Pairing</span>
+        <!-- Golden pairing · menu engineering -->
+        <div class="rounded-xl bg-surface-container-low hairline p-3.5">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="material-symbols-outlined text-primary text-[18px]" aria-hidden="true">local_bar</span>
+              <span class="font-label-caps text-label-caps uppercase text-secondary-fixed tracking-[0.12em] truncate">Recommended Pairing</span>
             </div>
-            <span class="font-label-caps text-label-caps bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full">
-              96% Flavor Synergy
-            </span>
+            <span class="font-label-caps text-label-caps text-tertiary bg-tertiary/10 px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap">96% SYNERGY</span>
           </div>
-          <div class="flex gap-space-sm items-center pt-1">
-            <div class="w-16 h-16 rounded-lg bg-surface-container overflow-hidden flex-shrink-0">
+          <div class="mt-3 flex gap-3.5 items-center">
+            <div class="w-[76px] h-[76px] rounded-xl overflow-hidden flex-shrink-0 shadow-[0_10px_24px_-10px_rgba(0,0,0,0.6)] ring-1 ring-inset ring-white/10">
               <img class="w-full h-full object-cover"
                    alt="Refined Japanese highball cocktail with hand-carved ice sphere, smoked olive oil droplets glistening on top surface with yuzu peel garnish in a crystal glass."
                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG8IHnMriqUvoPdvjrGXlKJqnbBmyNBHshWo_7dHMqSGE6K3-hmXsKsUHslzxV-BZoTVjN9iY-c-DgUf4ulH-JnvuOOPyPVCFh71baKR8zSqb1_Hu9oWMwAJ5-jX5yi_Drqm5l0gtEY8D_5h3VuP5DM7qIxpu15AtcxBpbjEEfOPR2NGMDpUoBFOj2zDCbfHeANOxirAZuX_s0Op2WNbNv7zYtWZ4GWJSXvp2dZLsS_WRCp3hkpb0Zlw"/>
             </div>
             <div class="flex-1 min-w-0">
-              <h4 class="font-title-editorial text-title-editorial text-on-surface font-medium truncate" id="daypart-menu">Smoked Olive Oil &amp; Yuzu Hi-Ball</h4>
-              <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate" id="daypart-menu-sub">Paired with Warm Koji Cashews</p>
-              <div class="flex items-center gap-2 mt-1">
-                <span class="font-label-caps text-label-caps text-tertiary">Cost: $3.20</span>
-                <span class="font-label-caps text-label-caps text-outline-variant">&#8226;</span>
-                <span class="font-label-caps text-label-caps text-primary">Target: $21 (84.7% Margin)</span>
-              </div>
+              <h4 id="daypart-menu" class="text-[17px] leading-[22px] font-semibold tracking-[-0.01em] text-on-surface">Smoked Olive Oil &amp; Yuzu Hi-Ball</h4>
+              <p id="daypart-menu-sub" class="mt-1 font-body-sm text-body-sm text-on-surface-variant">Paired with Warm Koji Cashews</p>
             </div>
           </div>
-        </div>
-
-        <!-- Spatial & Aesthetic Lighting Guidance -->
-        <div class="bg-surface-container-low rounded-lg p-space-sm flex items-start gap-3">
-          <div class="w-8 h-8 rounded-lg bg-secondary-container/60 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <span class="material-symbols-outlined text-secondary text-lg">candle</span>
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center justify-between">
-              <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Spatial Ambiance Preset</span>
-              <span class="font-label-caps text-label-caps text-on-surface-variant">LUTRON SYNCED</span>
+          <!-- price architecture -->
+          <div class="mt-3 grid grid-cols-3 rounded-lg bg-surface-container/60 hairline divide-x divide-outline-variant/25 overflow-hidden">
+            <div class="px-2.5 py-2 min-w-0">
+              <span class="micro-caps text-outline block">POUR COST</span>
+              <span class="tnum block mt-1 text-[13px] leading-4 font-bold text-on-surface">$3.20</span>
             </div>
-            <p class="font-body-sm text-body-sm text-on-surface mt-1">
-              Dim wall sconces to <span class="text-primary font-medium">2800K</span> at <span class="text-primary font-medium">35% intensity</span>. Light amber candlewells on soapstone surfaces to soften room perimeter.
-            </p>
+            <div class="px-2.5 py-2 min-w-0">
+              <span class="micro-caps text-outline block">MENU PRICE</span>
+              <span class="tnum block mt-1 text-[13px] leading-4 font-bold text-on-surface">$21</span>
+            </div>
+            <div class="px-2.5 py-2 min-w-0">
+              <span class="micro-caps text-outline block">MARGIN</span>
+              <span class="tnum block mt-1 text-[13px] leading-4 font-bold text-tertiary">84.7%</span>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Weekend Cultural Forecast Previews -->
-    <section class="space-y-space-sm">
+    <!-- ── The Forecast · weekend radar timeline ── -->
+    <section class="reveal pt-1" style="--d:.26s">
       <div class="flex items-center justify-between px-1">
-        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">WEEKEND RADAR FORECAST</span>
-        <span class="font-label-caps text-label-caps text-secondary flex items-center gap-1">
-          <span class="material-symbols-outlined text-xs">tune</span> PREDICTIVE
+        <span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-[0.22em]">WEEKEND RADAR FORECAST</span>
+        <span class="font-label-caps text-label-caps uppercase text-secondary inline-flex items-center gap-1 tracking-[0.14em]">
+          <span class="material-symbols-outlined text-xs" aria-hidden="true">tune</span>PREDICTIVE
         </span>
       </div>
 
-      <!-- Saturday Card -->
-      <div class="w-full bg-surface-container rounded-xl p-space-md shadow-md flex flex-col space-y-2">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="font-label-caps text-label-caps bg-surface-container-high text-on-surface px-2 py-0.5 rounded">SATURDAY OCT 26</span>
-            <span class="font-label-caps text-label-caps text-tertiary font-medium">21:30 PEAK SURGE</span>
-          </div>
-          <span class="material-symbols-outlined text-on-surface-variant text-lg">wine_bar</span>
-        </div>
-        <h4 class="font-headline-sm text-headline-sm text-on-surface mt-1">Midnight Natural Wine + Pet-Nat Pop-up</h4>
-        <p class="font-body-sm text-body-sm text-on-surface-variant">
-          Triggered by dual gallery opening receptions at <span class="text-on-surface font-medium">Greenpoint Loft (350ft)</span>. Expect +85 culturally coherent foot-traffic spillover between 21:00 and 23:30.
-        </p>
-        <div class="flex items-center justify-between pt-1">
-          <div class="flex items-center gap-2">
-            <span class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded">Menu: Skin-Contact Carignan</span>
-            <span class="font-label-caps text-label-caps text-secondary-fixed bg-secondary-container/40 px-2 py-0.5 rounded">Audio: 110 BPM Dark Wave</span>
-          </div>
-        </div>
-      </div>
+      <div class="relative mt-3.5">
+        <div class="absolute left-[19px] top-8 bottom-8 w-px bg-outline-variant/40" aria-hidden="true"></div>
 
-      <!-- Sunday Card -->
-      <div class="w-full bg-surface-container rounded-xl p-space-md shadow-md flex flex-col space-y-2">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="font-label-caps text-label-caps bg-surface-container-high text-on-surface px-2 py-0.5 rounded">SUNDAY OCT 27</span>
-            <span class="font-label-caps text-label-caps text-secondary font-medium">11:00 - 15:30</span>
+        <!-- Saturday -->
+        <article class="relative flex gap-3">
+          <div class="relative z-10 flex-shrink-0 w-10 h-10 rounded-xl bg-surface-container-low hairline flex flex-col items-center justify-center" aria-label="Saturday October 26">
+            <span class="micro-caps text-secondary leading-none" style="letter-spacing:.06em">SAT</span>
+            <span class="tnum text-[13px] leading-none font-bold text-on-surface mt-1">26</span>
           </div>
-          <span class="material-symbols-outlined text-on-surface-variant text-lg">palette</span>
-        </div>
-        <h4 class="font-headline-sm text-headline-sm text-on-surface mt-1">Low-Tempo Brunch &amp; Risograph Print Swap</h4>
-        <p class="font-body-sm text-body-sm text-on-surface-variant">
-          Co-promoted affinity activation targeting local graphic designers and architects. Projected +22% dwell time and higher espresso &amp; amaro spritz cadence.
-        </p>
-        <div class="flex items-center justify-between pt-1">
-          <div class="flex items-center gap-2">
-            <span class="font-label-caps text-label-caps text-tertiary bg-tertiary/10 px-2 py-0.5 rounded">Audio: Ambient Dub &amp; ECM</span>
-            <span class="font-label-caps text-label-caps text-primary-fixed bg-primary-container/20 px-2 py-0.5 rounded">Batch: Kardamom Buns</span>
+          <div class="flex-1 min-w-0 rounded-xl bg-surface-container hairline p-3.5">
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="text-[16px] leading-[21px] font-semibold tracking-[-0.01em] text-on-surface">Midnight Natural Wine + Pet-Nat Pop-up</h4>
+              <span class="material-symbols-outlined text-[18px] text-secondary flex-shrink-0 mt-0.5" aria-hidden="true">wine_bar</span>
+            </div>
+            <span class="tnum mt-1.5 block font-label-caps text-label-caps uppercase text-tertiary tracking-[0.1em]">21:30 &#183; PEAK SURGE</span>
+            <p class="mt-1.5 font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              Triggered by dual gallery opening receptions at <span class="text-on-surface font-medium">Greenpoint Loft (350ft)</span>. Expect +85 culturally coherent foot-traffic spillover between 21:00 and 23:30.
+            </p>
+            <div class="mt-2.5 flex flex-wrap gap-1.5">
+              <span class="font-label-caps text-label-caps inline-flex items-center gap-1 text-primary bg-primary/10 px-2 py-1 rounded-md whitespace-nowrap">
+                <span class="material-symbols-outlined text-[12px]" aria-hidden="true">local_bar</span>SKIN-CONTACT CARIGNAN
+              </span>
+              <span class="font-label-caps text-label-caps inline-flex items-center gap-1 text-secondary bg-secondary-container/40 px-2 py-1 rounded-md whitespace-nowrap">
+                <span class="material-symbols-outlined text-[12px]" aria-hidden="true">graphic_eq</span>110 BPM DARK WAVE
+              </span>
+            </div>
           </div>
-        </div>
+        </article>
+
+        <!-- Sunday -->
+        <article class="relative flex gap-3 mt-3">
+          <div class="relative z-10 flex-shrink-0 w-10 h-10 rounded-xl bg-surface-container-low hairline flex flex-col items-center justify-center" aria-label="Sunday October 27">
+            <span class="micro-caps text-secondary leading-none" style="letter-spacing:.06em">SUN</span>
+            <span class="tnum text-[13px] leading-none font-bold text-on-surface mt-1">27</span>
+          </div>
+          <div class="flex-1 min-w-0 rounded-xl bg-surface-container hairline p-3.5">
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="text-[16px] leading-[21px] font-semibold tracking-[-0.01em] text-on-surface">Low-Tempo Brunch &amp; Risograph Print Swap</h4>
+              <span class="material-symbols-outlined text-[18px] text-secondary flex-shrink-0 mt-0.5" aria-hidden="true">palette</span>
+            </div>
+            <span class="tnum mt-1.5 block font-label-caps text-label-caps uppercase text-secondary tracking-[0.1em]">11:00 &#8211; 15:30</span>
+            <p class="mt-1.5 font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              Co-promoted affinity activation targeting local graphic designers and architects. Projected +22% dwell time and higher espresso &amp; amaro spritz cadence.
+            </p>
+            <div class="mt-2.5 flex flex-wrap gap-1.5">
+              <span class="font-label-caps text-label-caps inline-flex items-center gap-1 text-tertiary bg-tertiary/10 px-2 py-1 rounded-md whitespace-nowrap">
+                <span class="material-symbols-outlined text-[12px]" aria-hidden="true">graphic_eq</span>AMBIENT DUB &amp; ECM
+              </span>
+              <span class="font-label-caps text-label-caps inline-flex items-center gap-1 text-primary bg-primary/10 px-2 py-1 rounded-md whitespace-nowrap">
+                <span class="material-symbols-outlined text-[12px]" aria-hidden="true">bakery_dining</span>KARDAMOM BUNS
+              </span>
+            </div>
+          </div>
+        </article>
       </div>
     </section>
 
-    <!-- Operator Action Suite -->
-    <section class="space-y-space-xs pt-space-xs">
-      <button class="w-full h-13 py-3 px-4 rounded-xl bg-primary-container text-on-primary-container hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-lg group">
-        <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">campaign</span>
-        <span class="font-label-caps text-label-caps uppercase tracking-wider font-bold">Broadcast Shift Notes to Staff</span>
+    <!-- ── Operator action suite ── -->
+    <section class="reveal space-y-2.5 pt-1" style="--d:.33s">
+      <button type="button" class="press w-full h-[52px] rounded-xl flex items-center justify-center gap-2 font-label-caps text-label-caps uppercase tracking-[0.14em] font-bold text-[#241503] bg-gradient-to-r from-[#ea9a5b] via-primary-container to-[#c65f1f] shadow-[0_16px_36px_-14px_rgba(217,119,54,0.65)] hover:brightness-[1.06] transition group">
+        <span class="material-symbols-outlined text-lg group-hover:rotate-12 transition-transform duration-300" aria-hidden="true">campaign</span>
+        Broadcast Shift Notes to Staff
       </button>
-      <div class="grid grid-cols-2 gap-space-xs">
-        <button class="py-2.5 px-3 rounded-lg bg-surface-container-high text-secondary hover:bg-surface-bright transition-colors flex items-center justify-center gap-1.5 shadow-sm">
-          <span class="material-symbols-outlined text-base text-secondary">speaker</span>
-          <span class="font-label-caps text-label-caps tracking-wider">Push to Sonos</span>
+      <div class="grid grid-cols-2 gap-2.5">
+        <button type="button" class="press h-11 rounded-xl bg-surface-container-low hairline text-secondary hover:bg-surface-container-high flex items-center justify-center gap-1.5 font-label-caps text-label-caps uppercase tracking-[0.1em]">
+          <span class="material-symbols-outlined text-base" aria-hidden="true">speaker</span>Push to Sonos
         </button>
-        <button class="py-2.5 px-3 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-colors flex items-center justify-center gap-1.5 shadow-sm">
-          <span class="material-symbols-outlined text-base">picture_as_pdf</span>
-          <span class="font-label-caps text-label-caps tracking-wider">Export Ops PDF</span>
+        <button type="button" class="press h-11 rounded-xl bg-surface-container-low hairline text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high flex items-center justify-center gap-1.5 font-label-caps text-label-caps uppercase tracking-[0.1em]">
+          <span class="material-symbols-outlined text-base" aria-hidden="true">picture_as_pdf</span>Export Ops PDF
         </button>
       </div>
     </section>
 
-    <!-- Realtime Telemetry Heartbeat Bar -->
-    <footer class="pt-2 text-center">
-      <div class="inline-flex items-center gap-2 px-3 py-1 bg-surface-container-low rounded-full">
-        <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-ping"></span>
-        <span class="font-label-caps text-label-caps text-on-surface-variant tracking-widest">AMBER ROOM TELEMETRY RUNNING &#8226; LATENCY 14MS</span>
+    <!-- ── Realtime heartbeat ── -->
+    <footer class="reveal pt-1 pb-1 text-center" style="--d:.4s">
+      <div class="inline-flex items-center gap-2.5 rounded-full bg-surface-container-low/80 hairline px-3.5 py-1.5">
+        <span class="eq h-2.5 text-tertiary" aria-hidden="true">
+          <span style="animation-delay:0s"></span>
+          <span style="animation-delay:.22s"></span>
+          <span style="animation-delay:.1s"></span>
+        </span>
+        <span class="font-label-caps text-label-caps text-on-surface-variant tracking-[0.14em]">AMBER ROOM TELEMETRY &#183; 14MS</span>
       </div>
     </footer>
 
@@ -1919,23 +2129,23 @@
   </section>
 </main>
 
-<nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.6)]" data-active-classes="text-primary bg-surface-container/80">
-  <div class="flex justify-around items-center h-20 px-space-xs">
-    <a aria-current="page" class="flex flex-col items-center justify-center w-16 h-14 rounded-xl transition-all gap-1 text-primary bg-surface-container/80" data-path="playbook" href="#">
-      <span class="material-symbols-outlined text-2xl">calendar_month</span>
-      <span class="font-label-caps text-label-caps tracking-wider">HOME</span>
+<nav class="fixed bottom-0 left-0 right-0 z-50 px-4 pb-[max(env(safe-area-inset-bottom),14px)] pt-2" data-active-classes="text-primary bg-surface-container/80">
+  <div class="nav-dock mx-auto max-w-[358px] h-[64px] flex items-center justify-around px-1.5">
+    <a aria-current="page" class="nav-tab flex flex-col items-center justify-center w-16 h-[52px] rounded-xl transition-all gap-0.5 text-primary bg-surface-container/80" data-path="playbook" href="#">
+      <span class="material-symbols-outlined text-[22px]">calendar_month</span>
+      <span class="font-label-caps text-label-caps tracking-[0.12em]">HOME</span>
     </a>
-    <a class="flex flex-col items-center justify-center w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all gap-1" data-path="taste-heat" href="#">
-      <span class="material-symbols-outlined text-2xl">radar</span>
-      <span class="font-label-caps text-label-caps tracking-wider">DISCOVER</span>
+    <a class="nav-tab flex flex-col items-center justify-center w-16 h-[52px] rounded-xl text-on-surface-variant hover:text-on-surface transition-all gap-0.5" data-path="taste-heat" href="#">
+      <span class="material-symbols-outlined text-[22px]">radar</span>
+      <span class="font-label-caps text-label-caps tracking-[0.12em]">DISCOVER</span>
     </a>
-    <a class="flex flex-col items-center justify-center w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all gap-1" data-path="menu-sound" href="#">
-      <span class="material-symbols-outlined text-2xl">nightlife</span>
-      <span class="font-label-caps text-label-caps tracking-wider">MENU</span>
+    <a class="nav-tab flex flex-col items-center justify-center w-16 h-[52px] rounded-xl text-on-surface-variant hover:text-on-surface transition-all gap-0.5" data-path="menu-sound" href="#">
+      <span class="material-symbols-outlined text-[22px]">nightlife</span>
+      <span class="font-label-caps text-label-caps tracking-[0.12em]">MENU</span>
     </a>
-    <a class="flex flex-col items-center justify-center w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all gap-1" data-path="live-pulse" href="#">
-      <span class="material-symbols-outlined text-2xl">vital_signs</span>
-      <span class="font-label-caps text-label-caps tracking-wider">LIVE</span>
+    <a class="nav-tab flex flex-col items-center justify-center w-16 h-[52px] rounded-xl text-on-surface-variant hover:text-on-surface transition-all gap-0.5" data-path="live-pulse" href="#">
+      <span class="material-symbols-outlined text-[22px]">vital_signs</span>
+      <span class="font-label-caps text-label-caps tracking-[0.12em]">LIVE</span>
     </a>
   </div>
 </nav>
@@ -2800,6 +3010,32 @@
 </script>
 
 <script>
+  /* ---------------- Count-up engine: [data-countup] numerals ---------------- */
+  (function initCountups() {
+    var els = document.querySelectorAll('[data-countup]');
+    if (!els.length) return;
+    var reduce = false;
+    try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { /* keep motion */ }
+    if (reduce) return;
+    els.forEach(function (el) {
+      var to = parseFloat(el.getAttribute('data-countup'));
+      if (isNaN(to)) return;
+      var commas = el.hasAttribute('data-commas');
+      function fmt(n) { return commas ? Math.round(n).toLocaleString('en-US') : String(Math.round(n)); }
+      var t0 = null, dur = 1200;
+      function step(ts) {
+        if (t0 === null) t0 = ts;
+        var p = Math.min(1, (ts - t0) / dur);
+        var e = 1 - Math.pow(1 - p, 4); /* ease-out quart */
+        el.textContent = fmt(to * e);
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  })();
+</script>
+
+<script>
 /* ================================================================
    ATTUNE LIVE FEED — Qloo Taste AI + LLM playbook
    ----------------------------------------------------------------
@@ -2888,8 +3124,28 @@
   }
 
   /* ----------------------- DOM writers ----------------------- */
+  function motionOK() {
+    try { return !window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return true; }
+  }
+  /* Numeric metrics tween from their current value to the live value —
+     instruments feel alive instead of snapping. */
+  function tweenTo(el, targetText) {
+    var n = parseFloat(targetText);
+    if (isNaN(n) || !motionOK()) { el.textContent = targetText; return; }
+    var dec = (String(targetText).split('.')[1] || '').length;
+    var start = parseFloat(el.textContent);
+    if (isNaN(start) || start === n) { el.textContent = targetText; return; }
+    var t0 = performance.now(), dur = 850;
+    function step(t) {
+      var p = Math.min(1, (t - t0) / dur);
+      var e = 1 - Math.pow(1 - p, 3); /* ease-out cubic */
+      el.textContent = (start + (n - start) * e).toFixed(dec);
+      if (p < 1) requestAnimationFrame(step); else el.textContent = targetText;
+    }
+    requestAnimationFrame(step);
+  }
   function setMetric(name, value) {
-    document.querySelectorAll('[data-qloo="' + name + '"]').forEach(function (el) { el.textContent = value; });
+    document.querySelectorAll('[data-qloo="' + name + '"]').forEach(function (el) { tweenTo(el, value); });
   }
   function setText(id, text) {
     var el = document.getElementById(id);
@@ -2916,7 +3172,7 @@
     var host = document.getElementById('grounding-chips');
     if (!host) return;
     host.innerHTML = rows.slice(0, 3).map(function (r) {
-      return '<span class="font-label-caps text-label-caps text-secondary bg-secondary-container/40 px-1.5 py-0.5 rounded">' +
+      return '<span class="font-label-caps text-label-caps text-secondary bg-secondary-container/40 ring-1 ring-inset ring-secondary/25 px-2 py-1 rounded-md">' +
         esc(r.name) + ' &#183; ' + r.affinity.toFixed(2) + '</span>';
     }).join('');
   }
@@ -3126,9 +3382,19 @@
   }
 
   /* ----------------------- LLM playbook ----------------------- */
+  function setLlmMode(mode) {
+    var el = document.getElementById('llm-mode');
+    if (!el) return;
+    el.textContent = mode;
+    el.classList.toggle('text-tertiary', mode !== 'CURATED');
+    el.classList.toggle('bg-tertiary/10', mode !== 'CURATED');
+    el.classList.toggle('text-on-surface-variant', mode === 'CURATED');
+    el.classList.toggle('bg-surface-container-high', mode === 'CURATED');
+  }
   function loadPlaybook() {
     var persona = document.getElementById('llm-persona');
-    if (persona) persona.textContent = 'LLM writing playbook from Qloo grounding\u2026';
+    if (persona) persona.textContent = 'Qloo grounding delivered \u2014 LLM is composing the playbook\u2026';
+    setLlmMode('WRITING');
     var ctrl = ('AbortController' in window) ? new AbortController() : null;
     var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 25000) : null;
     return fetch(API_BASE + '/llm/playbook', {
@@ -3149,12 +3415,17 @@
       state.provider = data.provider || null;
       state.model = data.model || null;
       if (persona) persona.textContent = '\u201C' + parsed.persona + '\u201D';
+      setLlmMode('LLM LIVE');
       setText('daypart-action-label', 'Daypart Play \u00B7 LLM');
       applyDaypart(currentDaypart);
     }).catch(function (err) {
       if (timer) clearTimeout(timer);
       state.llmLive = false;
-      if (persona) persona.textContent = 'LLM offline \u2014 curated persona shown. (' + String(err && err.message || err) + ')';
+      /* Operators never see stack traces — keep the quote pristine,
+         log the code for the console instead. */
+      console.warn('[attune llm]', err && err.message || err);
+      if (persona) persona.textContent = '\u201CAnalog-leaning night owls who treat listening as the main event.\u201D';
+      setLlmMode('CURATED');
     });
   }
 
@@ -3265,7 +3536,7 @@
         setBadges(false);
         var persona = document.getElementById('llm-persona');
         if (persona && !state.llmLive) {
-          persona.textContent = '\u201CAnalog-leaning night owls who treat listening as the main event.\u201D \u2014 curated demo feed (' + String(err && err.message || err) + ')';
+          persona.textContent = '\u201CAnalog-leaning night owls who treat listening as the main event.\u201D';
         }
         console.warn('[attune feed]', err);
       })
