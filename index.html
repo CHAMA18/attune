@@ -1898,7 +1898,7 @@
             </span>
           </div>
           <p id="daypart-audio-title" class="mt-3 text-[16px] leading-[22px] font-semibold tracking-[-0.01em] text-on-surface">Warm Japanese Kanky&#333; Ongaku &amp; Vinyl Jazz</p>
-          <p class="mt-0.5 font-body-sm text-body-sm text-on-surface-variant">Streaming &#183; <span id="daypart-audio-stream" class="italic text-primary-fixed">Eriko Shimizu Trio &#8212; Midsummer Amber</span></p>
+          <p class="mt-0.5 font-body-sm text-body-sm text-on-surface-variant">On repeat &#183; <span id="daypart-audio-stream" class="italic text-primary-fixed">Eriko Shimizu Trio &#8212; Midsummer Amber</span></p>
 
           <!-- instrument cells · divide-only, no boxes -->
           <div class="mt-3.5 grid grid-cols-3 divide-x divide-outline-variant/25">
@@ -1939,7 +1939,7 @@
             Queue side-B kanky&#333; ongaku for the 16-20 swell; run the hi-ball feature tray to garden tables from 17:30.
           </p>
           <p id="daypart-driver" class="mt-2 font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-            People within 800ft are streaming <span class="text-secondary font-medium">Ryuichi Sakamoto</span> and keep showing up to <span class="text-secondary font-medium">Pioneer Works</span> events.
+            People within 800ft have <span class="text-secondary font-medium">Ryuichi Sakamoto</span> on repeat and keep showing up at <span class="text-secondary font-medium">Pioneer Works</span>.
           </p>
         </div>
 
@@ -2224,24 +2224,23 @@
               <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-primary" data-qloo="block-heat">94.8</span>
               <span class="micro-caps text-outline/80">/100</span>
             </div>
-            <span class="mt-1 inline-flex items-center gap-0.5 font-label-caps text-label-caps text-tertiary">
-              <span class="material-symbols-outlined text-[13px]" aria-hidden="true">trending_up</span>+6.2%
+            <span class="mt-1 font-label-caps text-label-caps text-tertiary">
+              crowd average
             </span>
           </div>
           <div class="px-3 py-3.5 flex flex-col min-w-0">
-            <span class="micro-caps text-on-surface-variant">NEW MATCHES</span>
+            <span class="micro-caps text-on-surface-variant">HOT SPOTS</span>
             <div class="mt-2 flex items-baseline">
-              <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-secondary" data-qloo="new-matches">37</span>
+              <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-secondary" data-qloo="hot-spots">37</span>
             </div>
-            <span class="mt-1 font-label-caps text-label-caps text-on-surface-variant/80 truncate">+9 today</span>
+            <span class="mt-1 font-label-caps text-label-caps text-on-surface-variant/80 truncate">within 800 ft</span>
           </div>
           <div class="px-3 py-3.5 flex flex-col min-w-0">
-            <span class="micro-caps text-on-surface-variant">MATCH RATE</span>
-            <div class="mt-2 flex items-baseline gap-0.5">
-              <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-on-surface" data-qloo="match-rate">12.4</span>
-              <span class="micro-caps text-outline/80">%</span>
+            <span class="micro-caps text-on-surface-variant">BLOCK SCENES</span>
+            <div class="mt-2 flex items-baseline">
+              <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-on-surface" data-qloo="block-scenes">12</span>
             </div>
-            <span class="mt-1 font-label-caps text-label-caps text-primary truncate">of the block</span>
+            <span class="mt-1 font-label-caps text-label-caps text-primary truncate">on this block</span>
           </div>
         </div>
       </div>
@@ -2335,7 +2334,7 @@
       </div>
       <div class="space-y-4" id="qlooSignalList">
         <div class="space-y-2">
-          <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Streaming</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">On repeat</span>
           <div class="flex items-center gap-2">
             <span class="font-body-sm text-body-sm text-on-surface flex-1 truncate">Ryuichi Sakamoto</span>
             <div class="w-16 h-1 rounded-full bg-surface-container-highest overflow-hidden flex-shrink-0">
@@ -2359,7 +2358,7 @@
           </div>
         </div>
         <div class="space-y-2">
-          <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Palate</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Food &amp; drink</span>
           <div class="flex items-center gap-2">
             <span class="font-body-sm text-body-sm text-on-surface flex-1 truncate">P&#233;t-Nat by the Glass</span>
             <div class="w-16 h-1 rounded-full bg-surface-container-highest overflow-hidden flex-shrink-0">
@@ -4225,7 +4224,7 @@
    ATTUNE LIVE FEED — Qloo Taste AI + LLM playbook
    ----------------------------------------------------------------
    Pipeline:  venue geo -> GET /api/qloo/v2/insights (places, artists)
-              + /v2/audiences (micro-tribes) -> normalized metrics -> DOM
+              + place genre tags -> crowd clusters -> normalized metrics -> DOM
               -> grounding JSON -> POST /api/llm/playbook -> daypart copy.
 
    Compliance (Qloo LLM Hackathon rules):
@@ -4451,8 +4450,7 @@
       var hot = ents.filter(function (e) { return affinityOf(e) >= 0.8; }).length;
       setMetric('block-heat', heat.toFixed(1));
       setMetric('taste-synergy', (max * 100).toFixed(1));
-      setMetric('new-matches', String(hot));
-      setMetric('match-rate', (ents.length / 30 * 100).toFixed(1));
+      setMetric('hot-spots', String(hot));
       setText('radar-pool', ents.length + ' PLACES');
       state.places = ents.map(function (e) {
         return { name: nameOf(e), affinity: affinityOf(e), tags: e.tags || [] };
@@ -4488,48 +4486,133 @@
     state.tribes = rows;
   }
 
+  /* Crowd phrases — Qloo place genres translated into plain-English groups a
+     bar operator recognizes. Same block vocabulary, no segment-speak. */
+  var CROWD_PHRASES = {
+    cocktail_bar: 'Cocktail bar crowd', wine_bar: 'Wine bar crowd', beer_bar: 'Craft beer crowd',
+    sports_bar: 'Sports bar crowd', dive_bar: 'Dive bar crowd', bar: 'Neighborhood bar crowd', pub: 'Neighborhood bar crowd',
+    coffee_shop: 'Coffee shop people', cafe: 'Coffee shop people', coffee_roasters: 'Coffee shop people', tea_room: 'Tea room crowd',
+    breakfast: 'Brunch crowd', bakery: 'Brunch crowd', bagel_shop: 'Brunch crowd', patisserie: 'Brunch crowd', brunch_restaurant: 'Brunch crowd',
+    dessert_shop: 'Dessert & pastry crowd', ice_cream_shop: 'Dessert & pastry crowd', chocolate_shop: 'Dessert & pastry crowd',
+    sushi: 'Sushi & izakaya crowd', japanese: 'Sushi & izakaya crowd', ramen_shop: 'Sushi & izakaya crowd',
+    asian: 'Asian kitchen crowd', asian_fusion: 'Asian kitchen crowd',
+    italian: 'Italian table crowd', pasta_shop: 'Italian table crowd', pizza: 'Pizza crowd',
+    american: 'New American crowd', tapas: 'Tapas & small plates crowd', mexican: 'Tacos & mezcal crowd',
+    mediterranean: 'Mediterranean table crowd', greek: 'Mediterranean table crowd', french: 'French bistro crowd',
+    vegan: 'Plant-based crowd', vegetarian: 'Plant-based crowd', salad_shop: 'Plant-based crowd',
+    live_music_venue: 'Live music crowd', jazz_club: 'Live music crowd', concert_hall: 'Live music crowd', nightclub: 'Late-night club crowd',
+    tourist_attraction: 'Explorers & visitors', event_venue: 'Event & gig goers', wedding_venue: 'Private events crowd',
+    art_gallery: 'Gallery crowd', museum: 'Museum crowd', bookstore: 'Bookstore browsers',
+    vintage_clothing_store: 'Vintage shoppers', used_clothing_store: 'Vintage shoppers', thrift_store: 'Vintage shoppers',
+    consignment_shop: 'Vintage shoppers', clothing_store: 'Vintage shoppers',
+    hotel: 'Visiting guests', park: 'Park loungers', deli: 'Deli regulars', juice_bar: 'Juice & wellness crowd'
+  };
+  /* Umbrella genres carry no crowd signal — skip them. */
+  var CROWD_SKIP = {
+    place: 1, restaurant: 1, shopping: 1, personal_care: 1, hairdresser: 1,
+    hair_salon: 1, barber_shop: 1, delivery: 1, lunch: 1
+  };
+  var AUDIENCE_PHRASES = {
+    'Political Junkie': 'News & politics readers', 'Arts Culture': 'Arts & culture crowd',
+    'Foodie': 'Dining-out crowd', 'Cooking': 'Home cooks', 'Museums': 'Museum-goers',
+    'Cinephile': 'Film lovers', 'Music Festivals': 'Festival-goers', 'Avid Reader': 'Book lovers',
+    'Exercising': 'Wellness crowd', 'Coffee': 'Coffee people', 'Nightlife': 'Nightlife regulars',
+    'Live Music': 'Live music fans', 'Wine': 'Wine drinkers', 'Travel': 'Frequent travelers',
+    'Fashion': 'Fashion crowd', 'Gaming': 'Gamers', 'Pets': 'Pet people'
+  };
+  function crowdPhrase(key) {
+    return CROWD_PHRASES[key] || (key.replace(/_/g, ' ') + ' crowd');
+  }
+  function plainAudience(name) {
+    var n = String(name || '').trim();
+    return AUDIENCE_PHRASES[n] || n.replace(/\s+(Junkie|Enthusiast|Maven|Aficionado|Buff|Fanatic)s?$/i, ' fans');
+  }
+  /* Rank weighted genre buckets into a 58-100 dominance band vs the block's
+     strongest — an honest spread computed from real tags, not a score ladder. */
+  function dominance(weights, n) {
+    var keys = Object.keys(weights).sort(function (a, b) { return weights[b] - weights[a]; });
+    var hi = keys.length ? weights[keys[0]] : 0;
+    return keys.slice(0, n || 5).map(function (k) {
+      return { name: k, score: Math.round(58 + 42 * (weights[k] / (hi || 1))) };
+    });
+  }
+  /* 'urn:tag:genre:place:restaurant:cocktail_bar' -> 'cocktail_bar' */
+  function genreKey(urn) {
+    return String(urn || '').split(':').pop();
+  }
+  /* Collapses the doubled first names Qloo occasionally returns
+     ("Kierra Kierra Sheard" -> "Kierra Sheard") without touching real names. */
+  function tidyName(n) {
+    return String(n == null ? '' : n).replace(/\b([\w'\u2019-]+)\b(\s+\1\b)+/gi, '$1').trim();
+  }
+  /* First descriptive music tag for the sub-line: prefer a two-word tag
+     ("Psychedelic Rock", "World Music") over a bare genre, then fall back. */
+  function artistKind(e) {
+    var tags = e.tags || [];
+    var prefixes = ['urn:tag:subgenre:qloo:', 'urn:tag:genre:qloo:', 'urn:tag:style:qloo:'];
+    function scan(wantSpace) {
+      for (var p = 0; p < prefixes.length; p++) {
+        for (var i = 0; i < tags.length; i++) {
+          var urn = tags[i].id || tags[i].urn || '';
+          var nm = tags[i].name || '';
+          if (urn.indexOf(prefixes[p]) === 0 && nm && (String(nm).indexOf(' ') !== -1) === wantSpace) return nm;
+        }
+      }
+      return null;
+    }
+    return scan(true) || scan(false);
+  }
+
   function loadTribes(placeEntities) {
-    /* Leisure segments are the venue-relevant slice of Qloo's audience taxonomy
-       (food, arts, going out). Segment order is Qloo's own. */
+    /* Crowds are read off the block itself: the genres Qloo puts on the places
+       its taste graph ranks hottest inside the radius, weighted by affinity. */
+    var weights = {};
+    (placeEntities || []).forEach(function (e) {
+      var w = 1 + Math.max(0, Math.min(1, affinityOf(e) || 0));
+      (e.tags || []).forEach(function (t) {
+        if (String(t.id || t.urn || '').indexOf('urn:tag:genre:place') !== 0) return;
+        var key = genreKey(t.id || t.urn);
+        if (!key || CROWD_SKIP[key]) return;
+        var phrase = crowdPhrase(key);
+        weights[phrase] = (weights[phrase] || 0) + w;
+      });
+    });
+    var crowds = dominance(weights, 5);
+    if (crowds.length) {
+      setMetric('block-scenes', String(Object.keys(weights).length));
+      renderTribes(crowds);
+      return Promise.resolve();
+    }
+    /* Tag-poor blocks: Qloo's leisure audience taxonomy as a deep fallback,
+       translated out of segment-speak so the card stays human. */
     return qlooFetch('/v2/audiences', {
       'filter.audience.types': 'urn:audience:leisure',
       'take': '10'
     }).then(function (res) {
       var ents = entitiesOf(res);
       if (!ents.length) throw new Error('EMPTY');
-      renderTribes(ents.map(function (e, i) {
-        var aff = affinityOf(e) || (0.94 - i * 0.07);
-        return { name: nameOf(e), score: pct(aff) };
-      }).slice(0, 5));
+      var rows = ents.map(function (e, i) {
+        var aff = affinityOf(e);
+        return { name: plainAudience(nameOf(e)), score: aff > 0 ? pct(aff) : Math.max(58, 88 - i * 6) };
+      }).slice(0, 5);
+      setMetric('block-scenes', String(rows.length));
+      renderTribes(rows);
     }).catch(function () {
-      /* Fallback: cluster the block's place-genre tags into tribes */
-      var counts = {};
-      (placeEntities || []).forEach(function (e) {
-        (e.tags || []).forEach(function (t) {
-          var urn = t.id || t.urn || '';
-          if (urn.indexOf('urn:tag:genre:place') !== 0) return;
-          var label = t.name || urn.split(':').pop().replace(/_/g, ' ');
-          if (!label) return;
-          counts[label] = (counts[label] || 0) + 1 + affinityOf(e);
-        });
-      });
-      var ranked = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; }).slice(0, 5);
-      if (!ranked.length) throw new Error('NO_TAGS');
-      var hi = counts[ranked[0]];
-      renderTribes(ranked.map(function (label, i) {
-        return { name: label, score: Math.max(58, Math.round(counts[label] / hi * 94)) };
-      }));
+      throw new Error('NO_TAGS');
     });
   }
 
-  function renderSignals(stream, palate) {
+  function renderSignals(stream, palateRows) {
     var host = document.getElementById('qlooSignalList');
     if (host) {
       var bars = ['bg-primary', 'bg-primary/70', 'bg-secondary'];
       var tones = ['text-primary', 'text-secondary', 'text-secondary'];
-      function row(label, score, i) {
+      function row(label, score, i, sub) {
         return '<div class="flex items-center gap-2">' +
-          '<span class="font-body-sm text-body-sm text-on-surface flex-1 truncate">' + esc(label) + '</span>' +
+          '<div class="flex-1 min-w-0">' +
+            '<span class="font-body-sm text-body-sm text-on-surface block truncate">' + esc(label) + '</span>' +
+            (sub ? '<span class="micro-caps text-on-surface-variant block truncate">' + esc(sub) + '</span>' : '') +
+          '</div>' +
           '<div class="w-16 h-1 rounded-full bg-surface-container-highest overflow-hidden flex-shrink-0">' +
             '<div class="h-full rounded-full ' + bars[i] + '" style="width:' + score + '%"></div>' +
           '</div>' +
@@ -4538,26 +4621,48 @@
       }
       var html = '';
       if (stream.length) {
-        html += '<div class="space-y-2"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Streaming</span>';
-        html += stream.map(function (e, i) { return row(nameOf(e), pct(affinityOf(e)), i); }).join('') + '</div>';
+        html += '<div class="space-y-2"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">On repeat</span>';
+        html += stream.map(function (s, i) { return row(s.name, pct(s.affinity), i, s.kind); }).join('') + '</div>';
       }
-      if (palate.length) {
-        html += '<div class="space-y-2"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Palate</span>';
-        html += palate.map(function (label, i) { return row(label, [95, 88, 81][i], i); }).join('') + '</div>';
+      if (palateRows.length) {
+        html += '<div class="space-y-2"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Food &amp; drink</span>';
+        html += palateRows.map(function (r, i) { return row(r.name, r.score, i); }).join('') + '</div>';
       }
       if (html) host.innerHTML = html;
     }
     /* Traceability sentence — real entity names, real affinities */
-    var topArtist = stream[0] ? nameOf(stream[0]) : null;
+    var topArtist = stream[0] ? stream[0].name : null;
     var topPlace = (state.places && state.places[0]) ? state.places[0].name : null;
     if (topArtist || topPlace) {
-      var htmlDriver = 'People within ' + RADIUS_FT + 'ft are streaming ' +
-        '<span class="text-secondary font-medium">' + esc(topArtist || 'local favourites') + '</span>' +
-        (topPlace ? ' and keep showing up to <span class="text-secondary font-medium">' + esc(topPlace) + '</span> events.' : '.');
+      var htmlDriver = 'People within ' + RADIUS_FT + 'ft have ' +
+        '<span class="text-secondary font-medium">' + esc(topArtist || 'the block&#8217;s favorites') + '</span> on repeat' +
+        (topPlace ? ' and keep showing up at <span class="text-secondary font-medium">' + esc(topPlace) + '</span>.' : '.');
       setHtml('daypart-driver', htmlDriver);
-      if (topArtist) setText('daypart-overlap', pct(affinityOf(stream[0])) + '% CROWD MATCH');
+      if (topArtist) setText('daypart-overlap', pct(stream[0].affinity) + '% CROWD MATCH');
     }
   }
+
+  /* Food & drink pull — drink/food genres only, weighted like the crowds. */
+  function isPalateKey(key) {
+    return ['bar', 'cafe', 'coffee', 'tea', 'bakery', 'bagel', 'patisserie', 'dessert',
+      'ice_cream', 'chocolate', 'juice', 'deli', 'ramen', 'sushi', 'pizza', 'tapas'].some(function (p) {
+      return key.indexOf(p) === 0;
+    });
+  }
+  var PALATE_PHRASES = {
+    cocktail_bar: 'Cocktail bars', wine_bar: 'Wine by the glass', beer_bar: 'Craft beer lists',
+    sports_bar: 'Sports bars', dive_bar: 'Dive bars', bar: 'Neighborhood bars', pub: 'Neighborhood bars',
+    coffee_shop: 'Coffee & espresso', cafe: 'Coffee & espresso', coffee_roasters: 'Coffee & espresso', tea_room: 'Tea service',
+    breakfast: 'All-day breakfast', bakery: 'Fresh bakery', bagel_shop: 'Bagel shops', patisserie: 'Pastry counters', brunch_restaurant: 'All-day breakfast',
+    dessert_shop: 'Desserts', ice_cream_shop: 'Ice cream', chocolate_shop: 'Chocolate & confections',
+    sushi: 'Sushi & omakase', japanese: 'Japanese kitchens', ramen_shop: 'Ramen counters',
+    asian: 'Asian kitchens', asian_fusion: 'Asian fusion',
+    italian: 'Italian kitchens', pasta_shop: 'Fresh pasta', pizza: 'Pizza',
+    american: 'New American', tapas: 'Tapas & small plates', mexican: 'Tacos & antojitos',
+    mediterranean: 'Mediterranean', greek: 'Mediterranean', french: 'French bistro',
+    vegan: 'Plant-based', vegetarian: 'Plant-based', salad_shop: 'Plant-based',
+    deli: 'Deli counters', juice_bar: 'Juice & smoothies'
+  };
 
   function loadSignals(placeEntities) {
     /* Artists have no geography — rank them by affinity to the block's anchor venue.
@@ -4569,23 +4674,33 @@
       Object.assign(params, venueFilter());
     }
     return qlooFetch('/v2/insights', params).then(function (res) {
-      var stream = entitiesOf(res).filter(function (e) { return affinityOf(e) > 0; }).slice(0, 3);
-      var palateTags = {};
+      /* Top 3 distinct artists — deduped, tidy names, genre for the sub-line. */
+      var seen = {}, stream = [];
+      entitiesOf(res).forEach(function (e) {
+        if (stream.length >= 3) return;
+        var aff = affinityOf(e);
+        if (aff <= 0) return;
+        var label = tidyName(nameOf(e));
+        if (!label || seen[label.toLowerCase()]) return;
+        seen[label.toLowerCase()] = 1;
+        stream.push({ name: label, affinity: aff, kind: artistKind(e) });
+      });
+      var palateW = {};
       (placeEntities || []).forEach(function (e) {
+        var w = 1 + Math.max(0, Math.min(1, affinityOf(e) || 0));
         (e.tags || []).forEach(function (t) {
-          var urn = t.id || t.urn || '';
-          if (urn.indexOf('urn:tag:genre:place:restaurant') !== 0 &&
-              urn.indexOf('urn:tag:genre:place:bar') !== 0 &&
-              urn.indexOf('urn:tag:genre:place:cafe') !== 0) return;
-          var label = t.name || urn.split(':').pop().replace(/_/g, ' ');
-          if (label) palateTags[label] = (palateTags[label] || 0) + 1;
+          if (String(t.id || t.urn || '').indexOf('urn:tag:genre:place') !== 0) return;
+          var key = genreKey(t.id || t.urn);
+          if (!key || CROWD_SKIP[key] || !isPalateKey(key)) return;
+          var label = PALATE_PHRASES[key] || key.replace(/_/g, ' ');
+          palateW[label] = (palateW[label] || 0) + w;
         });
       });
-      var palate = Object.keys(palateTags).sort(function (a, b) { return palateTags[b] - palateTags[a]; }).slice(0, 3);
-      if (!stream.length && !palate.length) throw new Error('EMPTY');
-      state.artists = stream.map(function (e) { return { name: nameOf(e), affinity: affinityOf(e) }; });
-      state.palate = palate;
-      renderSignals(stream, palate);
+      var palateRows = dominance(palateW, 3);
+      if (!stream.length && !palateRows.length) throw new Error('EMPTY');
+      state.artists = stream.map(function (s) { return { name: s.name, affinity: s.affinity }; });
+      state.palate = palateRows.map(function (r) { return r.name; });
+      renderSignals(stream, palateRows);
     });
   }
 
@@ -4599,7 +4714,7 @@
       trace.push({ entity: p.name, kind: 'place', affinity: Number(p.affinity.toFixed(2)), surfaces: i === 0 ? ['driver sentence'] : ['block heat'] });
     });
     state.tribes.slice(0, 3).forEach(function (t) {
-      trace.push({ entity: t.name, kind: 'audience', affinity: Number((t.score / 100).toFixed(2)), surfaces: ['micro-tribe index', 'tribe hero'] });
+      trace.push({ entity: t.name, kind: 'crowd', affinity: Number((t.score / 100).toFixed(2)), surfaces: ['crowd index', 'tribe hero'] });
     });
     return {
       app: 'Attune',
@@ -4613,8 +4728,8 @@
       taste_metrics: {
         block_heat: (document.querySelector('[data-qloo="block-heat"]') || {}).textContent || null,
         taste_synergy: (document.querySelector('[data-qloo="taste-synergy"]') || {}).textContent || null,
-        new_matches: (document.querySelector('[data-qloo="new-matches"]') || {}).textContent || null,
-        match_rate: (document.querySelector('[data-qloo="match-rate"]') || {}).textContent || null
+        new_matches: (document.querySelector('[data-qloo="hot-spots"]') || {}).textContent || null,
+        match_rate: (document.querySelector('[data-qloo="block-scenes"]') || {}).textContent || null
       },
       micro_tribes: state.tribes.map(function (t) { return { name: t.name, affinity: Number((t.score / 100).toFixed(2)) }; }),
       nearby_place_affinities: state.places.slice(0, 10).map(function (p) { return { name: p.name, affinity: Number(p.affinity.toFixed(2)) }; }),
