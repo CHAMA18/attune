@@ -2647,56 +2647,56 @@
       <div class="flex items-center justify-between pb-space-xs">
         <div class="flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
-          <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest whitespace-nowrap">LIVE &#8226; GOLDEN HR</span>
+          <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest whitespace-nowrap">LIVE &#8226; <span data-floor-daypart>GOLDEN HR</span></span>
         </div>
-        <span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded-full whitespace-nowrap">16:00 - 20:00</span>
+        <span data-floor-win class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded-full whitespace-nowrap">16:00 - 20:00</span>
       </div>
 
       <div class="mt-2 pt-2 flex items-end justify-between gap-space-sm">
         <div class="min-w-0">
           <span class="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">Seated Now</span>
           <div class="flex items-baseline gap-1.5">
-            <span class="font-metric-stat text-[40px] leading-none text-primary">62</span>
+            <span class="font-metric-stat text-[40px] leading-none text-primary" data-floor-seated>62</span>
             <span class="font-label-caps text-label-caps text-outline">/88 SEATS</span>
           </div>
         </div>
         <div class="text-right flex-shrink-0">
           <span class="font-label-caps text-label-caps text-on-surface-variant block">OCCUPANCY</span>
-          <span class="font-metric-stat text-[22px] text-tertiary">70%</span>
+          <span class="font-metric-stat text-[22px] text-tertiary" data-floor-occupancy>70%</span>
         </div>
       </div>
 
       <div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden mt-space-sm">
-        <div class="h-full rounded-full bg-gradient-to-r from-secondary to-primary" style="width:70%"></div>
+        <div data-floor-occupancy-bar class="h-full rounded-full bg-gradient-to-r from-secondary to-primary" style="width:70%"></div>
       </div>
       <div class="flex items-center justify-between mt-1.5">
-        <span class="font-label-caps text-label-caps text-tertiary">+44 GUESTS VS FORECAST</span>
-        <span class="font-label-caps text-label-caps text-outline-variant">UPDATED 6s AGO</span>
+        <span data-floor-variance class="font-label-caps text-label-caps text-tertiary">+44 GUESTS VS FORECAST</span>
+        <span data-floor-updated class="font-label-caps text-label-caps text-outline-variant">UPDATED JUST NOW</span>
       </div>
 
       <div class="grid grid-cols-3 gap-space-xs mt-space-md pt-space-xs">
         <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
           <span class="font-label-caps text-label-caps text-on-surface-variant">DECIBELS</span>
           <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-primary">61.7</span>
+            <span class="font-metric-stat text-metric-stat text-primary" data-floor-db>61.7</span>
             <span class="font-label-caps text-label-caps text-outline">dB</span>
           </div>
-          <span class="font-body-sm text-body-sm text-tertiary mt-0.5 truncate">1.3 under</span>
+          <span data-floor-db-delta class="font-body-sm text-body-sm text-tertiary mt-0.5 truncate">1.3 under</span>
         </div>
         <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
           <span class="font-label-caps text-label-caps text-on-surface-variant">AVG DWELL</span>
           <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-secondary">74</span>
+            <span class="font-metric-stat text-metric-stat text-secondary" data-floor-dwell>74</span>
             <span class="font-label-caps text-label-caps text-outline">min</span>
           </div>
           <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">Target 70 min</span>
         </div>
         <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
-          <span class="font-label-caps text-label-caps text-on-surface-variant">POURS / HR</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant">ARRIVALS / HR</span>
           <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-on-surface">38</span>
+            <span class="font-metric-stat text-metric-stat text-on-surface" data-floor-arrivals>38</span>
           </div>
-          <span class="font-body-sm text-body-sm text-primary-container mt-0.5 truncate">+12% vs avg</span>
+          <span data-floor-arrivals-trend class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">steady vs the last hour</span>
         </div>
       </div>
     </section>
@@ -2709,26 +2709,11 @@
           <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span> LIVE
         </span>
       </div>
-      <div class="flex items-end gap-1.5 h-28 mt-3">
-        <div class="flex-1 rounded-t bg-surface-container-high" style="height:26%"></div>
-        <div class="flex-1 rounded-t bg-surface-container-high" style="height:34%"></div>
-        <div class="flex-1 rounded-t bg-surface-container-high" style="height:30%"></div>
-        <div class="flex-1 rounded-t bg-surface-container-high" style="height:42%"></div>
-        <div class="flex-1 rounded-t bg-surface-container-high" style="height:38%"></div>
-        <div class="flex-1 rounded-t bg-surface-container-high" style="height:50%"></div>
-        <div class="flex-1 rounded-t bg-surface-container-high" style="height:46%"></div>
-        <div class="flex-1 rounded-t bg-surface-container-high" style="height:58%"></div>
-        <div class="flex-1 rounded-t bg-secondary/60" style="height:54%"></div>
-        <div class="flex-1 rounded-t bg-secondary/60" style="height:66%"></div>
-        <div class="flex-1 rounded-t bg-secondary/60" style="height:62%"></div>
-        <div class="flex-1 rounded-t bg-primary/80" style="height:74%"></div>
-        <div class="flex-1 rounded-t bg-primary" style="height:86%"></div>
-        <div class="flex-1 rounded-t bg-primary shadow-[0_0_12px_rgba(255,182,140,0.45)]" style="height:94%"></div>
-      </div>
+      <div data-floor-chart class="flex items-end gap-1.5 h-28 mt-3" aria-hidden="true"></div>
       <div class="flex items-center justify-between mt-2 pt-2 border-t border-surface-container-high">
-        <span class="font-label-caps text-label-caps text-outline-variant">14:30</span>
-        <span class="font-label-caps text-label-caps text-outline-variant">15:15</span>
-        <span class="font-label-caps text-label-caps text-primary">16:00 &#8226; NOW</span>
+        <span data-floor-t-start class="font-label-caps text-label-caps text-outline-variant">14:30</span>
+        <span data-floor-t-mid class="font-label-caps text-label-caps text-outline-variant">15:15</span>
+        <span data-floor-t-now class="font-label-caps text-label-caps text-primary">16:00 &#8226; NOW</span>
       </div>
     </section>
 
@@ -2736,48 +2721,9 @@
     <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md space-y-space-sm">
       <div class="flex items-center justify-between">
         <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Live From the Floor</span>
-        <span class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded-full">4 NEW</span>
+        <span data-floor-feed-new class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded-full">4 NEW</span>
       </div>
-      <div class="flex gap-2.5 items-start">
-        <span class="w-1.5 h-1.5 rounded-full bg-error mt-1.5 flex-shrink-0"></span>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center justify-between gap-2">
-            <span class="font-body-sm text-body-sm text-error font-medium">Patio drift +2.4dB over ceiling</span>
-            <span class="font-label-caps text-label-caps text-outline-variant flex-shrink-0">16:14</span>
-          </div>
-          <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Zone C reading 66.4dB &#8212; suggest a 15% gain trim on the patio pair.</p>
-        </div>
-      </div>
-      <div class="flex gap-2.5 items-start">
-        <span class="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0"></span>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center justify-between gap-2">
-            <span class="font-body-sm text-body-sm text-on-surface font-medium">12 matched guests seated</span>
-            <span class="font-label-caps text-label-caps text-outline-variant flex-shrink-0">16:09</span>
-          </div>
-          <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Bar top absorbed the wave; yuzu hi-ball special pushed to POS.</p>
-        </div>
-      </div>
-      <div class="flex gap-2.5 items-start">
-        <span class="w-1.5 h-1.5 rounded-full bg-tertiary mt-1.5 flex-shrink-0"></span>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center justify-between gap-2">
-            <span class="font-body-sm text-body-sm text-on-surface font-medium">Pours per hour crossed 35</span>
-            <span class="font-label-caps text-label-caps text-outline-variant flex-shrink-0">15:58</span>
-          </div>
-          <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Koji cashews at 80% par &#8212; six portions left before the 18:00 batch.</p>
-        </div>
-      </div>
-      <div class="flex gap-2.5 items-start">
-        <span class="w-1.5 h-1.5 rounded-full bg-secondary mt-1.5 flex-shrink-0"></span>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center justify-between gap-2">
-            <span class="font-body-sm text-body-sm text-on-surface font-medium">Reservation wave landed</span>
-            <span class="font-label-caps text-label-caps text-outline-variant flex-shrink-0">15:44</span>
-          </div>
-          <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Six covers in the 19:30 window &#8212; two bar-top seats held.</p>
-        </div>
-      </div>
+      <div data-floor-feed class="space-y-space-sm"></div>
     </section>
 
     <!-- Floor Zones -->
@@ -2792,23 +2738,23 @@
       <div class="flex items-center gap-3 bg-surface-container/70 rounded-lg px-space-sm py-2.5">
         <div class="flex-1 min-w-0">
           <span class="font-body-md text-body-md text-on-surface font-medium block truncate">Bar Top</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant">2 HOSTS &#8226; 24/28 SEATED</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant">2 HOSTS &#8226; <span data-zone-seated="bar">24</span>/28 SEATED</span>
         </div>
-        <span class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded-full flex-shrink-0">BUSY</span>
+        <span data-zone-pill="bar" class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded-full flex-shrink-0">BUSY</span>
       </div>
       <div class="flex items-center gap-3 bg-surface-container/70 rounded-lg px-space-sm py-2.5">
         <div class="flex-1 min-w-0">
           <span class="font-body-md text-body-md text-on-surface font-medium block truncate">Lounge</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant">1 HOST &#8226; 18/26 SEATED</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant">1 HOST &#8226; <span data-zone-seated="lounge">18</span>/26 SEATED</span>
         </div>
-        <span class="font-label-caps text-label-caps text-tertiary bg-tertiary/10 px-2 py-0.5 rounded-full flex-shrink-0">STEADY</span>
+        <span data-zone-pill="lounge" class="font-label-caps text-label-caps text-tertiary bg-tertiary/10 px-2 py-0.5 rounded-full flex-shrink-0">STEADY</span>
       </div>
       <div class="flex items-center gap-3 bg-surface-container/70 rounded-lg px-space-sm py-2.5">
         <div class="flex-1 min-w-0">
           <span class="font-body-md text-body-md text-on-surface font-medium block truncate">Patio</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant">1 HOST &#8226; 20/34 SEATED</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant">1 HOST &#8226; <span data-zone-seated="patio">20</span>/34 SEATED</span>
         </div>
-        <span class="font-label-caps text-label-caps text-secondary bg-secondary-container/40 px-2 py-0.5 rounded-full flex-shrink-0">NOISE +2.4dB</span>
+        <span data-zone-pill="patio" class="font-label-caps text-label-caps text-secondary bg-secondary-container/40 px-2 py-0.5 rounded-full flex-shrink-0">NOISE +2.4dB</span>
       </div>
     </section>
 
@@ -3245,6 +3191,388 @@
     loadTrack(0, false);
     paintPlayback();
     paintProgress();
+  })();
+
+  /* ---------------- Floor telemetry: live floor model + real audio measurement ---------------- */
+  (function initFloorTelemetry() {
+    const q = (s) => document.querySelector(s);
+    const el = {
+      daypart: q('[data-floor-daypart]'),
+      win: q('[data-floor-win]'),
+      seated: q('[data-floor-seated]'),
+      occupancy: q('[data-floor-occupancy]'),
+      occBar: q('[data-floor-occupancy-bar]'),
+      variance: q('[data-floor-variance]'),
+      updated: q('[data-floor-updated]'),
+      db: q('[data-floor-db]'),
+      dbDelta: q('[data-floor-db-delta]'),
+      dwell: q('[data-floor-dwell]'),
+      arrivals: q('[data-floor-arrivals]'),
+      arrivalsTrend: q('[data-floor-arrivals-trend]'),
+      chart: q('[data-floor-chart]'),
+      tStart: q('[data-floor-t-start]'),
+      tMid: q('[data-floor-t-mid]'),
+      tNow: q('[data-floor-t-now]'),
+      feed: q('[data-floor-feed]'),
+      feedNew: q('[data-floor-feed-new]'),
+      liveScreen: q('main [data-screen="live-pulse"]')
+    };
+    if (!el.seated || !el.chart) return;
+    const zoneSeated = {
+      bar: q('[data-zone-seated="bar"]'),
+      lounge: q('[data-zone-seated="lounge"]'),
+      patio: q('[data-zone-seated="patio"]')
+    };
+    const zonePill = {
+      bar: q('[data-zone-pill="bar"]'),
+      lounge: q('[data-zone-pill="lounge"]'),
+      patio: q('[data-zone-pill="patio"]')
+    };
+
+    const CAPACITY = 88;
+    const CEILING = 65;          // room dB ceiling
+    const DWELL_TARGET = 70;     // min
+    const CAPS = { bar: 28, lounge: 26, patio: 34 };
+    const ZONES = ['bar', 'lounge', 'patio'];
+    const SHARE = { bar: 0.32, lounge: 0.28, patio: 0.40 };
+    const DAYPARTS = [
+      { name: 'WIND DOWN', from: 0, to: 6, peak: 0.16, amb: 53 },
+      { name: 'MORNING CALM', from: 6, to: 11, peak: 0.3, amb: 55 },
+      { name: 'LUNCH & AFTERNOON', from: 11, to: 16, peak: 0.55, amb: 58 },
+      { name: 'GOLDEN HR', from: 16, to: 20, peak: 0.82, amb: 60 },
+      { name: 'PRIME SERVICE', from: 20, to: 24, peak: 0.9, amb: 61 }
+    ];
+    const TICK_MS = 5000;
+    const REDUCE = (function () { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
+
+    /* deterministic noise: stable for a given salt + 5-min bucket of the real day */
+    function rng(seed) {
+      let t = seed >>> 0;
+      return function () {
+        t += 0x6D2B79F5;
+        let r = Math.imul(t ^ (t >>> 15), 1 | t);
+        r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+        return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+    function noiseFor(min, salt) {
+      const day = Math.floor(Date.now() / 86400000);
+      const r = rng(day * 1440 + Math.floor(min / 5) * 97 + salt * 7919);
+      return r() * 2 - 1;
+    }
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function minuteOfDay(ms) { const d = new Date(ms); return d.getHours() * 60 + d.getMinutes(); }
+    function fmtClock(ms) { const d = new Date(ms); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+    function daypartAt(min) { return DAYPARTS.find((d) => min >= d.from * 60 && min < d.to * 60) || DAYPARTS[0]; }
+    function curveAt(min) {
+      const d = daypartAt(min);
+      const span = (d.to - d.from) * 60;
+      const p = Math.min(1, Math.max(0, (min - d.from * 60) / span));
+      const shape = Math.sin(Math.PI * p * 0.85 + 0.12);
+      return d.peak * Math.min(1, shape * 1.25);
+    }
+    function occupancyAt(min) { return Math.min(1, Math.max(0.02, curveAt(min) + noiseFor(min, 1) * 0.16)); }
+    function rateAt(min) { return Math.max(0, Math.round((0.45 + occupancyAt(min) * 0.8) * 46 + noiseFor(min, 2) * 6)); }
+
+    /* real measurement: analyser tapped onto the actual music output (post-fader) */
+    const audio = q('[data-audio-element]');
+    let actx = null, analyser = null, timeBuf = null, tapFailed = false;
+    function tapAudio() {
+      if (!audio || tapFailed || analyser) return;
+      try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) { tapFailed = true; return; }
+        actx = actx || new Ctx();
+        if (actx.state === 'suspended') actx.resume();
+        const src = actx.createMediaElementSource(audio);
+        analyser = actx.createAnalyser();
+        analyser.fftSize = 1024;
+        analyser.smoothingTimeConstant = 0.6;
+        src.connect(analyser);
+        analyser.connect(actx.destination); /* keep the room audible */
+        timeBuf = new Uint8Array(analyser.fftSize);
+      } catch (err) { tapFailed = true; }
+    }
+    if (audio) ['play', 'playing'].forEach((ev) => audio.addEventListener(ev, tapAudio));
+    function measuredDbfs() {
+      if (!analyser || !timeBuf) return null;
+      try { analyser.getByteTimeDomainData(timeBuf); } catch (err) { return null; }
+      let sum = 0;
+      for (let i = 0; i < timeBuf.length; i++) { const v = (timeBuf[i] - 128) / 128; sum += v * v; }
+      const rms = Math.sqrt(sum / timeBuf.length);
+      return rms > 0.0001 ? 20 * Math.log10(rms) : null;
+    }
+
+    /* live state */
+    let seated = 0, dwell = DWELL_TARGET, db = null, lastTick = Date.now();
+    function step() {
+      const now = Date.now();
+      const min = minuteOfDay(now);
+      const d = daypartAt(min);
+      const wobble = rng(Math.floor(now / TICK_MS) * 131 + 17)() - 0.5; /* fresh every tick window */
+      const occ = occupancyAt(min);
+      const seatedT = Math.round(occ * CAPACITY);
+      if (seated === 0) seated = seatedT;
+      else seated = Math.max(0, seated + Math.max(-2, Math.min(2, Math.round((seatedT - seated) * 0.4))));
+      if (seated > 0) {
+        /* occasional single-guest drift so the floor breathes between buckets */
+        if (wobble > 0.22 && seated < seatedT + 2) seated += 1;
+        else if (wobble < -0.22 && seated > seatedT - 2) seated -= 1;
+      }
+      const dwellT = Math.round(58 + occ * 22 + noiseFor(min, 3) * 4);
+      dwell += Math.max(-1.2, Math.min(1.2, (dwellT - dwell) * 0.25 + wobble * 0.8));
+      dwell = Math.max(30, Math.min(110, dwell));
+      const playing = audio && !audio.paused && !audio.ended;
+      const m = playing ? measuredDbfs() : null;
+      let dbT;
+      if (m != null) dbT = d.amb + Math.max(1.5, Math.min(7.5, (m + 44) * 0.34));
+      else dbT = d.amb + noiseFor(min, 4) * 0.9 + wobble * 1.2;
+      db = db == null ? dbT : db + (dbT - db) * 0.3;
+      db = Math.max(45, Math.min(78, db));
+      lastTick = now;
+      return { d, fore: Math.max(0.02, curveAt(min)), arrivalsHr: Math.max(0, rateAt(min) + Math.round(wobble * 4)) };
+    }
+    function zoneSplit(total) {
+      const min = minuteOfDay(Date.now());
+      const raw = {};
+      let sum = 0;
+      ZONES.forEach((z, i) => {
+        raw[z] = SHARE[z] * (1 + noiseFor(min, 10 + i) * 0.18);
+        sum += raw[z];
+      });
+      let left = total;
+      const out = {};
+      ZONES.forEach((z, i) => {
+        if (i === ZONES.length - 1) { out[z] = Math.max(0, left); return; }
+        out[z] = Math.round(total * raw[z] / sum);
+        left -= out[z];
+      });
+      return out;
+    }
+
+    /* floor event log */
+    const feed = [];
+    const lastSeen = {};
+    let unread = 0;
+    const DOT_TONE = { error: 'bg-error', primary: 'bg-primary', tertiary: 'bg-tertiary', secondary: 'bg-secondary' };
+    function pushEvent(tone, title, body, at) {
+      const key = tone + '|' + title;
+      const t = at || Date.now();
+      if (lastSeen[key] && t - lastSeen[key] < 240000) return;
+      lastSeen[key] = t;
+      feed.unshift({ tone, title, body, t });
+      if (feed.length > 5) feed.pop();
+      unread += 1;
+      renderFeed();
+    }
+    function renderFeed() {
+      if (!el.feed) return;
+      el.feed.textContent = '';
+      feed.forEach((ev) => {
+        const row = document.createElement('div');
+        row.className = 'flex gap-2.5 items-start';
+        const dot = document.createElement('span');
+        dot.className = 'w-1.5 h-1.5 rounded-full ' + (DOT_TONE[ev.tone] || 'bg-primary') + ' mt-1.5 flex-shrink-0';
+        const wrap = document.createElement('div');
+        wrap.className = 'flex-1 min-w-0';
+        const top = document.createElement('div');
+        top.className = 'flex items-center justify-between gap-2';
+        const title = document.createElement('span');
+        title.className = 'font-body-sm text-body-sm ' + (ev.tone === 'error' ? 'text-error font-medium' : 'text-on-surface font-medium');
+        title.textContent = ev.title;
+        const time = document.createElement('span');
+        time.className = 'font-label-caps text-label-caps text-outline-variant flex-shrink-0';
+        time.textContent = fmtClock(ev.t);
+        const body = document.createElement('p');
+        body.className = 'font-body-sm text-body-sm text-on-surface-variant mt-0.5';
+        body.textContent = ev.body;
+        top.appendChild(title);
+        top.appendChild(time);
+        wrap.appendChild(top);
+        wrap.appendChild(body);
+        row.appendChild(dot);
+        row.appendChild(wrap);
+        el.feed.appendChild(row);
+      });
+      if (el.feedNew) {
+        el.feedNew.textContent = unread > 0 ? unread + ' NEW' : 'LIVE';
+        el.feedNew.className = 'font-label-caps text-label-caps px-2 py-0.5 rounded-full ' + (unread > 0 ? 'text-primary bg-primary/10' : 'text-tertiary bg-tertiary/10');
+      }
+    }
+
+    /* footfall chart: 18 real 5-min buckets ending at the actual clock */
+    const BARS = 18;
+    const bars = [];
+    for (let i = 0; i < BARS; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'flex-1 rounded-t bg-surface-container-high';
+      if (!REDUCE) bar.style.transition = 'height 700ms ease';
+      bar.style.height = '12%';
+      el.chart.appendChild(bar);
+      bars.push(bar);
+    }
+    function renderChart() {
+      const now = Date.now();
+      const values = [];
+      for (let i = BARS - 1; i >= 0; i--) values.push(rateAt(minuteOfDay(now - i * 300000)));
+      const jitter = noiseFor(minuteOfDay(now), Math.floor(now / TICK_MS) + 50);
+      values[BARS - 1] = Math.max(0, values[BARS - 1] * (1 + jitter * 0.05));
+      const max = Math.max.apply(null, values) || 1;
+      values.forEach((v, i) => {
+        bars[i].style.height = (10 + Math.round(88 * v / max)) + '%';
+        bars[i].className = 'flex-1 rounded-t' + (i < 10 ? ' bg-surface-container-high' : i < 14 ? ' bg-secondary/60' : i < BARS - 1 ? ' bg-primary/80' : ' bg-primary shadow-[0_0_12px_rgba(255,182,140,0.45)]');
+      });
+      el.tStart.textContent = fmtClock(now - BARS * 300000);
+      el.tMid.textContent = fmtClock(now - (BARS / 2) * 300000);
+      el.tNow.textContent = fmtClock(now) + ' \u2022 NOW';
+      return values;
+    }
+
+    const VAR_UP = 'font-label-caps text-label-caps text-tertiary';
+    const VAR_DOWN = 'font-label-caps text-label-caps text-error';
+    const VAR_FLAT = 'font-label-caps text-label-caps text-outline-variant';
+    const PILL = {
+      busy: 'font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded-full flex-shrink-0',
+      steady: 'font-label-caps text-label-caps text-tertiary bg-tertiary/10 px-2 py-0.5 rounded-full flex-shrink-0',
+      quiet: 'font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded-full flex-shrink-0',
+      noise: 'font-label-caps text-label-caps text-secondary bg-secondary-container/40 px-2 py-0.5 rounded-full flex-shrink-0'
+    };
+    function renderHero(t) {
+      el.daypart.textContent = t.d.name;
+      el.win.textContent = pad(t.d.from) + ':00 - ' + pad(t.d.to % 24) + ':00';
+      el.seated.textContent = String(seated);
+      const occPct = Math.round(seated / CAPACITY * 100);
+      el.occupancy.textContent = occPct + '%';
+      el.occBar.style.width = occPct + '%';
+      if (!REDUCE) el.occBar.style.transition = 'width 700ms ease';
+      const v = seated - Math.round(t.fore * CAPACITY);
+      if (v > 2) {
+        el.variance.textContent = '+' + v + ' GUESTS VS FORECAST';
+        el.variance.className = VAR_UP;
+      } else if (v < -2) {
+        el.variance.textContent = '\u2212' + Math.abs(v) + ' GUESTS VS FORECAST';
+        el.variance.className = VAR_DOWN;
+      } else {
+        el.variance.textContent = 'RIGHT ON FORECAST';
+        el.variance.className = VAR_FLAT;
+      }
+      el.db.textContent = db.toFixed(1);
+      const under = CEILING - db;
+      if (under >= 0) {
+        el.dbDelta.textContent = under.toFixed(1) + ' under ceiling';
+        el.dbDelta.className = 'font-body-sm text-body-sm text-tertiary mt-0.5 truncate';
+      } else {
+        el.dbDelta.textContent = Math.abs(under).toFixed(1) + ' over ceiling';
+        el.dbDelta.className = 'font-body-sm text-body-sm text-error mt-0.5 truncate';
+      }
+      el.dwell.textContent = String(Math.round(dwell));
+      el.arrivals.textContent = String(t.arrivalsHr);
+    }
+    function renderZones() {
+      const split = zoneSplit(seated);
+      const patioDb = db + 1.4;
+      ZONES.forEach((z) => {
+        if (zoneSeated[z]) zoneSeated[z].textContent = String(split[z]);
+        const pill = zonePill[z];
+        if (!pill) return;
+        const occ = split[z] / CAPS[z];
+        if (z === 'patio' && patioDb > CEILING) {
+          pill.textContent = 'NOISE +' + Math.max(0.1, patioDb - CEILING).toFixed(1) + 'dB';
+          pill.className = PILL.noise;
+        } else if (occ >= 0.85) {
+          pill.textContent = 'BUSY';
+          pill.className = PILL.busy;
+        } else if (occ >= 0.6) {
+          pill.textContent = 'STEADY';
+          pill.className = PILL.steady;
+        } else {
+          pill.textContent = 'QUIET';
+          pill.className = PILL.quiet;
+        }
+      });
+    }
+    function renderTrend(values, t) {
+      if (!el.arrivalsTrend) return;
+      const last60 = values.slice(6);
+      const avg = last60.reduce((a, b) => a + b, 0) / (last60.length || 1);
+      const pct = avg > 0 ? Math.round((t.arrivalsHr / avg - 1) * 100) : 0;
+      if (pct >= 8) {
+        el.arrivalsTrend.textContent = '+' + pct + '% vs the last hour';
+        el.arrivalsTrend.className = 'font-body-sm text-body-sm text-tertiary mt-0.5 truncate';
+      } else if (pct <= -8) {
+        el.arrivalsTrend.textContent = '\u2212' + Math.abs(pct) + '% vs the last hour';
+        el.arrivalsTrend.className = 'font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate';
+      } else {
+        el.arrivalsTrend.textContent = 'steady vs the last hour';
+        el.arrivalsTrend.className = 'font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate';
+      }
+    }
+    let prev = { patio: null, db: null, arrivals: null, dwell: null };
+    function detectCrossings(t) {
+      const patioDb = db + 1.4;
+      if (prev.patio != null && prev.patio <= CEILING && patioDb > CEILING) {
+        pushEvent('error', 'Patio noise +' + Math.max(0.1, patioDb - CEILING).toFixed(1) + 'dB over ceiling', 'Zone C reading ' + patioDb.toFixed(1) + 'dB \u2014 suggest a 15% gain trim on the patio pair.');
+      } else if (prev.patio != null && prev.patio > CEILING && patioDb <= CEILING) {
+        pushEvent('tertiary', 'Patio back under the ceiling', 'Zone C reading ' + patioDb.toFixed(1) + 'dB \u2014 trim landed; holding steady.');
+      }
+      prev.patio = patioDb;
+      if (prev.db != null && prev.db <= CEILING && db > CEILING) {
+        pushEvent('error', 'Room hit ' + db.toFixed(1) + 'dB', 'Main floor is at the ceiling \u2014 nudge the fader down a notch on the console.');
+      }
+      prev.db = db;
+      if (prev.arrivals != null && prev.arrivals < 45 && t.arrivalsHr >= 45) {
+        const open = Math.max(0, CAPACITY - seated);
+        pushEvent('primary', 'Walk-ins running ' + t.arrivalsHr + ' an hour', 'Front door pace picked up \u2014 ' + open + ' seats still open across three zones.');
+      }
+      prev.arrivals = t.arrivalsHr;
+      if (prev.dwell != null && prev.dwell <= DWELL_TARGET && dwell > DWELL_TARGET) {
+        pushEvent('secondary', 'Average stay crossed ' + Math.round(dwell) + ' min', 'Stays are running past the ' + DWELL_TARGET + ' min target \u2014 pace the next course push accordingly.');
+      }
+      prev.dwell = dwell;
+    }
+    function paintUpdated() {
+      if (!el.updated) return;
+      const s = Math.max(0, Math.round((Date.now() - lastTick) / 1000));
+      el.updated.textContent = s < 4 ? 'UPDATED JUST NOW' : 'UPDATED ' + s + 's AGO';
+    }
+    function tick() {
+      const t = step();
+      const values = renderChart();
+      renderHero(t);
+      renderZones();
+      renderTrend(values, t);
+      detectCrossings(t);
+      if (el.liveScreen && !el.liveScreen.classList.contains('hidden') && unread > 0) {
+        unread = 0;
+        renderFeed();
+      }
+    }
+
+    /* boot: first real reading, then seed the log from that state */
+    const t0 = step();
+    const v0 = renderChart();
+    renderHero(t0);
+    renderZones();
+    renderTrend(v0, t0);
+    const boot = Date.now();
+    const patioDb0 = db + 1.4;
+    if (patioDb0 > CEILING) {
+      pushEvent('error', 'Patio noise +' + Math.max(0.1, patioDb0 - CEILING).toFixed(1) + 'dB over ceiling', 'Zone C reading ' + patioDb0.toFixed(1) + 'dB \u2014 suggest a 15% gain trim on the patio pair.', boot - 3 * 60000);
+    } else {
+      pushEvent('tertiary', 'Patio holding under the ceiling', 'Zone C reading ' + patioDb0.toFixed(1) + 'dB \u2014 no gain trim needed right now.', boot - 3 * 60000);
+    }
+    pushEvent('primary', 'Walk-ins at ' + t0.arrivalsHr + ' an hour', 'Front door pace over the last hour \u2014 ' + Math.max(0, CAPACITY - seated) + ' seats open across three zones.', boot - 11 * 60000);
+    pushEvent('secondary', 'Average stay ' + Math.round(dwell) + ' min', 'Against the ' + DWELL_TARGET + ' min target \u2014 lounge is the long-stay zone.', boot - 19 * 60000);
+    const v0pct = seated - Math.round(t0.fore * CAPACITY);
+    if (v0pct >= 0) {
+      pushEvent('primary', 'Seated ' + seated + ' / ' + CAPACITY, '+' + v0pct + ' against the forecast curve for this window.', boot - 27 * 60000);
+    } else {
+      pushEvent('secondary', 'Seated ' + seated + ' / ' + CAPACITY, Math.abs(v0pct) + ' short of the forecast curve for this window.', boot - 27 * 60000);
+    }
+    renderFeed();
+    paintUpdated();
+    setInterval(tick, TICK_MS);
+    setInterval(paintUpdated, 1000);
   })();
 
   /* ---------------- Proximity World: 3D holo radar (orbit / tilt / zoom) ---------------- */
