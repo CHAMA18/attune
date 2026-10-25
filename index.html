@@ -950,58 +950,55 @@
           </a>
         </div>
 
-        <section class="mt-space-lg mb-space-md rounded-xl bg-surface-container p-space-sm space-y-2.5" aria-label="Audio Guardrails" data-guardrails>
-          <div class="flex items-center justify-between px-1">
-            <div class="flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-secondary text-base">graphic_eq</span>
-              <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Audio Guardrails</span>
-            </div>
-            <span class="font-label-caps text-label-caps text-outline">PREVIEW</span>
+        <section class="mt-space-lg mb-space-md rounded-xl bg-surface-container p-space-sm" aria-label="Sound settings" data-guardrails>
+          <div class="flex items-center gap-1.5 px-1 pb-2">
+            <span class="material-symbols-outlined text-secondary text-base">graphic_eq</span>
+            <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Sound Settings</span>
           </div>
-          <div class="flex items-center justify-between gap-2 px-1">
-            <span class="font-label-caps text-label-caps text-on-surface-variant">PLAYER LEVEL</span>
+          <div class="flex items-center justify-between gap-2 px-1 pb-1.5">
+            <span class="font-label-caps text-label-caps text-on-surface-variant">VOLUME</span>
             <span class="font-label-caps text-label-caps text-primary" data-guardrail-level>READY</span>
           </div>
-          <div class="h-1.5 w-full rounded-full bg-surface-container-highest overflow-hidden" role="meter" aria-label="Menu player output level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-guardrail-meter>
+          <div class="h-1.5 w-full rounded-full bg-surface-container-highest overflow-hidden" role="meter" aria-label="Menu music volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-guardrail-meter>
             <div class="h-full rounded-full bg-tertiary transition-all duration-300" style="width:0%" data-guardrail-meter-fill></div>
           </div>
-          <div class="space-y-1.5 pt-1">
-            <div class="flex items-center justify-between gap-2 bg-surface-container-low/70 rounded-lg px-2 py-2">
+          <div class="divide-y divide-surface-container-high/60 pt-1.5">
+            <div class="flex items-center justify-between gap-2 py-2">
               <div class="min-w-0">
-                <span class="font-body-sm text-body-sm text-on-surface font-medium block">Auto-duck on announcements</span>
-                <span class="font-body-sm text-body-sm text-on-surface-variant block">Lower music by 6 dB while paging</span>
+                <span class="font-body-sm text-body-sm text-on-surface font-medium block">Quieter during announcements</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant block">Music softens while staff are paging</span>
               </div>
               <div class="flex-shrink-0" data-guardrail="duck">
                 <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-tertiary/10 text-tertiary" data-on="true" aria-pressed="true"><span data-state>ON</span></button>
               </div>
             </div>
-            <div class="flex items-center justify-between gap-2 bg-surface-container-low/70 rounded-lg px-2 py-2">
+            <div class="flex items-center justify-between gap-2 py-2">
               <div class="min-w-0">
-                <span class="font-body-sm text-body-sm text-on-surface font-medium block">Night descent limiter</span>
-                <span class="font-body-sm text-body-sm text-on-surface-variant block">Lower music by 6 dB after 23:00</span>
+                <span class="font-body-sm text-body-sm text-on-surface font-medium block">Quiet hours</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant block">Keeps music gentle after 11 pm</span>
               </div>
               <div class="flex-shrink-0" data-guardrail="night">
                 <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-tertiary/10 text-tertiary" data-on="true" aria-pressed="true"><span data-state>ON</span></button>
               </div>
             </div>
-            <div class="flex items-center justify-between gap-2 bg-surface-container-low/70 rounded-lg px-2 py-2">
+            <div class="flex items-center justify-between gap-2 py-2">
               <div class="min-w-0">
-                <span class="font-body-sm text-body-sm text-on-surface font-medium block">Spoken-word veto</span>
-                <span class="font-body-sm text-body-sm text-on-surface-variant block">Block spoken announcements when enabled</span>
+                <span class="font-body-sm text-body-sm text-on-surface font-medium block">Mute announcements</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant block">Silences spoken announcements entirely</span>
               </div>
               <div class="flex-shrink-0" data-guardrail="veto">
                 <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-surface-container-highest text-on-surface-variant" data-on="false" aria-pressed="false"><span data-state>OFF</span></button>
               </div>
             </div>
           </div>
-          <button type="button" data-guardrail-preview class="w-full flex items-center justify-center gap-1.5 rounded-lg bg-surface-container-high px-2 py-2 text-secondary hover:bg-surface-bright transition-colors">
+          <button type="button" data-guardrail-preview class="w-full flex items-center justify-center gap-1.5 rounded-lg bg-surface-container-high px-2 py-2 text-secondary hover:bg-surface-bright transition-colors mt-1.5">
             <span class="material-symbols-outlined text-base">campaign</span>
-            <span class="font-label-caps text-label-caps tracking-wider">Preview Staff Announcement</span>
+            <span class="font-label-caps text-label-caps tracking-wider">Play a Sample Announcement</span>
           </button>
-          <p class="font-body-sm text-body-sm text-on-surface-variant px-1" data-guardrail-status aria-live="polite">Controls affect this browser’s menu preview; they don’t control connected speakers.</p>
+          <p class="font-body-sm text-body-sm text-on-surface-variant px-1 pt-2" data-guardrail-status aria-live="polite">These settings shape the in-app preview only &#8212; house speakers keep their own volume.</p>
         </section>
 
-        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">VENUE SYSTEM</p>
+        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">VENUE</p>
         <div class="flex flex-col gap-1 pb-space-md">
           <button type="button"
                   class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
@@ -2211,7 +2208,7 @@
         </div>
       </div>
 
-      <p class="font-body-sm text-body-sm text-on-surface-variant text-center pt-1">Ambient sample preview &#8226; 58 min until descent handoff</p>
+      <p class="font-body-sm text-body-sm text-on-surface-variant text-center pt-1">Ambient sample preview &#8226; night volume starts in 58 min</p>
     </section>
 
     <!-- Menu &amp; Audio Action Suite -->
@@ -2600,10 +2597,10 @@
             announcementActive = false;
           }
           if (status) status.textContent = key === 'veto'
-            ? (guardrailState.veto ? 'Spoken announcements are blocked from the menu preview.' : 'Spoken announcements are allowed in the menu preview.')
+            ? (guardrailState.veto ? 'Spoken announcements stay silent in this preview.' : 'Spoken announcements play in this preview.')
             : (key === 'night' && guardrailState.night && (new Date().getHours() >= 23 || new Date().getHours() < 6)
-              ? 'Night descent is active: menu preview output is limited to 50%.'
-              : (key === 'night' ? 'Night descent volume limit updated.' : 'Announcement ducking preference updated.'));
+              ? 'Quiet hours are on \u2014 this preview stays at half volume.'
+              : (key === 'night' ? 'Quiet hours saved \u2014 music softens after 11 pm.' : 'Announcement volume setting saved.'));
           paintGuardrailState();
         });
       });
@@ -2611,11 +2608,11 @@
       const previewButton = guardrailSection.querySelector('[data-guardrail-preview]');
       if (previewButton) previewButton.addEventListener('click', () => {
         if (guardrailState.veto) {
-          if (status) status.textContent = 'Blocked by Spoken-word veto. Turn that option off to preview the announcement.';
+          if (status) status.textContent = 'Announcements are muted. Turn off Mute announcements to hear a sample.';
           return;
         }
         if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
-          if (status) status.textContent = 'Spoken preview is unavailable in this browser.';
+          if (status) status.textContent = 'Spoken samples are unavailable in this browser.';
           return;
         }
         if (announcementActive) return;
@@ -2626,8 +2623,8 @@
         announcementActive = true;
         paintGuardrailState();
         if (status) status.textContent = guardrailState.duck
-          ? 'Staff announcement playing; menu music is ducked by 6 dB.'
-          : 'Staff announcement playing; auto-duck is off.';
+          ? 'Sample announcement playing \u2014 music dips underneath.'
+          : 'Sample announcement playing at full volume.';
 
         let finished = false;
         const finishAnnouncement = () => {
@@ -2635,7 +2632,7 @@
           finished = true;
           announcementActive = false;
           paintGuardrailState();
-          if (status) status.textContent = 'Announcement finished; menu player level restored.';
+          if (status) status.textContent = 'Announcement finished \u2014 music back to normal.';
         };
         announcement.onend = finishAnnouncement;
         announcement.onerror = finishAnnouncement;
@@ -3895,8 +3892,8 @@
       action: 'Hold 3000K task light; espresso flight feature; keep vinyl jazz under 68dB.' },
     golden: { title: 'Golden Hour Shift', window: 'NOW TUNED \u2022 16:00 - 20:00',
       action: 'Queue side-B kanky\u014D ongaku for the 16-20 swell; run the hi-ball feature tray to garden tables from 17:30.' },
-    night: { title: 'Night Descent', window: 'NOW TUNED \u2022 20:00 - 02:00',
-      action: 'Drop to candlelight 2200K; natural-wine feature by the glass; low-slow descent mix after 23:00.' }
+    night: { title: 'Late-Night Shift', window: 'NOW TUNED \u2022 20:00 - 02:00',
+      action: 'Drop to candlelight 2200K; natural-wine feature by the glass; wind-down mix after 11 pm.' }
   };
   var currentDaypart = 'golden';
 
