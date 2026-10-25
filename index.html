@@ -101,10 +101,16 @@
     .drawer-rail { left: 50%; transform: translateX(-50%); }
   }
   .drawer-root {
+    z-index: 60;
+    pointer-events: none;
     visibility: hidden;
     transition: visibility 0s linear 0.32s;
   }
-  .drawer-root.drawer-open { visibility: visible; transition-delay: 0s; }
+  .drawer-root.drawer-open {
+    pointer-events: auto;
+    visibility: visible;
+    transition-delay: 0s;
+  }
   .drawer-backdrop {
     opacity: 0;
     transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -371,19 +377,6 @@
       <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-widest">ATTUNE</span>
     </div>
 
-    <div class="flex-1 flex flex-col items-center justify-center px-space-xs min-w-0">
-      <button class="w-full max-w-[210px] py-1 px-space-sm rounded-full bg-surface-container/70 flex flex-col items-center justify-center hover:bg-surface-container-high transition-colors">
-        <div class="flex items-center gap-1.5 w-full justify-center">
-          <span class="w-1.5 h-1.5 rounded-full bg-secondary animate-radar-dot flex-shrink-0"></span>
-          <span class="font-body-sm text-body-sm text-on-surface font-medium truncate text-center">The Amber Room</span>
-        </div>
-        <div class="flex items-center gap-1 w-full justify-center">
-          <span class="font-label-caps text-label-caps text-on-surface-variant truncate">142 Franklin St, Greenpoint</span>
-          <span class="text-outline-variant text-[9px]">&#8226;</span>
-          <span class="font-label-caps text-label-caps text-secondary-fixed-dim whitespace-nowrap">800ft RADAR</span>
-        </div>
-      </button>
-    </div>
 
     <div class="flex items-center gap-space-xs flex-shrink-0">
       <button class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container-high/60 transition-colors">
@@ -463,16 +456,16 @@
           </a>
         </div>
 
-        <section class="mt-space-lg mb-space-md rounded-xl bg-surface-container p-space-sm space-y-2.5" aria-label="Audio Guardrails" data-guardrails>
+        <section class="mt-space-lg mb-space-md rounded-xl bg-surface-container p-space-sm space-y-2.5" aria-label="Sound Settings" data-guardrails>
           <div class="flex items-center justify-between px-1">
             <div class="flex items-center gap-1.5">
               <span class="material-symbols-outlined text-secondary text-base">graphic_eq</span>
-              <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Audio Guardrails</span>
+              <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Sound Settings</span>
             </div>
-            <span class="font-label-caps text-label-caps text-outline">PREVIEW</span>
+            <span class="font-label-caps text-label-caps text-outline">DEMO</span>
           </div>
           <div class="flex items-center justify-between gap-2 px-1">
-            <span class="font-label-caps text-label-caps text-on-surface-variant">PLAYER LEVEL</span>
+            <span class="font-label-caps text-label-caps text-on-surface-variant">MUSIC VOLUME</span>
             <span class="font-label-caps text-label-caps text-primary" data-guardrail-level>READY</span>
           </div>
           <div class="h-1.5 w-full rounded-full bg-surface-container-highest overflow-hidden" role="meter" aria-label="Menu player output level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-guardrail-meter>
@@ -481,8 +474,8 @@
           <div class="space-y-1.5 pt-1">
             <div class="flex items-center justify-between gap-2 bg-surface-container-low/70 rounded-lg px-2 py-2">
               <div class="min-w-0">
-                <span class="font-body-sm text-body-sm text-on-surface font-medium block">Auto-duck on announcements</span>
-                <span class="font-body-sm text-body-sm text-on-surface-variant block">Lower music by 6 dB while paging</span>
+                <span class="font-body-sm text-body-sm text-on-surface font-medium block">Lower music during announcements</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant block">Keep announcements easy to hear</span>
               </div>
               <div class="flex-shrink-0" data-guardrail="duck">
                 <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-tertiary/10 text-tertiary" data-on="true" aria-pressed="true"><span data-state>ON</span></button>
@@ -490,8 +483,8 @@
             </div>
             <div class="flex items-center justify-between gap-2 bg-surface-container-low/70 rounded-lg px-2 py-2">
               <div class="min-w-0">
-                <span class="font-body-sm text-body-sm text-on-surface font-medium block">Night descent limiter</span>
-                <span class="font-body-sm text-body-sm text-on-surface-variant block">Lower music by 6 dB after 23:00</span>
+                <span class="font-body-sm text-body-sm text-on-surface font-medium block">Quieter music late at night</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant block">Turn the music down after 11 PM</span>
               </div>
               <div class="flex-shrink-0" data-guardrail="night">
                 <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-tertiary/10 text-tertiary" data-on="true" aria-pressed="true"><span data-state>ON</span></button>
@@ -499,19 +492,19 @@
             </div>
             <div class="flex items-center justify-between gap-2 bg-surface-container-low/70 rounded-lg px-2 py-2">
               <div class="min-w-0">
-                <span class="font-body-sm text-body-sm text-on-surface font-medium block">Spoken-word veto</span>
-                <span class="font-body-sm text-body-sm text-on-surface-variant block">Block spoken announcements when enabled</span>
+                <span class="font-body-sm text-body-sm text-on-surface font-medium block">Play spoken announcements</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant block">Turn off to hear music only</span>
               </div>
-              <div class="flex-shrink-0" data-guardrail="veto">
-                <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-surface-container-highest text-on-surface-variant" data-on="false" aria-pressed="false"><span data-state>OFF</span></button>
+              <div class="flex-shrink-0" data-guardrail="announcements">
+                <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-tertiary/10 text-tertiary" data-on="true" aria-pressed="true"><span data-state>ON</span></button>
               </div>
             </div>
           </div>
           <button type="button" data-guardrail-preview class="w-full flex items-center justify-center gap-1.5 rounded-lg bg-surface-container-high px-2 py-2 text-secondary hover:bg-surface-bright transition-colors">
             <span class="material-symbols-outlined text-base">campaign</span>
-            <span class="font-label-caps text-label-caps tracking-wider">Preview Staff Announcement</span>
+            <span class="font-label-caps text-label-caps tracking-wider">Play Announcement Example</span>
           </button>
-          <p class="font-body-sm text-body-sm text-on-surface-variant px-1" data-guardrail-status aria-live="polite">Controls affect this browser’s menu preview; they don’t control connected speakers.</p>
+          <p class="font-body-sm text-body-sm text-on-surface-variant px-1" data-guardrail-status aria-live="polite">These settings only affect the music preview on this device.</p>
         </section>
 
         <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">VENUE SYSTEM</p>
@@ -798,42 +791,6 @@
       <!-- Mini Progress Line -->
       <div class="w-full bg-surface-container-lowest/60 h-1 rounded-full mt-3 overflow-hidden">
         <div class="bg-secondary h-full rounded-full w-[40%]"></div>
-      </div>
-    </section>
-
-    <!-- Daypart Timeline Navigator -->
-    <section class="flex flex-col space-y-space-xs">
-      <div class="flex items-center justify-between px-1">
-        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">FRIDAY OCT 25 CADENCE</span>
-        <span class="font-label-caps text-label-caps text-primary flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span> LIVE SYNC
-        </span>
-      </div>
-      <div class="grid grid-cols-4 gap-1.5 pt-1" id="daypart-selector">
-        <!-- 1: Morning -->
-        <button class="daypart-btn bg-surface-container rounded-lg p-2 text-left transition-all hover:bg-surface-container-high opacity-70" data-daypart="morning">
-          <span class="font-label-caps text-label-caps text-on-surface-variant block">07-11</span>
-          <span class="font-body-sm text-body-sm text-on-surface font-medium truncate block mt-0.5">Roasters</span>
-        </button>
-        <!-- 2: Daylight -->
-        <button class="daypart-btn bg-surface-container rounded-lg p-2 text-left transition-all hover:bg-surface-container-high opacity-70" data-daypart="daylight">
-          <span class="font-label-caps text-label-caps text-on-surface-variant block">11-16</span>
-          <span class="font-body-sm text-body-sm text-on-surface font-medium truncate block mt-0.5">Linger</span>
-        </button>
-        <!-- 3: Golden Hour (Active) -->
-        <button class="daypart-btn bg-surface-container-highest text-on-surface rounded-lg p-2 text-left relative overflow-hidden shadow-[0_0_16px_rgba(217,119,54,0.25)] ring-0" data-daypart="golden">
-          <div class="absolute inset-x-0 top-0 h-0.5 bg-primary"></div>
-          <span class="font-label-caps text-label-caps text-primary block flex items-center gap-1 font-semibold">
-            16-20
-            <span class="w-1 h-1 rounded-full bg-primary animate-pulse"></span>
-          </span>
-          <span class="font-body-sm text-body-sm text-secondary-fixed font-semibold truncate block mt-0.5">Golden Hr</span>
-        </button>
-        <!-- 4: Night Descent -->
-        <button class="daypart-btn bg-surface-container rounded-lg p-2 text-left transition-all hover:bg-surface-container-high opacity-70" data-daypart="night">
-          <span class="font-label-caps text-label-caps text-on-surface-variant block">20-02</span>
-          <span class="font-body-sm text-body-sm text-on-surface font-medium truncate block mt-0.5">Descent</span>
-        </button>
       </div>
     </section>
 
@@ -1845,22 +1802,6 @@
 </nav>
 
 <script>
-  (function initPlaybook() {
-    const buttons = document.querySelectorAll('.daypart-btn');
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        buttons.forEach(b => {
-          b.classList.remove('bg-surface-container-highest', 'shadow-[0_0_16px_rgba(217,119,54,0.25)]', 'opacity-100');
-          b.classList.add('bg-surface-container', 'opacity-70');
-        });
-        btn.classList.remove('opacity-70', 'bg-surface-container');
-        btn.classList.add('bg-surface-container-highest', 'opacity-100', 'shadow-[0_0_16px_rgba(217,119,54,0.25)]');
-      });
-    });
-  })();
-</script>
-
-<script>
   /* ---------------- Tab router: bottom navbar <-> screens ---------------- */
   (function initRouter() {
     const links = Array.prototype.slice.call(document.querySelectorAll('nav a[data-path], #app-drawer a[data-path]'));
@@ -1943,7 +1884,7 @@
     let seeking = false;
     let playbackIntent = false;
     let announcementActive = false;
-    const guardrailState = { duck: true, night: true, veto: false };
+    const guardrailState = { duck: true, night: true, announcements: true };
     const GUARDRAIL_STORAGE_KEY = 'attune-audio-guardrails';
     const guardrailSection = document.querySelector('[data-guardrails]');
     const status = guardrailSection && guardrailSection.querySelector('[data-guardrail-status]');
@@ -1953,9 +1894,13 @@
 
     try {
       const saved = JSON.parse(localStorage.getItem(GUARDRAIL_STORAGE_KEY) || 'null');
-      if (saved && typeof saved === 'object') Object.keys(guardrailState).forEach(key => {
-        if (typeof saved[key] === 'boolean') guardrailState[key] = saved[key];
-      });
+      if (saved && typeof saved === 'object') {
+        ['duck', 'night'].forEach(key => {
+          if (typeof saved[key] === 'boolean') guardrailState[key] = saved[key];
+        });
+        if (typeof saved.announcements === 'boolean') guardrailState.announcements = saved.announcements;
+        else if (typeof saved.veto === 'boolean') guardrailState.announcements = !saved.veto;
+      }
     } catch (error) { /* keep in-memory defaults when storage is unavailable */ }
 
     audio.src = source;
@@ -2005,27 +1950,29 @@
         button.addEventListener('click', () => {
           guardrailState[key] = !guardrailState[key];
           try { localStorage.setItem(GUARDRAIL_STORAGE_KEY, JSON.stringify(guardrailState)); } catch (error) { /* keep this session's setting */ }
-          if (key === 'veto' && guardrailState.veto && announcementActive) {
+          if (key === 'announcements' && !guardrailState.announcements && announcementActive) {
             window.speechSynthesis.cancel();
             announcementActive = false;
           }
-          if (status) status.textContent = key === 'veto'
-            ? (guardrailState.veto ? 'Spoken announcements are blocked from the menu preview.' : 'Spoken announcements are allowed in the menu preview.')
+          const state = button.querySelector('[data-state]');
+          if (state) state.textContent = guardrailState[key] ? 'ON' : 'OFF';
+          if (status) status.textContent = key === 'announcements'
+            ? (guardrailState.announcements ? 'Spoken announcements are on.' : 'Spoken announcements are off.')
             : (key === 'night' && guardrailState.night && (new Date().getHours() >= 23 || new Date().getHours() < 6)
-              ? 'Night descent is active: menu preview output is limited to 50%.'
-              : (key === 'night' ? 'Night descent volume limit updated.' : 'Announcement ducking preference updated.'));
+              ? 'Late-night music is quieter now.'
+              : (key === 'night' ? 'Late-night music setting updated.' : 'Announcement music setting updated.'));
           paintGuardrailState();
         });
       });
 
       const previewButton = guardrailSection.querySelector('[data-guardrail-preview]');
       if (previewButton) previewButton.addEventListener('click', () => {
-        if (guardrailState.veto) {
-          if (status) status.textContent = 'Blocked by Spoken-word veto. Turn that option off to preview the announcement.';
+        if (!guardrailState.announcements) {
+          if (status) status.textContent = 'Spoken announcements are off. Turn them on to hear an example.';
           return;
         }
         if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
-          if (status) status.textContent = 'Spoken preview is unavailable in this browser.';
+          if (status) status.textContent = 'An announcement example isn’t available in this browser.';
           return;
         }
         if (announcementActive) return;
@@ -2036,8 +1983,8 @@
         announcementActive = true;
         paintGuardrailState();
         if (status) status.textContent = guardrailState.duck
-          ? 'Staff announcement playing; menu music is ducked by 6 dB.'
-          : 'Staff announcement playing; auto-duck is off.';
+          ? 'Playing an announcement. Music is quieter.'
+          : 'Playing an announcement. Music volume stays the same.';
 
         let finished = false;
         const finishAnnouncement = () => {
@@ -2045,7 +1992,7 @@
           finished = true;
           announcementActive = false;
           paintGuardrailState();
-          if (status) status.textContent = 'Announcement finished; menu player level restored.';
+          if (status) status.textContent = 'The example is finished. Music volume is back to normal.';
         };
         announcement.onend = finishAnnouncement;
         announcement.onerror = finishAnnouncement;
@@ -2336,7 +2283,7 @@
       }
     }
 
-    trigger.addEventListener('click', () => setOpen(!root.classList.contains('drawer-open')));
+    trigger.addEventListener('click', () => setOpen(true));
     if (closeBtn) closeBtn.addEventListener('click', () => setOpen(false));
     if (backdrop) backdrop.addEventListener('click', () => setOpen(false));
     Array.prototype.slice.call(root.querySelectorAll('a[data-path]')).forEach(link => {
@@ -2345,6 +2292,303 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && root.classList.contains('drawer-open')) setOpen(false);
     });
+  })();
+
+  /* ---------------- Theme toggle: drawer Light/Dark switch ---------------- */
+  (function initTheme() {
+    const root = document.documentElement;
+    const toggle = document.getElementById('theme-toggle');
+    if (!toggle) return;
+
+    const icon = toggle.querySelector('[data-theme-icon]');
+    const label = toggle.querySelector('[data-theme-label]');
+    const track = toggle.querySelector('[data-theme-track]');
+    const knob = toggle.querySelector('[data-theme-knob]');
+
+    function apply(light, persist) {
+      root.classList.toggle('light', light);
+      if (persist) {
+        try { localStorage.setItem('roomtone-theme', light ? 'light' : 'dark'); } catch (e) { /* ignore */ }
+      }
+      toggle.setAttribute('aria-pressed', light ? 'false' : 'true');
+      if (icon) icon.textContent = light ? 'light_mode' : 'dark_mode';
+      if (label) label.textContent = light ? 'Light Mode' : 'Dark Mode';
+      if (track) {
+        track.classList.toggle('bg-primary', !light);
+        track.classList.toggle('bg-surface-container-highest', light);
+      }
+      if (knob) {
+        knob.classList.toggle('translate-x-4', !light);
+        knob.classList.toggle('bg-on-primary', !light);
+        knob.classList.toggle('bg-on-surface-variant', light);
+      }
+    }
+
+    let stored = 'dark';
+    try { stored = localStorage.getItem('roomtone-theme') || 'dark'; } catch (e) { /* ignore */ }
+    apply(stored === 'light', false);
+    toggle.addEventListener('click', () => apply(!root.classList.contains('light'), true));
+  })();
+
+  /* ---------------- Auth: drawer Sign Out -> operator authentication ---------------- */
+  (function initAuth() {
+    const shell = document.getElementById('auth-shell');
+    const signOutBtn = document.getElementById('drawer-signout');
+    if (!shell || !signOutBtn) return;
+
+    const kicker = document.getElementById('auth-kicker');
+    const headline = document.getElementById('auth-headline');
+    const sub = document.getElementById('auth-sub');
+    const segments = document.getElementById('auth-segments');
+    const form = document.getElementById('auth-form');
+    const submitBtn = document.getElementById('auth-submit');
+    if (!kicker || !headline || !sub || !segments || !form || !submitBtn) return;
+
+    const submitLabel = submitBtn.querySelector('[data-submit-label]');
+    const submitIcon = submitBtn.querySelector('[data-submit-icon]');
+    const inputs = {
+      name: document.getElementById('auth-name'),
+      email: document.getElementById('auth-email'),
+      password: document.getElementById('auth-password'),
+      confirm: document.getElementById('auth-confirm')
+    };
+    const forgotSuccess = document.getElementById('auth-forgot-success');
+    const forgotEmailLine = document.getElementById('auth-forgot-email');
+    const toast = document.getElementById('toast');
+    const toastText = toast ? toast.querySelector('[data-toast-text]') : null;
+    const toastIcon = toast ? toast.querySelector('[data-toast-icon]') : null;
+    const baseBorder = 'border-outline-variant/50';
+    const errorBorder = ['border-error', 'ring-2', 'ring-error/20'];
+
+    const copy = {
+      signin: {
+        kicker: 'OPERATOR ACCESS \u00B7 THE AMBER ROOM',
+        head: 'Set the <em class="italic text-primary">tone</em>.',
+        sub: 'Welcome back, operator. Sync the floor, the sound and the cellar in one shift view.',
+        cta: 'CONTINUE'
+      },
+      register: {
+        kicker: 'NEW OPERATOR \u00B7 VENUE 142-FRANKLIN',
+        head: 'Join the <em class="italic text-primary">room</em>.',
+        sub: 'Create your operator pass to run tonight\u2019s playbook, taste radar and sound architecture.',
+        cta: 'CREATE PASS'
+      },
+      forgot: {
+        kicker: 'ACCOUNT RECOVERY',
+        head: 'Recover <em class="italic text-primary">access</em>.',
+        sub: 'Enter your operator email and we\u2019ll send a secure six-digit reset code.',
+        cta: 'SEND RESET CODE'
+      },
+      'forgot-success': {
+        kicker: 'ACCOUNT RECOVERY',
+        head: 'Recover <em class="italic text-primary">access</em>.',
+        sub: 'Enter your operator email and we\u2019ll send a secure six-digit reset code.',
+        cta: 'SEND RESET CODE'
+      }
+    };
+
+    let mode = 'signin';
+    let busy = false;
+    let toastTimer;
+
+    function showToast(message, icon) {
+      if (!toast) return;
+      toastText.textContent = message;
+      toastIcon.textContent = icon || 'check_circle';
+      toast.classList.remove('opacity-0', 'translate-y-2');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.add('opacity-0', 'translate-y-2'), 2600);
+    }
+
+    function paintSegments() {
+      shell.querySelectorAll('#auth-segments [data-auth-mode]').forEach(btn => {
+        const active = btn.getAttribute('data-auth-mode') === mode;
+        btn.classList.toggle('bg-primary', active);
+        btn.classList.toggle('text-on-primary', active);
+        btn.classList.toggle('text-on-surface-variant', !active);
+      });
+    }
+
+    function clearErrors() {
+      Object.keys(inputs).forEach(key => {
+        const input = inputs[key];
+        if (!input) return;
+        input.classList.remove.apply(input.classList, errorBorder);
+        input.classList.add(baseBorder);
+        input.removeAttribute('aria-invalid');
+        const note = shell.querySelector('[data-error="' + key + '"]');
+        if (note) note.classList.add('hidden');
+      });
+    }
+
+    function setError(key, message) {
+      const input = inputs[key];
+      if (!input) return;
+      input.classList.remove(baseBorder);
+      input.classList.add.apply(input.classList, errorBorder);
+      input.setAttribute('aria-invalid', 'true');
+      const note = shell.querySelector('[data-error="' + key + '"]');
+      if (note) {
+        note.textContent = message;
+        note.classList.remove('hidden');
+      }
+    }
+
+    function setMode(next) {
+      mode = next;
+      const c = copy[next];
+      kicker.textContent = c.kicker;
+      headline.innerHTML = c.head;
+      sub.textContent = c.sub;
+      submitLabel.textContent = c.cta;
+      shell.querySelectorAll('[data-mode-field]').forEach(el => {
+        el.classList.toggle('hidden', el.getAttribute('data-mode-field').split(/\s+/).indexOf(mode) === -1);
+      });
+      segments.classList.toggle('hidden', mode === 'forgot' || mode === 'forgot-success');
+      form.classList.toggle('hidden', mode === 'forgot-success');
+      forgotSuccess.classList.toggle('hidden', mode !== 'forgot-success');
+      clearErrors();
+      paintSegments();
+    }
+
+    function validate() {
+      let ok = true;
+      clearErrors();
+      if (mode === 'register' && inputs.name.value.trim().length < 2) {
+        setError('name', 'Tell us your name.');
+        ok = false;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputs.email.value.trim())) {
+        setError('email', 'That email doesn\u2019t look right.');
+        ok = false;
+      }
+      if (mode !== 'forgot') {
+        const min = mode === 'register' ? 8 : 4;
+        if (inputs.password.value.length < min) {
+          setError('password', mode === 'register' ? 'Use at least 8 characters.' : 'Enter your password.');
+          ok = false;
+        }
+        if (mode === 'register') {
+          if (!inputs.confirm.value) {
+            setError('confirm', 'Re-enter your password.');
+            ok = false;
+          } else if (inputs.confirm.value !== inputs.password.value) {
+            setError('confirm', 'Passwords don\u2019t match.');
+            ok = false;
+          }
+        }
+      }
+      return ok;
+    }
+
+    function showAuth() {
+      shell.classList.add('auth-visible');
+      shell.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      shell.querySelectorAll('.auth-rise').forEach(el => {
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+      });
+      setTimeout(() => { if (mode !== 'forgot-success' && inputs.email) inputs.email.focus(); }, 340);
+    }
+
+    function hideAuth() {
+      shell.classList.remove('auth-visible');
+      shell.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    signOutBtn.addEventListener('click', () => {
+      const backdrop = document.querySelector('#app-drawer .drawer-backdrop');
+      if (backdrop) backdrop.click();
+      setMode('signin');
+      form.reset();
+      showAuth();
+    });
+
+    shell.querySelectorAll('#auth-segments [data-auth-mode]').forEach(btn => {
+      btn.addEventListener('click', () => setMode(btn.getAttribute('data-auth-mode')));
+    });
+
+    document.getElementById('auth-forgot').addEventListener('click', () => setMode('forgot'));
+    document.getElementById('auth-back-signin').addEventListener('click', () => setMode('signin'));
+
+    shell.querySelectorAll('[data-eye]').forEach(btn => {
+      const target = document.getElementById(btn.getAttribute('data-eye'));
+      if (!target) return;
+      btn.addEventListener('click', () => {
+        const masked = target.type === 'password';
+        target.type = masked ? 'text' : 'password';
+        btn.querySelector('.material-symbols-outlined').textContent = masked ? 'visibility_off' : 'visibility';
+        btn.setAttribute('aria-label', masked ? 'Hide password' : 'Show password');
+      });
+    });
+
+    const rememberBtn = document.getElementById('auth-remember');
+    if (rememberBtn) {
+      const rememberTrack = rememberBtn.querySelector('[data-remember-track]');
+      const rememberKnob = rememberBtn.querySelector('[data-remember-knob]');
+      let remember = false;
+      try { remember = localStorage.getItem('roomtone-remember') === 'true'; } catch (e) { /* ignore */ }
+      const paintRemember = () => {
+        rememberBtn.setAttribute('aria-pressed', remember ? 'true' : 'false');
+        rememberTrack.classList.toggle('bg-primary', remember);
+        rememberTrack.classList.toggle('bg-surface-container-highest', !remember);
+        rememberKnob.classList.toggle('translate-x-4', remember);
+        rememberKnob.classList.toggle('bg-on-primary', remember);
+        rememberKnob.classList.toggle('bg-on-surface-variant', !remember);
+      };
+      rememberBtn.addEventListener('click', () => {
+        remember = !remember;
+        try { localStorage.setItem('roomtone-remember', remember ? 'true' : 'false'); } catch (e) { /* ignore */ }
+        paintRemember();
+      });
+      paintRemember();
+    }
+
+    shell.querySelectorAll('[data-alt]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const message = btn.getAttribute('data-alt') === 'badge'
+          ? 'Venue badge SSO pairs from the back-of-house reader.'
+          : 'One-time codes are issued at the door terminal.';
+        showToast(message, 'info');
+      });
+    });
+
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      if (busy || !validate()) return;
+      busy = true;
+      submitBtn.classList.add('opacity-80', 'pointer-events-none');
+      submitBtn.setAttribute('aria-busy', 'true');
+      submitIcon.textContent = 'progress_activity';
+      submitIcon.classList.add('animate-spin');
+      submitLabel.textContent = mode === 'register' ? 'CREATING PASS\u2026'
+        : (mode === 'forgot' ? 'SENDING\u2026' : 'AUTHENTICATING\u2026');
+
+      setTimeout(() => {
+        busy = false;
+        submitBtn.classList.remove('opacity-80', 'pointer-events-none');
+        submitBtn.removeAttribute('aria-busy');
+        submitIcon.textContent = 'arrow_forward';
+        submitIcon.classList.remove('animate-spin');
+        if (mode === 'forgot') {
+          forgotEmailLine.textContent = 'Check ' + inputs.email.value.trim() + ' \u2014 the code expires in 10 minutes.';
+          setMode('forgot-success');
+        } else {
+          const message = mode === 'register'
+            ? 'Operator pass created \u2014 welcome aboard'
+            : 'Signed in \u2014 Amber Room shift synced';
+          hideAuth();
+          form.reset();
+          setMode('signin');
+          showToast(message);
+        }
+      }, 900);
+    });
+
+    setMode('signin');
   })();
 
   /* ---------------- Theme toggle: drawer Light/Dark switch ---------------- */

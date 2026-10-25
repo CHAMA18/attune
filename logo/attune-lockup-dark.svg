@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 168" width="1040" height="336" fill="none">
-  <title>Attune lockup on dark</title>
+  <title>Attune OS — lockup on dark</title>
   <style>@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&amp;family=Playfair+Display:ital,wght@1,500&amp;display=swap');</style>
   <defs>
     <linearGradient id="amd" x1="34" y1="12" x2="72" y2="66" gradientUnits="userSpaceOnUse">
@@ -20,5 +20,6 @@
     <circle cx="12" cy="6.6" r="1.2" fill="#ffb68c"/>
   </g>
   <text x="152" y="90" font-family="'JetBrains Mono', monospace" font-size="40" font-weight="600" letter-spacing="10" fill="#ffb68c">ATTUNE</text>
+  <text x="362" y="90" font-family="'Playfair Display', serif" font-size="46" font-style="italic" font-weight="500" fill="#e1e2e9">OS</text>
   <text x="154" y="126" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="500" letter-spacing="6" fill="#a38c80">AMBIENCE INTELLIGENCE</text>
 </svg>
