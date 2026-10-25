@@ -1833,6 +1833,7 @@
             <span class="font-label-caps text-label-caps text-secondary bg-secondary-container/40 ring-1 ring-inset ring-secondary/25 px-2 py-1 rounded-md">Ryuichi Sakamoto &#183; 96% MATCH</span>
             <span class="font-label-caps text-label-caps text-secondary bg-secondary-container/40 ring-1 ring-inset ring-secondary/25 px-2 py-1 rounded-md">Pioneer Works &#183; 91% MATCH</span>
           </div>
+          <p id="agent-trace" class="mt-2 micro-caps text-on-surface-variant/70" style="letter-spacing:.08em" aria-live="polite"></p>
         </div>
 
         <div class="rule mt-4" aria-hidden="true"></div>
@@ -4084,6 +4085,7 @@
     provider: null, model: null,
     places: [], artists: [], palate: [], tribes: [],
     anchor: null,      /* block taste anchor { id, name } — seeds affinity queries */
+    anchorPull: null,  /* avg anchor contribution from Qloo explainability (0..1) */
     llm: null          /* parsed playbook */
   };
 
@@ -4212,16 +4214,27 @@
         return (Number(b.popularity) || 0) - (Number(a.popularity) || 0);
       })[0];
       state.anchor = { id: anchor.entity_id || anchor.id, name: nameOf(anchor) };
-      /* Hop 2 — Qloo affinity-ranks the whole block against its own anchor */
+      /* Hop 2 — Qloo affinity-ranks the whole block against its own anchor.
+         feature.explainability=true adds per-result contribution scores so the
+         grounding JSON the agent receives is auditable, not vibes. */
       return qlooFetch('/v2/insights', {
         'signal.interests.entities': state.anchor.id,
         'filter.type': 'urn:entity:place',
         'filter.location': wkt(),
         'filter.location.radius': String(radiusM),
-        'take': '30'
+        'take': '30',
+        'feature.explainability': 'true'
       });
     }).then(function (res) {
-      var ents = entitiesOf(res).filter(function (e) { return affinityOf(e) > 0; });
+      var all = entitiesOf(res);
+      /* How strongly the anchor drove the ranking, averaged (0..1). */
+      var esum = 0, en = 0;
+      all.forEach(function (e) {
+        var ex = e.query && e.query.explainability && e.query.explainability['signal.interests.entities'];
+        if (Array.isArray(ex)) ex.forEach(function (c) { esum += Number(c.score) || 0; en += 1; });
+      });
+      state.anchorPull = en ? Number((esum / en).toFixed(2)) : null;
+      var ents = all.filter(function (e) { return affinityOf(e) > 0; });
       if (!ents.length) throw new Error('EMPTY');
       var top = ents.slice(0, 10);
       var heat = top.reduce(function (s, e) { return s + affinityOf(e); }, 0) / top.length * 100;
@@ -4338,8 +4351,9 @@
   }
 
   function loadSignals(placeEntities) {
-    /* Artists have no geography — rank them by affinity to the block's anchor venue */
-    var params = { 'filter.type': 'urn:entity:artist', 'take': '10' };
+    /* Artists have no geography — rank them by affinity to the block's anchor venue.
+       Explainability on: the agent gets per-artist anchor contributions. */
+    var params = { 'filter.type': 'urn:entity:artist', 'take': '10', 'feature.explainability': 'true' };
     if (state.anchor && state.anchor.id) {
       params['signal.interests.entities'] = state.anchor.id;
     } else {
@@ -4384,6 +4398,9 @@
       venue: VENUE,
       block_radius_ft: RADIUS_FT,
       feed: state.live ? 'qloo_live' : 'demo',
+      anchor: state.anchor,
+      anchor_pull: state.anchorPull,
+      focus_daypart: currentDaypart,
       taste_metrics: {
         block_heat: (document.querySelector('[data-qloo="block-heat"]') || {}).textContent || null,
         taste_synergy: (document.querySelector('[data-qloo="taste-synergy"]') || {}).textContent || null,
@@ -4434,7 +4451,17 @@
       state.provider = data.provider || null;
       state.model = data.model || null;
       if (persona) persona.textContent = '\u201C' + parsed.persona + '\u201D';
-      setLlmMode('AI LIVE');
+      setLlmMode(data.engine === 'llm' ? 'AI LIVE' : 'LIVE DATA');
+      /* Agent trace — what the playbook agent actually did, in order. */
+      var tr = document.getElementById('agent-trace');
+      if (tr) tr.textContent = (data.agentTrace && data.agentTrace.length)
+        ? data.agentTrace.map(function (s) { return s.detail; }).join(' \u2192 ')
+        : '';
+      /* The agent's cited drivers (includes its own server-side Qloo hop). */
+      var drv = (data && data.drivers) || [];
+      if (drv.length) {
+        setChips(drv.slice(0, 3).map(function (d) { return { name: d.name, affinity: d.score }; }));
+      }
       setText('daypart-action-label', 'The Play \u00B7 AI');
       applyDaypart(currentDaypart);
     }).catch(function (err) {
@@ -4490,7 +4517,7 @@
     setText('daypart-action', (state.llmLive && state.llm.actions && state.llm.actions[dp]) || demo.action);
     if (state.llmLive && state.llm.anchor) {
       setText('daypart-audio-title', state.llm.anchor);
-      setText('daypart-audio-stream', 'Streaming: Qloo block anchor \u00B7 ' + (state.llm.bpm ? state.llm.bpm + ' BPM zone' : 'BPM per block tempo'));
+      setText('daypart-audio-stream', 'Qloo block anchor \u00B7 ' + (state.llm.bpm ? state.llm.bpm + ' BPM zone' : 'BPM per block tempo'));
     }
     if (state.llmLive && state.llm.menu && dp === 'golden') {
       setText('daypart-menu', state.llm.menu);
