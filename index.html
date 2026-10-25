@@ -315,6 +315,86 @@
     .auth-shell.auth-visible .strike-ring,
     .auth-shell.auth-visible .lockup-halo { animation: none; }
   }
+
+  /* ==================== AUTH ACCESS — world-class pass ====================
+     Motion language: the struck fork — strike, resonate, settle.
+     Every surface is token-driven (rgb(var(--c-*)/a)) so light + dark themes
+     are both first-class. All motion honors prefers-reduced-motion. */
+
+  /* — Atmosphere: rotating aurora light, vignette depth, film grain — */
+  .aurora {
+    position: absolute; left: -30%; top: -46%; width: 160%; aspect-ratio: 1;
+    border-radius: 9999px; filter: blur(42px); opacity: 0.9;
+    background: conic-gradient(from 0deg,
+      transparent 0deg,
+      rgb(var(--c-primary) / 0.10) 55deg,
+      transparent 120deg,
+      rgb(var(--c-tertiary) / 0.09) 195deg,
+      transparent 255deg,
+      rgb(var(--c-secondary) / 0.07) 315deg,
+      transparent 360deg);
+    animation: aurora-spin 64s linear infinite;
+  }
+  @keyframes aurora-spin { to { transform: rotate(1turn); } }
+
+  .a-vignette { background: radial-gradient(130% 92% at 50% 28%, transparent 52%, rgb(var(--c-background) / 0.42) 100%); }
+  .a-grain {
+    opacity: 0.05; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
+  html.light .a-grain { opacity: 0.035; }
+
+  /* — Card chrome: top light, precision corner ticks — */
+  .a-card::before {
+    content: ''; position: absolute; top: -1px; left: 12%; right: 12%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(var(--c-primary) / 0.4), transparent);
+  }
+  .a-card .tick { position: absolute; width: 9px; height: 9px; color: rgb(var(--c-outline) / 0.45); pointer-events: none; }
+  .a-card .t-tl { top: -5px; left: -5px; border-top: 1px solid; border-left: 1px solid; border-top-left-radius: 4px; }
+  .a-card .t-tr { top: -5px; right: -5px; border-top: 1px solid; border-right: 1px solid; border-top-right-radius: 4px; }
+  .a-card .t-bl { bottom: -5px; left: -5px; border-bottom: 1px solid; border-left: 1px solid; border-bottom-left-radius: 4px; }
+  .a-card .t-br { bottom: -5px; right: -5px; border-bottom: 1px solid; border-right: 1px solid; border-bottom-right-radius: 4px; }
+
+  /* — Segmented control: spring thumb — */
+  #auth-thumb { will-change: transform; }
+
+  /* — Fields: label shift, lead icon, focus glow, error priority — */
+  .afield label { transition: color 0.2s ease; }
+  .afield:focus-within label { color: rgb(var(--c-primary)); }
+  .afield .a-ico { transition: color 0.2s ease; }
+  .afield:focus-within .a-ico { color: rgb(var(--c-primary)); }
+  .afield input:focus {
+    outline: none;
+    border-color: rgb(var(--c-primary) / 0.7);
+    box-shadow: 0 0 0 4px rgb(var(--c-primary) / 0.10), 0 0 28px -10px rgb(var(--c-primary) / 0.35);
+  }
+  .afield input.ring-2, .afield input.ring-2:focus {
+    border-color: rgb(var(--c-error));
+    box-shadow: 0 0 0 4px rgb(var(--c-error) / 0.10);
+  }
+  .a-tick { transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .a-tick.on { opacity: 1 !important; transform: translateY(-50%) scale(1) !important; }
+
+  /* — CTA: sheen sweep — */
+  .a-sheen { will-change: transform; }
+
+  /* — Mode swap: field enter + measured height — */
+  @keyframes field-enter {
+    from { opacity: 0; transform: translateY(7px); }
+    to { opacity: 1; transform: none; }
+  }
+  .field-enter { animation: field-enter 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+  /* — Telemetry: breathing lock, latency swap — */
+  @keyframes tls-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+  .a-tls-lock { animation: tls-pulse 3.2s ease-in-out infinite; }
+  #latency-ms { transition: opacity 0.18s ease; display: inline-block; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .aurora, .a-sheen, .field-enter, .a-tls-lock { animation: none !important; }
+    #auth-thumb { transition: none !important; }
+    #latency-ms { transition: none !important; }
+  }
 </style>
 
 <script src="https://cdn.tailwindcss.com"></script>
@@ -584,6 +664,7 @@
 
     <!-- ambient art -->
     <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div class="aurora"></div>
       <div class="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-primary/15 blur-3xl"></div>
       <div class="absolute top-1/3 -left-28 w-72 h-72 rounded-full bg-tertiary/10 blur-3xl"></div>
       <svg class="absolute -bottom-14 -right-12 w-64 h-64 opacity-[0.07] text-primary" viewBox="0 0 200 200" fill="none" stroke="currentColor">
@@ -593,6 +674,8 @@
         <line x1="100" y1="14" x2="100" y2="186"/>
         <line x1="14" y1="100" x2="186" y2="100"/>
       </svg>
+      <div class="a-vignette absolute inset-0"></div>
+      <div class="a-grain absolute inset-0"></div>
     </div>
 
     <!-- brand lockup — the struck fork -->
@@ -619,50 +702,64 @@
     </div>
 
     <!-- form card -->
-    <div class="relative auth-rise auth-d1 rounded-xl bg-surface-container-low/80 backdrop-blur-xl border border-outline-variant/40 shadow-[0_20px_60px_rgba(0,0,0,0.45)] p-space-md">
-      <div id="auth-segments" class="flex p-1 rounded-full bg-surface-container mb-space-md">
-        <button type="button" data-auth-mode="signin" class="flex-1 py-2 rounded-full font-label-caps text-label-caps tracking-widest bg-primary text-on-primary transition-colors">SIGN IN</button>
-        <button type="button" data-auth-mode="register" class="flex-1 py-2 rounded-full font-label-caps text-label-caps tracking-widest text-on-surface-variant transition-colors">REGISTER</button>
+    <div class="a-card relative auth-rise auth-d1 rounded-xl bg-surface-container-low/80 backdrop-blur-xl border border-outline-variant/40 shadow-[0_20px_60px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,201,163,0.07)] p-space-md">
+      <span class="tick t-tl" aria-hidden="true"></span><span class="tick t-tr" aria-hidden="true"></span>
+      <span class="tick t-bl" aria-hidden="true"></span><span class="tick t-br" aria-hidden="true"></span>
+      <div id="auth-segments" class="relative flex p-1 rounded-full bg-surface-container mb-space-md" role="tablist" aria-label="Authentication mode">
+        <span id="auth-thumb" class="absolute top-1 bottom-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-primary shadow-[0_2px_14px_rgba(217,119,54,0.38),inset_0_1px_0_rgba(255,255,255,0.20)] transition-transform duration-300 ease-[cubic-bezier(0.34,1.3,0.64,1)]" aria-hidden="true"></span>
+        <button type="button" role="tab" aria-selected="true" data-auth-mode="signin" class="relative z-10 flex-1 py-2 rounded-full font-label-caps text-label-caps tracking-widest text-on-primary transition-colors duration-300">SIGN IN</button>
+        <button type="button" role="tab" aria-selected="false" data-auth-mode="register" class="relative z-10 flex-1 py-2 rounded-full font-label-caps text-label-caps tracking-widest text-on-surface-variant transition-colors duration-300">REGISTER</button>
       </div>
 
       <form id="auth-form" novalidate>
-        <div class="pb-space-sm hidden" data-mode-field="register">
+        <div class="afield pb-space-sm hidden" data-mode-field="register">
           <label for="auth-name" class="font-label-caps text-label-caps text-outline tracking-widest block pb-1">OPERATOR NAME</label>
-          <input id="auth-name" name="name" type="text" autocomplete="name" placeholder="Your name"
-                 class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-space-sm py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary/70 transition-colors"/>
+          <div class="relative">
+            <span class="a-ico material-symbols-outlined text-lg pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-outline" aria-hidden="true">person</span>
+            <input id="auth-name" name="name" type="text" autocomplete="name" enterkeyhint="next" placeholder="Your name"
+                   class="w-full pl-10 pr-3 bg-surface-container border border-outline-variant/50 rounded-lg px-space-sm py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline/70 transition-colors"/>
+          </div>
           <p class="hidden pt-1 font-body-sm text-body-sm text-error" data-error="name" role="alert">Tell us your name.</p>
         </div>
 
-        <div class="pb-space-sm" data-mode-field="signin register forgot">
+        <div class="afield pb-space-sm" data-mode-field="signin register forgot">
           <label for="auth-email" class="font-label-caps text-label-caps text-outline tracking-widest block pb-1">EMAIL</label>
-          <input id="auth-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="operator@amberroom.nyc"
-                 class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-space-sm py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary/70 transition-colors"/>
+          <div class="relative">
+            <span class="a-ico material-symbols-outlined text-lg pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-outline" aria-hidden="true">mail</span>
+            <input id="auth-email" name="email" type="email" autocomplete="email" inputmode="email" enterkeyhint="next" autocapitalize="none" spellcheck="false" placeholder="operator@amberroom.nyc"
+                   class="w-full pl-10 pr-10 bg-surface-container border border-outline-variant/50 rounded-lg px-space-sm py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline/70 transition-colors"/>
+            <span class="a-tick material-symbols-outlined text-base text-primary absolute right-3 top-1/2 -translate-y-1/2 scale-75 opacity-0 pointer-events-none" data-email-tick aria-hidden="true">check_circle</span>
+          </div>
           <p class="hidden pt-1 font-body-sm text-body-sm text-error" data-error="email" role="alert">That email doesn&#8217;t look right.</p>
         </div>
 
-        <div class="pb-space-sm" data-mode-field="signin register">
+        <div class="afield pb-space-sm" data-mode-field="signin register">
           <label for="auth-password" class="font-label-caps text-label-caps text-outline tracking-widest block pb-1">PASSWORD</label>
           <div class="relative">
-            <input id="auth-password" name="password" type="password" autocomplete="current-password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"
-                   class="w-full pr-11 bg-surface-container border border-outline-variant/50 rounded-lg px-space-sm py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary/70 transition-colors"/>
+            <span class="a-ico material-symbols-outlined text-lg pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-outline" aria-hidden="true">key</span>
+            <input id="auth-password" name="password" type="password" autocomplete="current-password" enterkeyhint="go" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"
+                   class="w-full pl-10 pr-11 bg-surface-container border border-outline-variant/50 rounded-lg px-space-sm py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline/70 transition-colors"/>
             <button type="button" data-eye="auth-password" aria-label="Show password"
-                    class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface">
+                    class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface transition-colors">
               <span class="material-symbols-outlined text-lg">visibility</span>
             </button>
           </div>
+          <p class="acaps hidden pt-1.5 font-label-caps text-[9px] tracking-[0.18em] text-secondary-fixed items-center gap-1" data-caps="auth-password" aria-live="polite"><span class="material-symbols-outlined text-[12px]" aria-hidden="true">keyboard_capslock</span>CAPS LOCK IS ON</p>
           <p class="hidden pt-1 font-body-sm text-body-sm text-error" data-error="password" role="alert">Enter your password.</p>
         </div>
 
-        <div class="pb-space-sm hidden" data-mode-field="register">
+        <div class="afield pb-space-sm hidden" data-mode-field="register">
           <label for="auth-confirm" class="font-label-caps text-label-caps text-outline tracking-widest block pb-1">CONFIRM PASSWORD</label>
           <div class="relative">
-            <input id="auth-confirm" name="confirm-password" type="password" autocomplete="new-password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"
-                   class="w-full pr-11 bg-surface-container border border-outline-variant/50 rounded-lg px-space-sm py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary/70 transition-colors"/>
+            <span class="a-ico material-symbols-outlined text-lg pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-outline" aria-hidden="true">lock_reset</span>
+            <input id="auth-confirm" name="confirm-password" type="password" autocomplete="new-password" enterkeyhint="done" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"
+                   class="w-full pl-10 pr-11 bg-surface-container border border-outline-variant/50 rounded-lg px-space-sm py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline/70 transition-colors"/>
             <button type="button" data-eye="auth-confirm" aria-label="Show password"
-                    class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface">
+                    class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface transition-colors">
               <span class="material-symbols-outlined text-lg">visibility</span>
             </button>
           </div>
+          <p class="acaps hidden pt-1.5 font-label-caps text-[9px] tracking-[0.18em] text-secondary-fixed items-center gap-1" data-caps="auth-confirm" aria-live="polite"><span class="material-symbols-outlined text-[12px]" aria-hidden="true">keyboard_capslock</span>CAPS LOCK IS ON</p>
           <p class="hidden pt-1 font-body-sm text-body-sm text-error" data-error="confirm" role="alert">Passwords don&#8217;t match.</p>
         </div>
 
@@ -677,9 +774,10 @@
         </div>
 
         <button type="submit" id="auth-submit"
-                class="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-gradient-to-r from-primary to-secondary text-on-primary font-label-caps text-label-caps tracking-widest font-semibold shadow-[0_10px_30px_rgba(217,119,54,0.30)] hover:brightness-110 active:scale-[0.99] transition-all">
-          <span data-submit-label>CONTINUE</span>
-          <span class="material-symbols-outlined text-base" data-submit-icon>arrow_forward</span>
+                class="group relative w-full overflow-hidden flex items-center justify-center gap-2 py-3 rounded-lg bg-gradient-to-r from-primary to-secondary text-on-primary font-label-caps text-label-caps tracking-widest font-semibold shadow-[0_10px_30px_rgba(217,119,54,0.30)] hover:shadow-[0_14px_38px_rgba(217,119,54,0.42)] hover:brightness-110 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-container-low outline-none transition-all">
+          <span class="a-sheen absolute inset-y-0 -left-1/2 w-1/2 -translate-x-full skew-x-[-18deg] bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[450%]" aria-hidden="true"></span>
+          <span data-submit-label class="relative">CONTINUE</span>
+          <span class="material-symbols-outlined text-base relative transition-transform duration-300 group-hover:translate-x-1" data-submit-icon>arrow_forward</span>
         </button>
 
         <div class="flex items-center gap-2 pt-space-md pb-space-xs" data-mode-field="signin register">
@@ -718,8 +816,8 @@
     <div class="relative auth-rise auth-d3">
       <div data-waveform class="flex items-end gap-0.5 h-10 w-full opacity-80"></div>
       <div class="flex items-center justify-between pt-space-sm">
-        <span class="font-label-caps text-label-caps text-outline tracking-widest">SECURE SESSION &#183; TLS 1.3</span>
-        <span class="font-label-caps text-label-caps text-outline tracking-widest">LATENCY 14MS</span>
+        <span class="font-label-caps text-label-caps text-outline tracking-widest flex items-center gap-1"><span class="a-tls-lock material-symbols-outlined text-[11px] text-primary/70" aria-hidden="true">lock</span>SECURE SESSION &#183; TLS 1.3</span>
+        <span class="font-label-caps text-label-caps text-outline tracking-widest">LATENCY <span id="latency-ms">14</span>MS</span>
       </div>
       <p class="font-label-caps text-label-caps text-outline tracking-widest pt-space-xs pb-space-sm text-center">ATTUNE &#183; AMBIENCE INTELLIGENCE</p>
     </div>
@@ -2427,13 +2525,15 @@
       toastTimer = setTimeout(() => toast.classList.add('opacity-0', 'translate-y-2'), 2600);
     }
 
+    const thumb = document.getElementById('auth-thumb');
     function paintSegments() {
       shell.querySelectorAll('#auth-segments [data-auth-mode]').forEach(btn => {
         const active = btn.getAttribute('data-auth-mode') === mode;
-        btn.classList.toggle('bg-primary', active);
         btn.classList.toggle('text-on-primary', active);
         btn.classList.toggle('text-on-surface-variant', !active);
+        btn.setAttribute('aria-selected', active ? 'true' : 'false');
       });
+      if (thumb) thumb.style.transform = mode === 'register' ? 'translateX(100%)' : 'translateX(0)';
     }
 
     function clearErrors() {
@@ -2461,18 +2561,65 @@
       }
     }
 
-    function setMode(next) {
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* Morph the card between modes: measure -> mutate -> animate height,
+       while entering fields rise in with a light stagger. */
+    function animateModeSwap(mutate) {
+      const card = form.closest('.a-card');
+      if (reduceMotion || !card) { mutate(); paintSegments(); return; }
+      const startH = card.offsetHeight;
+      mutate();
+      paintSegments();
+      const entering = [];
+      shell.querySelectorAll('[data-mode-field], #auth-forgot-success').forEach(el => {
+        if (!el.classList.contains('hidden')) entering.push(el);
+      });
+      entering.forEach((el, i) => {
+        el.classList.remove('field-enter');
+        void el.offsetWidth;
+        el.style.animationDelay = Math.min(i * 30, 120) + 'ms';
+        el.classList.add('field-enter');
+        setTimeout(() => { el.classList.remove('field-enter'); el.style.animationDelay = ''; }, 480 + i * 30);
+      });
+      const endH = card.offsetHeight;
+      if (startH === endH) return;
+      const ticks = card.querySelectorAll('.tick');
+      card.style.height = startH + 'px';
+      card.style.overflow = 'hidden';
+      ticks.forEach(t => { t.style.opacity = '0'; });
+      void card.offsetHeight;
+      card.style.transition = 'height 0.34s cubic-bezier(0.22, 1, 0.36, 1)';
+      card.style.height = endH + 'px';
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        card.style.height = '';
+        card.style.overflow = '';
+        card.style.transition = '';
+        ticks.forEach(t => { t.style.opacity = ''; });
+        card.removeEventListener('transitionend', finish);
+      };
+      card.addEventListener('transitionend', finish);
+      setTimeout(finish, 460);
+    }
+
+    function setMode(next, animate) {
       mode = next;
       const c = copy[next];
       submitLabel.textContent = c.cta;
-      shell.querySelectorAll('[data-mode-field]').forEach(el => {
-        el.classList.toggle('hidden', el.getAttribute('data-mode-field').split(/\s+/).indexOf(mode) === -1);
-      });
-      segments.classList.toggle('hidden', mode === 'forgot' || mode === 'forgot-success');
-      form.classList.toggle('hidden', mode === 'forgot-success');
-      forgotSuccess.classList.toggle('hidden', mode !== 'forgot-success');
-      clearErrors();
-      paintSegments();
+      const mutate = () => {
+        shell.querySelectorAll('[data-mode-field]').forEach(el => {
+          el.classList.toggle('hidden', el.getAttribute('data-mode-field').split(/\s+/).indexOf(mode) === -1);
+        });
+        segments.classList.toggle('hidden', mode === 'forgot' || mode === 'forgot-success');
+        form.classList.toggle('hidden', mode === 'forgot-success');
+        forgotSuccess.classList.toggle('hidden', mode !== 'forgot-success');
+        clearErrors();
+      };
+      if (animate) animateModeSwap(mutate);
+      else { mutate(); paintSegments(); }
     }
 
     function validate() {
@@ -2532,11 +2679,11 @@
     });
 
     shell.querySelectorAll('#auth-segments [data-auth-mode]').forEach(btn => {
-      btn.addEventListener('click', () => setMode(btn.getAttribute('data-auth-mode')));
+      btn.addEventListener('click', () => setMode(btn.getAttribute('data-auth-mode'), true));
     });
 
-    document.getElementById('auth-forgot').addEventListener('click', () => setMode('forgot'));
-    document.getElementById('auth-back-signin').addEventListener('click', () => setMode('signin'));
+    document.getElementById('auth-forgot').addEventListener('click', () => setMode('forgot', true));
+    document.getElementById('auth-back-signin').addEventListener('click', () => setMode('signin', true));
 
     shell.querySelectorAll('[data-eye]').forEach(btn => {
       const target = document.getElementById(btn.getAttribute('data-eye'));
@@ -2548,6 +2695,29 @@
         btn.setAttribute('aria-label', masked ? 'Hide password' : 'Show password');
       });
     });
+
+    /* Caps-lock awareness: the instrument warns before you mistype. */
+    shell.querySelectorAll('[data-caps]').forEach(chip => {
+      const target = document.getElementById(chip.getAttribute('data-caps'));
+      if (!target) return;
+      const paint = ev => {
+        const on = !!(ev && ev.getModifierState && ev.getModifierState('CapsLock'));
+        chip.classList.toggle('hidden', !on);
+        chip.classList.toggle('flex', !!on);
+      };
+      target.addEventListener('keydown', paint);
+      target.addEventListener('keyup', paint);
+      target.addEventListener('blur', () => { chip.classList.add('hidden'); chip.classList.remove('flex'); });
+    });
+
+    /* Live email validity: a quiet check the moment the address resolves. */
+    const emailTick = shell.querySelector('[data-email-tick]');
+    if (emailTick) {
+      inputs.email.addEventListener('input', () => {
+        const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputs.email.value.trim());
+        emailTick.classList.toggle('on', ok);
+      });
+    }
 
     const rememberBtn = document.getElementById('auth-remember');
     if (rememberBtn) {
@@ -2613,6 +2783,19 @@
     });
 
     setMode('signin');
+  })();
+
+  /* Live telemetry: the latency readout breathes like a real connection. */
+  (function initLatency() {
+    const el = document.getElementById('latency-ms');
+    if (!el) return;
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setInterval(() => {
+      const next = String(11 + Math.floor(Math.random() * 9));
+      if (reduce) { el.textContent = next; return; }
+      el.style.opacity = '0.25';
+      setTimeout(() => { el.textContent = next; el.style.opacity = '1'; }, 180);
+    }, 2600);
   })();
 </script>
 
