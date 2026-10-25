@@ -76,13 +76,13 @@ const SYSTEM_PROMPT =
   "- Every line you write must name at least one grounded entity (place, artist, audience, or palate tag).\n" +
   "- Write operator-facing copy: concrete, physical, zero marketing fluff, under 120 words total.\n" +
   "- Format exactly as these lines, no markdown, no extra lines:\n" +
-  "PERSONA: <one line naming the dominant audience segment>\n" +
+  "PERSONA: <one full sentence, under 16 words, naming the dominant audience segment and what they crave>\n" +
   "ROASTERS 07-11: <morning action>\n" +
   "LINGER 11-16: <midday action>\n" +
   "GOLDEN 16-20: <golden-hour action>\n" +
   "NIGHT 20-02: <late action>\n" +
   "PLAYLIST: <anchor artist> <BPM band like 105-120 BPM>\n" +
-  "MENU: <one menu callout citing a palate tag>";
+  "MENU: <one concrete dish or drink callout inspired by a palate tag — never an abstract label>";
 
 /* --------------------------- helpers ---------------------------- */
 function json(res, code, obj) {

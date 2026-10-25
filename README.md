@@ -2,15 +2,39 @@
 
 **Attune** turns Qloo's Taste AI™ into an operating system for independent bar & restaurant operators. Instead of another analytics dashboard, it converts the taste graph of the block around your door — 250M+ entities across music, dining, film, fashion and more — into a **dayparted operations playbook**: what to pour, what to play, how to light the room, hour by hour.
 
-Built for the **Qloo LLM Hackathon**. Mobile-first, single-file frontend, Firebase backend.
+Built for the **Qloo Agentic Hackathon** ("Agents, but with taste"). Mobile-first, single-file frontend, agent sidecar + Firebase backend.
 
 ---
 
 ## The 30-second pitch
 
-> Every block has a taste signature. The Amber Room sits in Greenpoint, Brooklyn, 800 feet from Pioneer Works and a cluster of natural-wine bars. Attune reads that signature through Qloo, grounds an LLM in it, and hands the operator a Friday playbook: *queue kankyō ongaku side-B for the 16–20 swell, run the hi-ball tray to garden tables from 17:30, sconces to 2800K at 35%.* Not a report — a shift plan.
+> Every block has a taste signature. Your venue sits 800 feet from the places and people that set the block's rhythm. Attune's **playbook agent** reads that signature through Qloo, grounds itself deeper server-side (a cross-domain artist hop off your block anchor, with explainability), and hands the operator a night plan: *anchor to the dive bar two doors down, spin Ersen into the golden-hour set, run the natural-wine flight through the 16–20 swell.* Not a report — a shift plan where every line cites the entity that drove it.
 
-## How Qloo grounds the LLM
+## Your venue, not a demo venue
+
+Onboarding asks for the venue name and neighborhood. Attune resolves it against Qloo's entity graph (`/v2/search`), then runs the entire taste graph — anchor, affinities, audiences, artists, agent — against **that** block (`filter.location.query=<locality>`). Change the venue anytime in the drawer (**Your Venue → Retune the room**) and every metric, playbook line, and cited driver recomputes. The Amber Room demo block is only the fallback, clearly badged.
+
+## The playbook agent (ground → enrich → compose)
+
+The agent is not a chat box bolted onto a dashboard — it is the composition engine, and its work is auditable in the UI (the agent-trace strip on the Home card):
+
+```
+1. GROUND   the app ships its grounding JSON: venue, block anchor, place/
+            artist affinities, audience segments, palate tags, focus daypart
+2. ENRICH   the agent re-queries Qloo server-side — a cross-domain artist hop
+            seeded by the block anchor (urn:entity:place → urn:entity:artist)
+            with feature.explainability=true, so every driver carries a real
+            contribution score. The agent now holds entities the client never sent.
+3. COMPOSE  an LLM (z-ai / OpenAI / Gemini / Anthropic — provider-switchable)
+            writes the playbook under a strict contract: cite only grounded
+            entities, one concrete action per daypart, <120 words.
+4. FALLBACK deterministic composer (data → copy) if every LLM path fails —
+            the route always answers 200. The app never dead-ends.
+```
+
+Response contract: `{ playbook, engine: llm|local, provider, model, generatedAt, latencyMs, agentTrace[], drivers[] }`. `drivers` re-renders as the cited MATCH chips; `agentTrace` renders verbatim as the trace strip.
+
+## The grounding pipeline (app side)
 
 The entire pipeline is **retrieval-augmented with Qloo as the retriever**:
 
@@ -58,11 +82,11 @@ The entire pipeline is **retrieval-augmented with Qloo as the retriever**:
 
 | State | Badge | Behavior |
 |---|---|---|
-| Qloo reachable + LLM configured | `LIVE · GROUNDED BY QLOO` | Full pipeline: live metrics → LLM playbook |
-| Qloo reachable, LLM down | `LIVE · GROUNDED BY QLOO` | Live metrics + curated playbook, error noted in strip |
-| No backend reachable | `DEMO FEED · 800FT RADAR` | Curated demo data, clearly badged — the app never dead-ends |
+| Qloo reachable + LLM path up | `AI LIVE` | Full agent: grounding → enrichment → LLM compose, trace visible |
+| Qloo reachable, LLM down | `LIVE DATA` | Deterministic composer writes from the same grounded data |
+| No backend reachable | `DEMO DATA` | Curated demo block, clearly badged — the app never dead-ends |
 
-Responses are cached client-side for 15 minutes (sessionStorage) to stay gentle on the monthly Qloo quota.
+Responses are cached client-side for 15 minutes (sessionStorage) to stay gentle on the monthly Qloo quota; switching venues clears the cache automatically.
 
 ## Run it
 
@@ -71,9 +95,11 @@ Responses are cached client-side for 15 minutes (sessionStorage) to stay gentle 
 npm run dev          # serves on http://localhost:3000
 
 # option B — production-shaped local stack (recommended)
-#   single-origin Caddy: static files + key-injecting Qloo proxy + LLM stub
-echo 'QLOO_API_KEY=your_key' > .env.local   # gitignored
-./scripts/serve.sh   # → http://localhost:3000  (LIVE badge)
+#   single-origin Caddy: static files + key-injecting Qloo proxy + playbook agent
+cp .env.example .env.local                 # then add your QLOO_API_KEY
+./scripts/serve.sh   # → http://localhost:3000  (agent + Qloo proxy live)
+#   serve.sh idempotently starts scripts/llm-sidecar.js (localhost:3789),
+#   which Caddy proxies /api/llm/playbook to. Logs: server.log, llm-sidecar.log
 
 # sign in: tap "EXPLORE THE DEMO ROOM • NO ACCOUNT" (one-tap demo login)
 ```
@@ -113,24 +139,25 @@ localStorage.setItem('roomtone.apiBase', 'https://us-central1-qloo-api-1.cloudfu
 ## Project layout
 
 ```
-index.html          single-file app (UI + Tailwind CDN + live-feed integration)
+index.html          single-file app (UI + Tailwind CDN + live-feed + venue resolution)
 auth.html           hash-routed auth (sign in / create / reset) + one-tap demo login
-functions/index.js  Firebase fn: Qloo proxy + /api/llm/playbook (3 providers)
+functions/index.js  Firebase fn: Qloo proxy + playbook agent (enrich + compose + fallback)
 firebase.json       Hosting rewrites /api/** → api function; cache headers
-Caddyfile           single-origin local stack: file_server + Qloo proxy + LLM stub
-scripts/serve.sh    Caddy launcher (loads .env.local, injects X-Api-Key server-side)
-scripts/local-api.js  zero-dependency Node fallback server (static + proxy + LLM)
+Caddyfile           single-origin local stack: file_server + Qloo proxy + agent proxy
+scripts/serve.sh    Caddy launcher (loads .env.local; idempotent sidecar spawn)
+scripts/llm-sidecar.js  playbook agent on 127.0.0.1:3789 (ground→enrich→compose→fallback)
+scripts/local-api.js  zero-dependency Node fallback server (static + proxy + agent)
+.env.example        environment template (QLOO_API_KEY, optional LLM_*)
 logo/               Attune mark + lockups (SVG)
 audio/              venue soundtrack asset (Pixabay, credited in-app)
 .verify/            dev verification scripts (not part of the app)
 ```
 
-## Mapping to judging criteria
+## Mapping to judging criteria (Qloo Agentic Hackathon)
 
 | Criterion | Where |
 |---|---|
-| Intelligent & thoughtful use of LLMs | Strict grounded prompt, fixed output contract, provider-agnostic backend, visible persona + per-daypart actions |
-| Integration with Qloo's API | `/v2/insights` (places + artists) and `/v2/audiences` fused into one taste profile; entity-level traceability UI |
-| Technical implementation | Server-side key vault (`defineSecret`), same-origin rewrites, CORS, client cache, timeout + graceful degradation, zero-dependency frontend |
-| Originality & creativity | Taste graph → *physical operations* (sound, light, pour, staff notes); daypart cadence model; Sonos/Lutron framing |
-| Real-world application | 30-day pilot model with renewal pricing; exportable ops PDF; shift notes broadcast; measurable lift metrics |
+| Technological implementation | Two-hop anchor flow + cross-domain artist enrichment + explainability contributions + `/v2/audiences` + `/v2/search` venue resolution; server-side key vault; agent trace + cited drivers in the UI |
+| Design | Editorial glass system, mobile-first, real-words copy discipline, auditable agent trace rendered as part of the product |
+| Potential impact | Independent operators type their venue and get tonight's plan — cited, physical, shift-ready; pricing + export surfaces built in |
+| Quality of the idea | The taste graph as an *operating* surface: the agent turns cultural affinity into pour/play/light decisions, and shows its receipts. Remove Qloo and there is nothing left — the block's taste is the product |

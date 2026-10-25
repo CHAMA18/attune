@@ -1045,6 +1045,27 @@
           </a>
         </div>
 
+        <section class="mt-space-lg mb-space-md rounded-xl bg-surface-container p-space-sm" aria-label="Your venue" data-venue-panel>
+          <div class="flex items-center gap-1.5 px-1 pb-1.5">
+            <span class="material-symbols-outlined text-secondary text-base">storefront</span>
+            <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Your Venue</span>
+          </div>
+          <p class="px-1 font-body-sm text-body-sm text-on-surface font-medium" data-venue-name>The Amber Room</p>
+          <p class="px-1 pb-2 font-body-sm text-body-sm text-on-surface-variant" data-venue-address>142 Franklin St, Greenpoint</p>
+          <div class="flex flex-col gap-1.5 px-1 pb-1">
+            <input data-venue-input type="text" autocomplete="organization" placeholder="Venue name"
+                   class="w-full bg-surface-container-high border border-outline-variant/50 rounded-lg px-2.5 py-2 font-body-sm text-body-sm text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary/70"/>
+            <input data-venue-area type="text" autocomplete="address-level2" placeholder="Neighborhood or city"
+                   class="w-full bg-surface-container-high border border-outline-variant/50 rounded-lg px-2.5 py-2 font-body-sm text-body-sm text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary/70"/>
+            <button type="button" data-venue-apply
+                    class="w-full flex items-center justify-center gap-1.5 rounded-lg bg-tertiary/10 px-2 py-2 text-tertiary hover:bg-tertiary/20 transition-colors">
+              <span class="material-symbols-outlined text-base">tune</span>
+              <span class="font-label-caps text-label-caps tracking-wider">Retune the room</span>
+            </button>
+            <p data-venue-note class="hidden px-1 font-body-sm text-body-sm text-on-surface-variant"></p>
+          </div>
+        </section>
+
         <section class="mt-space-lg mb-space-md rounded-xl bg-surface-container p-space-sm" aria-label="Sound settings" data-guardrails>
           <div class="flex items-center gap-1.5 px-1 pb-2">
             <span class="material-symbols-outlined text-secondary text-base">graphic_eq</span>
@@ -1236,6 +1257,13 @@
             <span class="material-symbols-outlined text-lg pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-outline" aria-hidden="true">storefront</span>
             <input id="ob-venue" type="text" autocomplete="organization" enterkeyhint="done" placeholder="Your venue"
                    class="w-full pl-10 pr-3 bg-surface-container border border-outline-variant/50 rounded-lg px-space-sm py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline/70 transition-colors focus:outline-none focus:border-primary/70 focus:shadow-[0_0_0_4px_rgb(var(--c-primary)/0.10)]"/>
+          </div>
+          <label for="ob-area" class="font-label-caps text-label-caps text-outline tracking-widest block pb-1 pt-space-sm">NEIGHBORHOOD OR CITY</label>
+          <div class="relative">
+            <span class="material-symbols-outlined text-lg pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-outline" aria-hidden="true">location_on</span>
+            <input id="ob-area" type="text" autocomplete="address-level2" enterkeyhint="done" placeholder="e.g. Greenpoint, Brooklyn"
+                   class="w-full pl-10 pr-3 bg-surface-container border border-outline-variant/50 rounded-lg px-space-sm py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline/70 transition-colors focus:outline-none focus:border-primary/70 focus:shadow-[0_0_0_4px_rgb(var(--c-primary)/0.10)]"/>
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 font-body-sm text-body-sm text-outline/70 hidden sm:block">this retunes the room to your block</span>
           </div>
         </div>
         <div class="grid grid-cols-2 gap-2 pt-space-xs" role="group" aria-label="Room type">
@@ -3585,8 +3613,11 @@
       try {
         localStorage.setItem(OB_KEY, 'done');
         localStorage.setItem(PROFILE_KEY, JSON.stringify({
-          venue: venueName(), room: picks.room, tone: picks.tone, tunedAt: Date.now()
+          venue: venueName(),
+          area: ((document.getElementById('ob-area') || {}).value || '').trim(),
+          room: picks.room, tone: picks.tone, tunedAt: Date.now()
         }));
+        window.dispatchEvent(new CustomEvent('attune:venue-changed'));
       } catch (e) { /* onboarding state is best-effort */ }
       shell.classList.remove('ob-visible');
       shell.setAttribute('aria-hidden', 'true');
@@ -4074,10 +4105,53 @@
     if (override) API_BASE = override;
   } catch (e) { /* storage blocked */ }
 
-  var VENUE = { name: 'The Amber Room', address: '142 Franklin St, Greenpoint', lat: 40.7226, lng: -73.9519 };
+  var DEFAULT_VENUE = { name: 'The Amber Room', address: '142 Franklin St, Greenpoint', lat: 40.7226, lng: -73.9519, locality: null };
+  var VENUE = DEFAULT_VENUE;   /* replaced by the operator's real venue once resolved */
   var RADIUS_FT = 800, FT_TO_M = 0.3048, CACHE_TTL = 15 * 60 * 1000;
   /* Qloo geo filters speak WKT: POINT(lng lat) */
   function wkt() { return 'POINT(' + VENUE.lng + ' ' + VENUE.lat + ')'; }
+  /* Two location dialects: a venue pin (WKT POINT + radius) or a locality name
+     (fuzzy-matched neighborhood/city). Operators type a venue + neighborhood;
+     we run the whole taste graph against THEIR block, not the demo block. */
+  function venueFilter() {
+    if (VENUE.locality) return { 'filter.location.query': VENUE.locality };
+    return { 'filter.location': wkt(), 'filter.location.radius': String(Math.max(60, Math.round(RADIUS_FT * FT_TO_M))) };
+  }
+  /* Read the operator's room profile (saved by onboarding or the drawer)
+     and resolve it to a real place via Qloo /v2/search. Returns true when
+     the venue changed. */
+  function resolveVenueFromProfile() {
+    var p = null;
+    try { p = JSON.parse(localStorage.getItem('attune.roomProfile') || 'null'); } catch (e) { p = null; }
+    if (!p || !p.venue) return Promise.resolve(false);
+    if (p.venue === 'Your Room' && !p.area) return Promise.resolve(false);
+    if (p.venue === DEFAULT_VENUE.name && !p.area) return Promise.resolve(false);
+    var q = p.venue + (p.area ? ' ' + p.area : '');
+    return qlooFetch('/v2/search', { 'query': q, 'filter.type': 'urn:entity:place', 'take': '3' }).then(function (res) {
+      var arr = (res && Array.isArray(res.results)) ? res.results : [];
+      var hit = null;
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i] && arr[i].properties && arr[i].properties.geocode) { hit = arr[i]; break; }
+      }
+      if (hit) {
+        var g = hit.properties.geocode || {};
+        VENUE = {
+          name: hit.name || p.venue,
+          address: hit.properties.address || hit.disambiguation || p.area || '',
+          lat: null, lng: null,
+          locality: p.area || g.name || null
+        };
+      } else if (p.area) {
+        VENUE = { name: p.venue, address: p.area, lat: null, lng: null, locality: p.area };
+      } else {
+        return false;   /* venue only, unresolved — keep the demo block */
+      }
+      return true;
+    }).catch(function () {
+      if (p.area) { VENUE = { name: p.venue, address: p.area, lat: null, lng: null, locality: p.area }; return true; }
+      return false;
+    });
+  }
 
   var state = {
     live: false,       /* Qloo feed reached */
@@ -4202,12 +4276,10 @@
   function loadRadar() {
     var radiusM = Math.max(60, Math.round(RADIUS_FT * FT_TO_M));
     /* Hop 1 — block anchor: the most popular venue inside the radius (Qloo popularity) */
-    return qlooFetch('/v2/insights', {
+    return qlooFetch('/v2/insights', Object.assign({
       'filter.type': 'urn:entity:place',
-      'filter.location': wkt(),
-      'filter.location.radius': String(radiusM),
       'take': '10'
-    }).then(function (res) {
+    }, venueFilter())).then(function (res) {
       var pool = entitiesOf(res);
       if (!pool.length) throw new Error('EMPTY');
       var anchor = pool.slice().sort(function (a, b) {
@@ -4217,14 +4289,12 @@
       /* Hop 2 — Qloo affinity-ranks the whole block against its own anchor.
          feature.explainability=true adds per-result contribution scores so the
          grounding JSON the agent receives is auditable, not vibes. */
-      return qlooFetch('/v2/insights', {
+      return qlooFetch('/v2/insights', Object.assign({
         'signal.interests.entities': state.anchor.id,
         'filter.type': 'urn:entity:place',
-        'filter.location': wkt(),
-        'filter.location.radius': String(radiusM),
         'take': '30',
         'feature.explainability': 'true'
-      });
+      }, venueFilter()));
     }).then(function (res) {
       var all = entitiesOf(res);
       /* How strongly the anchor drove the ranking, averaged (0..1). */
@@ -4357,8 +4427,7 @@
     if (state.anchor && state.anchor.id) {
       params['signal.interests.entities'] = state.anchor.id;
     } else {
-      params['filter.location'] = wkt();
-      params['filter.location.radius'] = String(Math.max(60, Math.round(RADIUS_FT * FT_TO_M)));
+      Object.assign(params, venueFilter());
     }
     return qlooFetch('/v2/insights', params).then(function (res) {
       var stream = entitiesOf(res).filter(function (e) { return affinityOf(e) > 0; }).slice(0, 3);
@@ -4401,6 +4470,7 @@
       anchor: state.anchor,
       anchor_pull: state.anchorPull,
       focus_daypart: currentDaypart,
+      venue_locality: VENUE.locality || null,
       taste_metrics: {
         block_heat: (document.querySelector('[data-qloo="block-heat"]') || {}).textContent || null,
         taste_synergy: (document.querySelector('[data-qloo="taste-synergy"]') || {}).textContent || null,
@@ -4521,7 +4591,7 @@
     }
     if (state.llmLive && state.llm.menu && dp === 'golden') {
       setText('daypart-menu', state.llm.menu);
-      setText('daypart-menu-sub', 'LLM pairing \u00B7 palate: ' + (state.palate[0] || 'block signals'));
+      setText('daypart-menu-sub', 'Paired from the block palate \u00B7 ' + ((state.palate && state.palate.slice(0, 2).join(' \u00B7 ')) || 'signals from the block'));
     }
   }
 
@@ -4589,8 +4659,83 @@
       .finally(function () { busy = false; });
   }
 
-  window.AttuneGrounding = { context: groundingContext, refresh: refresh };
-  refresh();
+  window.AttuneGrounding = { context: groundingContext, refresh: refresh, get venue() { return VENUE; } };
+  /* Venue first, then the whole taste graph — the operator's block, not the demo block. */
+  resolveVenueFromProfile().then(function () { refresh(); });
+  window.addEventListener('attune:venue-changed', function () {
+    try { sessionStorage.clear(); } catch (e) { /* quota */ }
+    resolveVenueFromProfile().then(function (changed) {
+      if (changed) {
+        state.anchor = null; state.places = []; state.artists = []; state.tribes = [];
+        state.live = false; state.llmLive = false;
+      }
+      window.dispatchEvent(new CustomEvent('attune:venue-resolved'));
+      refresh();
+    });
+  });
+})();
+</script>
+
+<script>
+/* Your Venue — resolve an operator's real venue + neighborhood through Qloo,
+   persist it to the room profile, and retune the whole feed. */
+(function venuePanel() {
+  var PROFILE_KEY = 'attune.roomProfile';
+  var nameEl = document.querySelector('[data-venue-name]');
+  var addrEl = document.querySelector('[data-venue-address]');
+  var inEl = document.querySelector('[data-venue-input]');
+  var areaEl = document.querySelector('[data-venue-area]');
+  var noteEl = document.querySelector('[data-venue-note]');
+  function readProfile() {
+    try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null') || {}; }
+    catch (e) { return {}; }
+  }
+  function paint() {
+    var v = (window.AttuneGrounding && window.AttuneGrounding.venue) || null;
+    var p = readProfile();
+    if (nameEl) nameEl.textContent = (v && v.name) || p.venue || 'The Amber Room';
+    if (addrEl) addrEl.textContent = (v && v.address) || p.area || 'Demo block \u00B7 Greenpoint';
+  }
+  function note(msg) {
+    if (!noteEl) return;
+    noteEl.textContent = msg;
+    noteEl.classList.remove('hidden');
+    setTimeout(function () { noteEl.classList.add('hidden'); }, 3600);
+  }
+  function toastMsg(msg) {
+    var t = document.getElementById('toast');
+    if (!t) return;
+    var txt = t.querySelector('[data-toast-text]');
+    var ico = t.querySelector('[data-toast-icon]');
+    if (txt) txt.textContent = msg;
+    if (ico) ico.textContent = 'tune';
+    t.classList.remove('opacity-0', 'translate-y-2');
+    setTimeout(function () { t.classList.add('opacity-0', 'translate-y-2'); }, 2800);
+  }
+  var applyBtn = document.querySelector('[data-venue-apply]');
+  if (applyBtn) {
+    applyBtn.addEventListener('click', function () {
+      var venue = (inEl && inEl.value || '').trim();
+      var area = (areaEl && areaEl.value || '').trim();
+      if (!venue && !area) { note('Add a venue name or a neighborhood first.'); return; }
+      var p = readProfile();
+      p.venue = venue || p.venue || 'Your Room';
+      p.area = area;
+      p.tunedAt = Date.now();
+      try { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch (e) { /* best-effort */ }
+      applyBtn.disabled = true;
+      note('Reading the taste graph around ' + (area || venue) + '\u2026');
+      window.dispatchEvent(new CustomEvent('attune:venue-changed'));
+      setTimeout(function () {
+        applyBtn.disabled = false;
+        paint();
+        toastMsg(p.venue + ' is in tune');
+      }, 3500);
+    });
+  }
+  window.addEventListener('attune:venue-resolved', paint);
+  window.addEventListener('attune:venue-changed', function () { setTimeout(paint, 3800); });
+  paint();
 })();
 </script>
 
