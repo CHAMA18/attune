@@ -564,33 +564,8 @@
       </svg>
     </div>
 
-    <!-- brand row -->
-    <div class="relative h-20 flex items-center justify-between flex-shrink-0 auth-rise">
-      <div class="flex items-center gap-space-sm">
-        <div class="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-container-high/60 shadow-[0_0_12px_rgba(217,119,54,0.12)]">
-          <span class="material-symbols-outlined text-primary text-xl">graphic_eq</span>
-        </div>
-        <div class="flex flex-col">
-          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-widest">ATTUNE</span>
-        </div>
-      </div>
-      <span class="flex items-center gap-1 px-2 py-1 rounded-full bg-surface-container font-label-caps text-label-caps text-outline tracking-widest">
-        <span class="material-symbols-outlined text-xs">lock</span>RESTRICTED
-      </span>
-    </div>
-
-    <!-- hero -->
-    <div class="relative pt-space-md pb-space-lg auth-rise auth-d1">
-      <div class="flex items-center gap-1.5 pb-space-xs">
-        <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
-        <span id="auth-kicker" class="font-label-caps text-label-caps text-secondary uppercase tracking-widest">OPERATOR ACCESS &#183; THE AMBER ROOM</span>
-      </div>
-      <h1 id="auth-headline" class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight">Set the <em class="italic text-primary">tone</em>.</h1>
-      <p id="auth-sub" class="font-body-md text-body-md text-on-surface-variant pt-space-xs">Welcome back, operator. Sync the floor, the sound and the cellar in one shift view.</p>
-    </div>
-
     <!-- form card -->
-    <div class="relative auth-rise auth-d2 rounded-xl bg-surface-container-low/80 backdrop-blur-xl border border-outline-variant/40 shadow-[0_20px_60px_rgba(0,0,0,0.45)] p-space-md">
+    <div class="relative auth-rise auth-d1 rounded-xl bg-surface-container-low/80 backdrop-blur-xl border border-outline-variant/40 shadow-[0_20px_60px_rgba(0,0,0,0.45)] p-space-md">
       <div id="auth-segments" class="flex p-1 rounded-full bg-surface-container mb-space-md">
         <button type="button" data-auth-mode="signin" class="flex-1 py-2 rounded-full font-label-caps text-label-caps tracking-widest bg-primary text-on-primary transition-colors">SIGN IN</button>
         <button type="button" data-auth-mode="register" class="flex-1 py-2 rounded-full font-label-caps text-label-caps tracking-widest text-on-surface-variant transition-colors">REGISTER</button>
@@ -2397,13 +2372,10 @@
     const signOutBtn = document.getElementById('drawer-signout');
     if (!shell || !signOutBtn) return;
 
-    const kicker = document.getElementById('auth-kicker');
-    const headline = document.getElementById('auth-headline');
-    const sub = document.getElementById('auth-sub');
     const segments = document.getElementById('auth-segments');
     const form = document.getElementById('auth-form');
     const submitBtn = document.getElementById('auth-submit');
-    if (!kicker || !headline || !sub || !segments || !form || !submitBtn) return;
+    if (!segments || !form || !submitBtn) return;
 
     const submitLabel = submitBtn.querySelector('[data-submit-label]');
     const submitIcon = submitBtn.querySelector('[data-submit-icon]');
@@ -2424,26 +2396,18 @@
     const copy = {
       signin: {
         kicker: 'OPERATOR ACCESS \u00B7 THE AMBER ROOM',
-        head: 'Set the <em class="italic text-primary">tone</em>.',
-        sub: 'Welcome back, operator. Sync the floor, the sound and the cellar in one shift view.',
         cta: 'CONTINUE'
       },
       register: {
         kicker: 'NEW OPERATOR \u00B7 VENUE 142-FRANKLIN',
-        head: 'Join the <em class="italic text-primary">room</em>.',
-        sub: 'Create your operator pass to run tonight\u2019s playbook, taste radar and sound architecture.',
         cta: 'CREATE PASS'
       },
       forgot: {
         kicker: 'ACCOUNT RECOVERY',
-        head: 'Recover <em class="italic text-primary">access</em>.',
-        sub: 'Enter your operator email and we\u2019ll send a secure six-digit reset code.',
         cta: 'SEND RESET CODE'
       },
       'forgot-success': {
         kicker: 'ACCOUNT RECOVERY',
-        head: 'Recover <em class="italic text-primary">access</em>.',
-        sub: 'Enter your operator email and we\u2019ll send a secure six-digit reset code.',
         cta: 'SEND RESET CODE'
       }
     };
@@ -2498,9 +2462,6 @@
     function setMode(next) {
       mode = next;
       const c = copy[next];
-      kicker.textContent = c.kicker;
-      headline.innerHTML = c.head;
-      sub.textContent = c.sub;
       submitLabel.textContent = c.cta;
       shell.querySelectorAll('[data-mode-field]').forEach(el => {
         el.classList.toggle('hidden', el.getAttribute('data-mode-field').split(/\s+/).indexOf(mode) === -1);
