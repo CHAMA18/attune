@@ -49,30 +49,238 @@
     transform-origin: center;
   }
 
-  /* Live radar (Discover screen). All colors flow through the theme tokens. */
-  .radar-ring { fill: none; stroke: rgb(var(--c-outline-variant)); stroke-width: 1; opacity: 0.5; }
-  .radar-ring-active { stroke: rgb(var(--c-primary)); opacity: 0.95; }
-  .radar-cross { stroke: rgb(var(--c-outline-variant)); stroke-width: 1; opacity: 0.35; }
-  .radar-cross-dim { opacity: 0.18; }
-  .radar-label { fill: rgb(var(--c-outline)); }
-  .radar-label-active { fill: rgb(var(--c-primary)); }
-  .radar-beam-stop { stop-color: rgb(var(--c-primary)); }
-  .radar-beam-edge { stroke: rgb(var(--c-primary)); stroke-width: 1.5; opacity: 0.65; }
-  .radar-beam { transform-origin: 150px 150px; animation: radar-spin 4s linear infinite; }
+  /* ===== Proximity World — a 3D hologram table of everyone near your door =====
+     Pure CSS 3D: perspective rig (tilt) + turntable world (orbit) + crossed-plane
+     light pillars. All colors flow through the theme tokens. */
+  @property --tilt  { syntax: '<angle>'; inherits: false; initial-value: 58deg; }
+  @property --orbit { syntax: '<angle>'; inherits: false; initial-value: -18deg; }
+  @property --zoom  { syntax: '<number>'; inherits: false; initial-value: 1; }
+
+  .holo-stage {
+    position: relative;
+    height: 344px;
+    border-radius: 1rem;
+    overflow: hidden;
+    background:
+      radial-gradient(130% 100% at 50% 0%, rgb(var(--c-surface-container-high) / 0.5), rgb(var(--c-surface-container-lowest) / 0.92) 72%);
+    touch-action: none;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .holo-stage:active { cursor: grabbing; }
+  /* viewfinder corner brackets */
+  .holo-stage::before {
+    content: '';
+    position: absolute; inset: 9px;
+    border-radius: 14px;
+    pointer-events: none;
+    background:
+      linear-gradient(rgb(var(--c-primary) / 0.5), rgb(var(--c-primary) / 0.5)) left 0 top 0 / 16px 1.5px,
+      linear-gradient(rgb(var(--c-primary) / 0.5), rgb(var(--c-primary) / 0.5)) left 0 top 0 / 1.5px 16px,
+      linear-gradient(rgb(var(--c-primary) / 0.5), rgb(var(--c-primary) / 0.5)) right 0 top 0 / 16px 1.5px,
+      linear-gradient(rgb(var(--c-primary) / 0.5), rgb(var(--c-primary) / 0.5)) right 0 top 0 / 1.5px 16px,
+      linear-gradient(rgb(var(--c-primary) / 0.5), rgb(var(--c-primary) / 0.5)) left 0 bottom 0 / 16px 1.5px,
+      linear-gradient(rgb(var(--c-primary) / 0.5), rgb(var(--c-primary) / 0.5)) left 0 bottom 0 / 1.5px 16px,
+      linear-gradient(rgb(var(--c-primary) / 0.5), rgb(var(--c-primary) / 0.5)) right 0 bottom 0 / 16px 1.5px,
+      linear-gradient(rgb(var(--c-primary) / 0.5), rgb(var(--c-primary) / 0.5)) right 0 bottom 0 / 1.5px 16px;
+    background-repeat: no-repeat;
+    z-index: 5;
+  }
+
+  .holo-scene {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    perspective: 840px;
+    animation: holo-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes holo-rise { from { opacity: 0; transform: scale(0.86); } to { opacity: 1; transform: none; } }
+  .holo-rig {
+    transform: rotateX(var(--tilt));
+    transform-style: preserve-3d;
+    animation: holo-tilt-in 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @keyframes holo-tilt-in { from { --tilt: 86deg; } }
+  .holo-world {
+    position: relative;
+    width: 400px; height: 400px;
+    transform: translateY(-16px) rotateZ(var(--orbit)) scale(var(--zoom));
+    transform-style: preserve-3d;
+    transition: --zoom 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: holo-orbit-in 1.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @keyframes holo-orbit-in { from { --orbit: -96deg; } }
+
+  /* ground disc + dot grain + fog fade */
+  .holo-ground {
+    position: absolute; inset: 0; border-radius: 50%;
+    transform: translateZ(0);
+    background-image:
+      radial-gradient(closest-side, rgb(var(--c-primary) / 0.055), transparent 72%),
+      radial-gradient(rgb(var(--c-primary) / 0.09) 1px, transparent 1.3px);
+    background-size: 100% 100%, 22px 22px;
+    -webkit-mask-image: radial-gradient(closest-side, #000 50%, transparent 84%);
+            mask-image: radial-gradient(closest-side, #000 50%, transparent 84%);
+  }
+  .holo-spoke {
+    position: absolute; left: 50%; top: 50%;
+    width: 1px; height: 140px;
+    transform-origin: top center;
+    transform: translateX(-50%) rotate(var(--a)) translateZ(0.2px);
+    background: linear-gradient(to bottom, rgb(var(--c-primary) / 0.16), rgb(var(--c-primary) / 0.04) 70%, transparent);
+  }
+  .holo-ring {
+    position: absolute; left: 50%; top: 50%;
+    width: calc(var(--r) * 2); height: calc(var(--r) * 2);
+    transform: translate(-50%, -50%) translateZ(0.4px);
+    border-radius: 50%;
+    border: 1px solid rgb(var(--c-primary) / 0.13);
+  }
+  .holo-ring-active {
+    border-color: rgb(var(--c-primary) / 0.8);
+    box-shadow: 0 0 20px rgb(var(--c-primary) / 0.28), inset 0 0 22px rgb(var(--c-primary) / 0.12);
+  }
+  .holo-ring-label {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%) translateY(calc(-1 * var(--r) - 7px)) translateZ(0.5px);
+    font-size: 8px; line-height: 1; font-weight: 700; letter-spacing: 0.14em;
+    color: rgb(var(--c-outline));
+  }
+  .holo-ring-label-active { color: rgb(var(--c-primary)); }
+  .holo-compass {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%) translateY(-152px) translateZ(0.5px);
+    width: 16px; height: 16px;
+    font-size: 9px; font-weight: 900; line-height: 16px; text-align: center;
+    color: rgb(var(--c-primary) / 0.85);
+  }
+
+  .holo-blip-layer, #holo-blips { position: absolute; inset: 0; transform-style: preserve-3d; pointer-events: none; }
+  #holo-blips .h-blip { pointer-events: auto; }
+
+  /* sweep beam — a luminous sector riding the plane */
+  .holo-beam {
+    position: absolute; left: 50%; top: 50%;
+    width: 280px; height: 280px;
+    transform: translate(-50%, -50%) translateZ(0.8px);
+    border-radius: 50%;
+    background: conic-gradient(from 0deg,
+      rgb(var(--c-primary) / 0.4) 0deg,
+      rgb(var(--c-primary) / 0.12) 40deg,
+      transparent 70deg, transparent 360deg);
+    -webkit-mask-image: radial-gradient(closest-side, #000 28%, transparent 97%);
+            mask-image: radial-gradient(closest-side, #000 28%, transparent 97%);
+    animation: radar-spin 4s linear infinite;
+  }
+  .holo-beam-edge {
+    position: absolute; left: 50%; top: 50%;
+    width: 1.5px; height: 140px;
+    transform-origin: top center;
+    transform: translateX(-50%) rotate(0deg) translateZ(0.9px);
+    background: linear-gradient(to bottom, rgb(var(--c-primary) / 0.9), transparent);
+    animation: radar-spin 4s linear infinite;
+  }
+
+  /* blips — light-pillar beings standing on the plane */
+  .h-blip {
+    position: absolute; left: var(--x); top: var(--y);
+    width: 0; height: 0;
+    transform: translateZ(0.6px);
+    transform-style: preserve-3d;
+    cursor: pointer;
+    outline: none;
+  }
+  .h-blip-patron { color: rgb(var(--c-primary)); }
+  .h-blip-warm   { color: rgb(var(--c-secondary)); }
+  .h-blip-venue  { color: rgb(var(--c-tertiary)); }
+  .h-pillar {
+    position: absolute;
+    left: -2px; bottom: 0;
+    width: 4px; height: var(--h, 20px);
+    transform-origin: 50% 100%;
+    transform: rotateX(-90deg);
+    border-radius: 2px;
+    background: linear-gradient(to top,
+      currentColor 0%,
+      color-mix(in srgb, currentColor 55%, transparent) 55%,
+      transparent 97%);
+    animation: blip-flash 4s linear infinite;
+    animation-delay: var(--d, 0s);
+    filter: drop-shadow(0 0 3px currentColor);
+  }
+  .h-pillar.p-b { transform: rotateX(-90deg) rotateZ(90deg); }
+  .h-pillar::after {  /* glowing head */
+    content: '';
+    position: absolute; left: 50%; top: -5px;
+    width: var(--cap, 9px); height: var(--cap, 9px);
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, currentColor 0%, currentColor 34%, transparent 70%);
+  }
+  .h-blip-venue .h-pillar { width: 3px; left: -1.5px; --cap: 11px; }
+  .h-blip-venue .h-pillar::after {
+    border-radius: 1.5px;
+    border: 1.5px solid currentColor;
+    background: transparent;
+    transform: translateX(-50%) rotate(45deg) translateY(1px);
+  }
+  .h-base {
+    position: absolute; left: 0; top: 0;
+    width: 26px; height: 26px;
+    transform: translate(-50%, -50%) translateZ(0.7px);
+    border-radius: 50%;
+    background: radial-gradient(circle, currentColor 0%, transparent 62%);
+    opacity: 0.34;
+    animation: blip-flash 4s linear infinite;
+    animation-delay: var(--d, 0s);
+  }
+  .h-ring {
+    position: absolute; left: 0; top: 0;
+    width: 26px; height: 26px;
+    transform: translate(-50%, -50%) translateZ(0.75px);
+    border-radius: 50%;
+    border: 1.2px dashed currentColor;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .h-sel .h-ring { opacity: 0.9; animation: radar-spin 9s linear infinite; }
+  .h-sel .h-pillar, .h-sel .h-base { animation-play-state: running; opacity: 1; }
+  .h-sel .h-pillar { filter: drop-shadow(0 0 6px currentColor); }
+  .holo-world.h-sel-mode .h-blip:not(.h-sel) { opacity: 0.38; transition: opacity 0.3s ease; }
+
+  /* your door — the reference beacon at the exact center */
+  .h-door { color: rgb(var(--c-on-surface)); cursor: default; }
+  .h-door .h-pillar { opacity: 1; width: 5px; left: -2.5px; --cap: 10px; }
+  .h-door-pulse {
+    position: absolute; left: 0; top: 0;
+    width: 30px; height: 30px;
+    transform: translate(-50%, -50%) translateZ(0.5px);
+    border-radius: 50%;
+    border: 1px solid rgb(var(--c-primary) / 0.55);
+    animation: holo-door-ping 2.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  .h-door-pulse.p2 { animation-delay: 1.3s; }
+  @keyframes holo-door-ping {
+    0% { transform: translate(-50%, -50%) translateZ(0.5px) scale(0.35); opacity: 0.9; }
+    100% { transform: translate(-50%, -50%) translateZ(0.5px) scale(2.6); opacity: 0; }
+  }
+
+  .holo-hint {
+    position: absolute; left: 0; right: 0; bottom: 10px;
+    display: flex; justify-content: center;
+    pointer-events: none;
+    z-index: 6;
+    transition: opacity 0.6s ease;
+  }
+  .holo-hint.hint-off { opacity: 0; }
+
+  @keyframes blip-flash { 0%, 28%, 100% { opacity: 0.55; } 1.5% { opacity: 1; } 10% { opacity: 0.85; } }
   @keyframes radar-spin { to { transform: rotate(360deg); } }
-  .radar-door { fill: rgb(var(--c-primary)); }
-  .radar-door-pulse { stroke: rgb(var(--c-primary)); stroke-width: 1; opacity: 0.35; }
-  .blip { cursor: pointer; }
-  .blip-patron { color: rgb(var(--c-primary)); }
-  .blip-patron-warm { color: rgb(var(--c-secondary)); }
-  .blip-venue { color: rgb(var(--c-tertiary)); }
-  .blip .sel-ring { opacity: 0; }
-  .blip.blip-sel .sel-ring { opacity: 1; }
-  /* Blips flare when the beam passes them: delay per blip = bearing/360 of the period. */
-  @keyframes blip-flash { 0%, 28%, 100% { opacity: 0.6; } 1.5% { opacity: 1; } 10% { opacity: 0.85; } }
-  .blip .blip-core { animation: blip-flash 4s linear infinite; animation-delay: var(--blip-delay, 0s); }
+
   @media (prefers-reduced-motion: reduce) {
-    .radar-beam, .blip .blip-core { animation: none; }
+    .holo-beam, .holo-beam-edge, .h-pillar, .h-base, .h-door-pulse,
+    .holo-scene, .holo-rig, .holo-world, .h-sel .h-ring { animation: none !important; }
+    .holo-world { transition: none; }
   }
 
   body { min-height: max(884px, 100dvh); }
@@ -1338,135 +1546,162 @@
   </section>
 
   <!-- ==================== SCREEN 2 · TASTE HEAT ==================== -->
-  <section class="screen w-full px-margin pb-12 space-y-space-md hidden" data-screen="taste-heat" aria-label="Taste Heat">
+  <section class="screen w-full px-margin pb-12 space-y-5 hidden" data-screen="taste-heat" aria-label="Taste Heat">
 
-    <!-- Radar Sweep Hero -->
-    <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md relative overflow-hidden">
-      <div class="absolute -right-12 -top-12 w-40 h-40 bg-tertiary/10 rounded-full blur-2xl pointer-events-none"></div>
-      <div class="flex items-center justify-between pb-space-xs">
-        <div class="flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-          <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest">800FT TASTE RADAR</span>
+    <!-- ── Proximity World · 3D holo radar ── -->
+    <section class="reveal relative overflow-hidden rounded-2xl bg-surface-container-low hairline shadow-[0_24px_50px_-30px_rgba(0,0,0,0.65)]" style="--d:.05s">
+      <div class="pointer-events-none absolute -top-24 -right-16 w-64 h-64 rounded-full bg-tertiary/[0.09] blur-3xl breathe" aria-hidden="true"></div>
+      <div class="grain absolute inset-0" aria-hidden="true"></div>
+
+      <div class="relative p-5 pb-4">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="relative w-2 h-2 text-tertiary flex-shrink-0">
+              <span class="halo absolute inset-0 rounded-full bg-tertiary"></span>
+              <span class="absolute inset-0 rounded-full bg-tertiary"></span>
+            </span>
+            <span class="font-label-caps text-label-caps text-secondary uppercase tracking-[0.14em]">800FT TASTE RADAR</span>
+          </div>
+          <span id="radar-sweep-age" class="font-label-caps text-label-caps uppercase tracking-[0.1em] text-tertiary hairline rounded-full px-2.5 py-1 bg-surface-container/60 backdrop-blur-sm flex-shrink-0">SWEEP LIVE</span>
         </div>
-        <span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded-full" id="radar-sweep-age">SWEEP LIVE</span>
+
+        <div class="mt-4 flex items-end justify-between gap-3">
+          <div class="min-w-0">
+            <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-[0.24em]">Hyperlocal Affinity Pool</span>
+            <h2 class="mt-1.5 text-[26px] leading-[30px] font-bold tracking-[-0.02em] text-on-surface">What the Block Craves</h2>
+          </div>
+          <div class="flex flex-col items-end flex-shrink-0">
+            <span class="tnum text-[17px] leading-5 font-bold text-tertiary whitespace-nowrap" id="radar-pool">312 PATRONS</span>
+            <span class="micro-caps text-outline mt-1" id="radar-scan">SCAN #4412</span>
+          </div>
+        </div>
+
+        <!-- Radius selector -->
+        <div class="flex items-center gap-1.5 mt-4" data-chip-group data-active="bg-primary text-on-primary" data-inactive="bg-surface-container text-on-surface-variant">
+          <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-surface-container text-on-surface-variant" data-radius="200">200FT</button>
+          <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-surface-container text-on-surface-variant" data-radius="400">400FT</button>
+          <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-primary text-on-primary" data-radius="800">800FT</button>
+        </div>
       </div>
 
-      <div class="mt-2 pt-2 flex items-end justify-between gap-space-sm">
-        <div class="min-w-0">
-          <span class="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">Hyperlocal Affinity Pool</span>
-          <h2 class="font-headline-sm text-headline-sm text-on-surface tracking-tight">What the Block Craves</h2>
-        </div>
-        <span class="font-metric-stat text-[13px] text-tertiary whitespace-nowrap" id="radar-pool">312 PATRONS</span>
-      </div>
+      <!-- 3D proximity world -->
+      <div class="relative px-4">
+        <div class="holo-stage" id="holo-stage" role="application"
+             aria-label="3D proximity world: patron matches and venues around The Amber Room within 800 feet. Drag to orbit, pinch or scroll to zoom, tap a signal for detail.">
+          <div class="holo-scene">
+            <div class="holo-rig" id="holo-rig" style="--tilt:58deg">
+              <div class="holo-world" id="holo-world" style="--orbit:-18deg;--zoom:1">
+                <div class="holo-ground" aria-hidden="true"></div>
+                <div class="holo-spoke" style="--a:0deg" aria-hidden="true"></div>
+                <div class="holo-spoke" style="--a:45deg" aria-hidden="true"></div>
+                <div class="holo-spoke" style="--a:90deg" aria-hidden="true"></div>
+                <div class="holo-spoke" style="--a:135deg" aria-hidden="true"></div>
+                <div class="holo-spoke" style="--a:180deg" aria-hidden="true"></div>
+                <div class="holo-spoke" style="--a:225deg" aria-hidden="true"></div>
+                <div class="holo-spoke" style="--a:270deg" aria-hidden="true"></div>
+                <div class="holo-spoke" style="--a:315deg" aria-hidden="true"></div>
+                <div class="holo-ring" data-ring="200" style="--r:35px" aria-hidden="true"></div>
+                <div class="holo-ring" data-ring="400" style="--r:70px" aria-hidden="true"></div>
+                <div class="holo-ring" data-ring="600" style="--r:105px" aria-hidden="true"></div>
+                <div class="holo-ring" data-ring="800" style="--r:140px" aria-hidden="true"></div>
+                <span class="holo-ring-label" data-ring-label="200" style="--r:35px" aria-hidden="true">200FT</span>
+                <span class="holo-ring-label" data-ring-label="400" style="--r:70px" aria-hidden="true">400FT</span>
+                <span class="holo-ring-label" data-ring-label="600" style="--r:105px" aria-hidden="true">600FT</span>
+                <span class="holo-ring-label" data-ring-label="800" style="--r:140px" aria-hidden="true">800FT</span>
+                <span class="holo-compass" aria-hidden="true">N</span>
+                <div class="holo-beam" aria-hidden="true"></div>
+                <div class="holo-beam-edge" aria-hidden="true"></div>
 
-      <!-- Radius Selector -->
-      <div class="flex items-center gap-1.5 mt-space-sm" data-chip-group data-active="bg-primary text-on-primary" data-inactive="bg-surface-container text-on-surface-variant">
-        <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-surface-container text-on-surface-variant" data-radius="200">200FT</button>
-        <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-surface-container text-on-surface-variant" data-radius="400">400FT</button>
-        <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-primary text-on-primary" data-radius="800">800FT</button>
-        <span class="font-label-caps text-label-caps text-outline-variant ml-auto" id="radar-scan">SCAN #4412</span>
-      </div>
+                <!-- your door -->
+                <div class="h-blip h-door" style="--x:50%;--y:50%" aria-hidden="true">
+                  <div class="h-door-pulse"></div>
+                  <div class="h-door-pulse p2"></div>
+                  <div class="h-pillar" style="--h:18px"></div>
+                  <div class="h-pillar p-b" style="--h:18px"></div>
+                </div>
 
-      <!-- Radar Visual (live sweep, tap a signal to inspect) -->
-      <div class="mt-3 rounded-lg bg-surface-container-lowest/70 p-space-sm">
-        <svg id="radar-svg" viewBox="0 0 300 300" class="w-full h-auto" role="img" aria-label="Radar sweep showing patron matches around The Amber Room within 800 feet">
-          <defs>
-            <linearGradient id="radarSweep" x1="0" y1="0" x2="1" y2="1">
-              <stop class="radar-beam-stop" offset="0" stop-opacity="0"/>
-              <stop class="radar-beam-stop" offset="1" stop-opacity="0.34"/>
-            </linearGradient>
-          </defs>
-          <g class="radar-grid">
-            <circle class="radar-ring" data-ring="200" cx="150" cy="150" r="28"/>
-            <circle class="radar-ring" data-ring="400" cx="150" cy="150" r="56"/>
-            <circle class="radar-ring" data-ring="600" cx="150" cy="150" r="84"/>
-            <circle class="radar-ring" data-ring="800" cx="150" cy="150" r="112"/>
-            <line class="radar-cross" x1="150" y1="30" x2="150" y2="270"/>
-            <line class="radar-cross" x1="30" y1="150" x2="270" y2="150"/>
-            <line class="radar-cross radar-cross-dim" x1="65" y1="65" x2="235" y2="235"/>
-            <line class="radar-cross radar-cross-dim" x1="235" y1="65" x2="65" y2="235"/>
-            <text class="radar-label font-label-caps" data-ring-label="200" x="150" y="132" text-anchor="middle" font-size="8" letter-spacing="1">200FT</text>
-            <text class="radar-label font-label-caps" data-ring-label="400" x="150" y="104" text-anchor="middle" font-size="8" letter-spacing="1">400FT</text>
-            <text class="radar-label font-label-caps" data-ring-label="600" x="150" y="76" text-anchor="middle" font-size="8" letter-spacing="1">600FT</text>
-            <text class="radar-label font-label-caps" data-ring-label="800" x="150" y="48" text-anchor="middle" font-size="8" letter-spacing="1">800FT</text>
-          </g>
-          <g id="radar-blips"></g>
-          <g class="radar-beam" aria-hidden="true">
-            <path d="M150 150 L150 38 A112 112 0 0 1 224.9 66.8 Z" fill="url(#radarSweep)"/>
-            <line class="radar-beam-edge" x1="150" y1="150" x2="224.9" y2="66.8"/>
-          </g>
-          <circle class="radar-door-pulse animate-pulse" cx="150" cy="150" r="14" fill="none"/>
-          <circle class="radar-door" cx="150" cy="150" r="6"/>
-          <circle cx="150" cy="150" r="2.5" fill="rgb(var(--c-inverse-on-surface))"/>
-        </svg>
-        <div class="flex items-center justify-center gap-4 pt-2 flex-wrap">
-          <span class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>PATRON MATCH</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-tertiary rotate-45"></span>VENUE</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-1.5"><span class="w-2 h-2 rounded-full border border-primary"></span>YOUR DOOR</span>
+                <div id="holo-blips"></div>
+              </div>
+            </div>
+          </div>
+          <div class="holo-hint" id="holo-hint">
+            <span class="micro-caps text-on-surface-variant/80 bg-surface-container-lowest/70 backdrop-blur-sm hairline rounded-full px-3 py-1.5">DRAG TO ORBIT &#183; TAP A SIGNAL</span>
+          </div>
         </div>
-        <div id="radar-detail" class="hidden mt-2 rounded-lg bg-surface-container/80 border border-outline-variant/40 p-space-sm">
-          <div class="flex items-start gap-2.5">
-            <div class="w-9 h-9 rounded-lg bg-surface-container-high flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-primary" id="radar-detail-icon">person</span>
+
+        <div class="flex items-center justify-center gap-4 pt-3 pb-1 flex-wrap">
+          <span class="font-label-caps text-label-caps text-on-surface-variant inline-flex items-center gap-1.5"><span class="w-1.5 h-2.5 rounded-sm bg-primary inline-block"></span>PATRON</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-tertiary rotate-45 inline-block"></span>VENUE</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full border border-on-surface inline-block"></span>YOUR DOOR</span>
+        </div>
+
+        <div id="radar-detail" class="hidden mb-4 rounded-xl bg-surface-container-low hairline p-3.5 field-enter">
+          <div class="flex items-start gap-3">
+            <div class="w-9 h-9 rounded-lg bg-primary/[0.12] ring-1 ring-inset ring-primary/25 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-primary text-[18px]" id="radar-detail-icon">person</span>
             </div>
             <div class="min-w-0 flex-1">
               <div class="flex items-center justify-between gap-2">
-                <p class="font-body-md text-body-md text-on-surface font-medium truncate" id="radar-detail-title">—</p>
-                <button type="button" id="radar-detail-close" aria-label="Close signal detail" class="flex-shrink-0 text-outline hover:text-on-surface transition-colors">
+                <p class="font-body-md text-body-md text-on-surface font-medium truncate" id="radar-detail-title">&#8212;</p>
+                <button type="button" id="radar-detail-close" aria-label="Close signal detail" class="press flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-outline hover:text-on-surface hover:bg-surface-container transition-colors">
                   <span class="material-symbols-outlined text-base">close</span>
                 </button>
               </div>
-              <p class="font-body-sm text-body-sm text-on-surface-variant truncate" id="radar-detail-sub">—</p>
-              <div class="flex items-center gap-2 pt-1.5">
+              <p class="font-body-sm text-body-sm text-on-surface-variant truncate" id="radar-detail-sub">&#8212;</p>
+              <div class="flex items-center gap-2 pt-2">
                 <div class="flex-1 h-1 rounded-full bg-surface-container-highest overflow-hidden">
-                  <div class="h-full rounded-full bg-primary transition-all" id="radar-detail-bar" style="width:0%"></div>
+                  <div class="h-full rounded-full bg-primary transition-all duration-500" id="radar-detail-bar" style="width:0%"></div>
                 </div>
-                <span class="font-metric-stat text-[12px] text-primary whitespace-nowrap" id="radar-detail-score">—</span>
+                <span class="tnum font-label-caps text-label-caps text-primary font-bold whitespace-nowrap" id="radar-detail-score">&#8212;</span>
               </div>
-              <p class="font-body-sm text-body-sm text-on-surface-variant pt-1" id="radar-detail-note">—</p>
+              <p class="font-body-sm text-body-sm text-on-surface-variant pt-1.5" id="radar-detail-note">&#8212;</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Heat Metric Triad -->
-      <div class="grid grid-cols-3 gap-space-xs mt-space-md pt-space-xs">
-        <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
-          <span class="font-label-caps text-label-caps text-on-surface-variant">BLOCK HEAT</span>
-          <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-primary" data-qloo="block-heat">94.8</span>
-            <span class="font-label-caps text-label-caps text-outline">/100</span>
+      <div class="relative px-5 pb-5">
+        <div class="grid grid-cols-3 rounded-xl bg-surface-container/60 hairline divide-x divide-outline-variant/25 overflow-hidden">
+          <div class="px-3 py-3.5 flex flex-col min-w-0">
+            <span class="micro-caps text-on-surface-variant">BLOCK HEAT</span>
+            <div class="mt-2 flex items-baseline gap-1">
+              <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-primary" data-qloo="block-heat">94.8</span>
+              <span class="micro-caps text-outline/80">/100</span>
+            </div>
+            <span class="mt-1 inline-flex items-center gap-0.5 font-label-caps text-label-caps text-tertiary">
+              <span class="material-symbols-outlined text-[13px]" aria-hidden="true">trending_up</span>+6.2%
+            </span>
           </div>
-          <span class="font-body-sm text-body-sm text-tertiary flex items-center gap-0.5 mt-0.5">
-            <span class="material-symbols-outlined text-[14px]">trending_up</span>+6.2%
-          </span>
-        </div>
-        <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
-          <span class="font-label-caps text-label-caps text-on-surface-variant">NEW MATCHES</span>
-          <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-secondary" data-qloo="new-matches">37</span>
+          <div class="px-3 py-3.5 flex flex-col min-w-0">
+            <span class="micro-caps text-on-surface-variant">NEW MATCHES</span>
+            <div class="mt-2 flex items-baseline">
+              <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-secondary" data-qloo="new-matches">37</span>
+            </div>
+            <span class="mt-1 font-label-caps text-label-caps text-on-surface-variant/80 truncate">+9 today</span>
           </div>
-          <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">+9 today</span>
-        </div>
-        <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
-          <span class="font-label-caps text-label-caps text-on-surface-variant">MATCH RATE</span>
-          <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-on-surface" data-qloo="match-rate">12.4</span>
-            <span class="font-label-caps text-label-caps text-outline">%</span>
+          <div class="px-3 py-3.5 flex flex-col min-w-0">
+            <span class="micro-caps text-on-surface-variant">MATCH RATE</span>
+            <div class="mt-2 flex items-baseline gap-0.5">
+              <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-on-surface" data-qloo="match-rate">12.4</span>
+              <span class="micro-caps text-outline/80">%</span>
+            </div>
+            <span class="mt-1 font-label-caps text-label-caps text-primary truncate">of active pool</span>
           </div>
-          <span class="font-body-sm text-body-sm text-primary-container mt-0.5 truncate">of active pool</span>
         </div>
       </div>
     </section>
 
     <!-- Micro-Tribe Index -->
-    <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md">
-      <div class="flex items-center justify-between pb-space-sm">
+    <section class="reveal relative rounded-2xl bg-surface-container-low hairline p-5" style="--d:.12s">
+      <div class="flex items-center justify-between pb-3">
         <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-secondary text-lg">groups</span>
-          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Micro-Tribe Index</span>
+          <span class="w-7 h-7 rounded-lg bg-secondary/[0.14] ring-1 ring-inset ring-secondary/25 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-secondary text-[16px]" aria-hidden="true">groups</span>
+          </span>
+          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-[0.16em]">Micro-Tribe Index</span>
         </div>
-        <span class="font-label-caps text-label-caps text-on-surface-variant" id="tribe-segment-count">12 SEGMENTS</span>
+        <span class="micro-caps text-on-surface-variant" id="tribe-segment-count">12 SEGMENTS</span>
       </div>
       <div class="space-y-3" id="qlooTribeList">
         <div class="flex flex-col gap-1">
@@ -1533,13 +1768,15 @@
     </section>
 
     <!-- Affinity Signals -->
-    <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md">
-      <div class="flex items-center justify-between pb-space-sm">
+    <section class="reveal relative rounded-2xl bg-surface-container-low hairline p-5" style="--d:.19s">
+      <div class="flex items-center justify-between pb-3">
         <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary text-lg">bar_chart</span>
-          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Affinity Signals</span>
+          <span class="w-7 h-7 rounded-lg bg-primary/[0.12] ring-1 ring-inset ring-primary/25 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-primary text-[16px]" aria-hidden="true">bar_chart</span>
+          </span>
+          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-[0.16em]">Affinity Signals</span>
         </div>
-        <span class="font-label-caps text-label-caps text-primary">800FT POOL</span>
+        <span class="micro-caps text-primary">800FT POOL</span>
       </div>
       <div class="space-y-4" id="qlooSignalList">
         <div class="space-y-2">
@@ -1618,10 +1855,10 @@
     </section>
 
     <!-- Radar Movement Feed -->
-    <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md space-y-space-sm">
+    <section class="reveal relative rounded-2xl bg-surface-container-low hairline p-5 space-y-3.5" style="--d:.26s">
       <div class="flex items-center justify-between">
-        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Radar Movement</span>
-        <span class="font-label-caps text-label-caps text-tertiary flex items-center gap-1">
+        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-[0.2em]">Radar Movement</span>
+        <span class="font-label-caps text-label-caps text-tertiary inline-flex items-center gap-1.5 tracking-[0.12em]">
           <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span> LIVE
         </span>
       </div>
@@ -1668,19 +1905,17 @@
     </section>
 
     <!-- Taste Heat Action Suite -->
-    <section class="space-y-space-xs pt-space-xs">
-      <button class="w-full py-3 px-4 rounded-xl bg-primary-container text-on-primary-container hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-lg group">
-        <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">my_location</span>
-        <span class="font-label-caps text-label-caps uppercase tracking-wider font-bold">Recalibrate 800ft Scan</span>
+    <section class="reveal space-y-2.5 pt-1" style="--d:.33s">
+      <button type="button" class="press w-full h-[52px] rounded-xl flex items-center justify-center gap-2 font-label-caps text-label-caps uppercase tracking-[0.14em] font-bold text-[#241503] bg-gradient-to-r from-[#ea9a5b] via-primary-container to-[#c65f1f] shadow-[0_16px_36px_-14px_rgba(217,119,54,0.65)] hover:brightness-[1.06] transition group">
+        <span class="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform duration-500" aria-hidden="true">my_location</span>
+        Recalibrate 800ft Scan
       </button>
-      <div class="grid grid-cols-2 gap-space-xs">
-        <button class="py-2.5 px-3 rounded-lg bg-surface-container-high text-secondary hover:bg-surface-bright transition-colors flex items-center justify-center gap-1.5 shadow-sm">
-          <span class="material-symbols-outlined text-base text-secondary">dataset</span>
-          <span class="font-label-caps text-label-caps tracking-wider">Export Heat Map</span>
+      <div class="grid grid-cols-2 gap-2.5">
+        <button type="button" class="press h-11 rounded-xl bg-surface-container-low hairline text-secondary hover:bg-surface-container-high flex items-center justify-center gap-1.5 font-label-caps text-label-caps uppercase tracking-[0.1em]">
+          <span class="material-symbols-outlined text-base" aria-hidden="true">dataset</span>Export Heat Map
         </button>
-        <button class="py-2.5 px-3 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-colors flex items-center justify-center gap-1.5 shadow-sm">
-          <span class="material-symbols-outlined text-base">share</span>
-          <span class="font-label-caps text-label-caps tracking-wider">Share Segments</span>
+        <button type="button" class="press h-11 rounded-xl bg-surface-container-low hairline text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high flex items-center justify-center gap-1.5 font-label-caps text-label-caps uppercase tracking-[0.1em]">
+          <span class="material-symbols-outlined text-base" aria-hidden="true">share</span>Share Segments
         </button>
       </div>
     </section>
@@ -2462,15 +2697,20 @@
     paintProgress();
   })();
 
-  /* ---------------- Live radar: beam-synced blips, radius, telemetry ---------------- */
-  (function initRadar() {
-    const svg = document.getElementById('radar-svg');
-    const blipLayer = document.getElementById('radar-blips');
-    if (!svg || !blipLayer) return;
+  /* ---------------- Proximity World: 3D holo radar (orbit / tilt / zoom) ---------------- */
+  (function initHolo() {
+    const stage = document.getElementById('holo-stage');
+    const rig = document.getElementById('holo-rig');
+    const world = document.getElementById('holo-world');
+    const blipLayer = document.getElementById('holo-blips');
+    if (!stage || !rig || !world || !blipLayer) return;
 
-    const PERIOD = 4000;              // matches .radar-beam / .blip-core CSS animation
-    const SCALE = 112 / 800;          // 800FT ring = 112 SVG units, center (150,150)
+    const PERIOD = 4000;                    // matches .holo-beam / .h-pillar CSS animation
+    const R800 = 140;                       // 800FT ring radius in plane px
+    const PLANE = 400;                      // world plane size
     const COMPASS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+    const ZOOM_BY_RADIUS = { 200: 1.5, 400: 1.16, 800: 1 };
+    const REDUCE = (function () { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
 
     const signals = [
       { id: 'p1',  kind: 'patron', label: 'Analog Minimalist',        tribe: 'Pet-Nat Devotee',        dist: 240, bearing: 37,  affinity: 94, hot: true,  note: 'Sakamoto on repeat \u00B7 two doors down' },
@@ -2499,47 +2739,62 @@
     const detailBar = document.getElementById('radar-detail-bar');
     const detailScore = document.getElementById('radar-detail-score');
     const detailNote = document.getElementById('radar-detail-note');
+    const hint = document.getElementById('holo-hint');
 
     let radius = 800;
     let selected = null;
     let scans = 0;
 
+    /* ----- camera state ----- */
+    const cam = { orbit: -18, tilt: 58, zoom: 1, vOrbit: 0, idle: 0 };
+
     function bearingLabel(bearing) {
       return COMPASS[Math.round(((bearing % 360) + 360) % 360 / 45) % 8];
     }
 
+    function paint() {
+      rig.style.setProperty('--tilt', cam.tilt.toFixed(2) + 'deg');
+      world.style.setProperty('--orbit', cam.orbit.toFixed(2) + 'deg');
+      world.style.setProperty('--zoom', cam.zoom.toFixed(3));
+    }
+
+    /* ----- blips ----- */
     function renderBlips() {
       const visible = signals.filter(s => s.dist <= radius);
       blipLayer.innerHTML = visible.map(s => {
-        const r = s.dist * SCALE;
+        const rr = (s.dist / 800) * R800;             // plane px from center
         const a = s.bearing * Math.PI / 180;
-        const x = (150 + r * Math.sin(a)).toFixed(1);
-        const y = (150 - r * Math.cos(a)).toFixed(1);
+        const x = 50 + (rr * Math.sin(a)) / PLANE * 100;
+        const y = 50 - (rr * Math.cos(a)) / PLANE * 100;
         const delay = (s.bearing / 360 * PERIOD / 1000).toFixed(2);
-        const size = s.kind === 'venue' ? 4 : 2.4 + (s.affinity - 70) / 30 * 2.2;
-        const tone = s.kind === 'venue' ? 'venue' : (s.hot ? 'patron' : 'patron-warm');
-        const halo = '<circle class="blip-core" cx="' + x + '" cy="' + y + '" r="' + (size * 2.3).toFixed(1) + '" fill="currentColor" opacity="0.16"/>';
-        const core = s.kind === 'venue'
-          ? '<rect class="blip-core" x="' + (x - size).toFixed(1) + '" y="' + (y - size).toFixed(1) + '" width="' + (size * 2).toFixed(1) + '" height="' + (size * 2).toFixed(1) + '" transform="rotate(45 ' + x + ' ' + y + ')" fill="none" stroke="currentColor" stroke-width="1.5"/>'
-          : '<circle class="blip-core" cx="' + x + '" cy="' + y + '" r="' + size.toFixed(1) + '" fill="currentColor"/>';
-        const selRing = '<circle class="sel-ring" cx="' + x + '" cy="' + y + '" r="' + (size + 5).toFixed(1) + '" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="3 3"/>';
-        return '<g class="blip blip-' + tone + (selected === s.id ? ' blip-sel' : '') + '" data-id="' + s.id + '" style="--blip-delay:' + delay + 's" tabindex="0" role="button" aria-label="' + s.label + ', ' + s.dist + ' feet ' + bearingLabel(s.bearing) + ', ' + s.affinity + ' percent match">' + halo + core + selRing + '</g>';
+        const h = s.kind === 'venue' ? 12 : Math.round(13 + (s.affinity - 76) / 18 * 14);
+        const tone = s.kind === 'venue' ? 'h-blip-venue' : (s.hot ? 'h-blip-patron' : 'h-blip-warm');
+        const pillar = '<div class="h-pillar" style="--h:' + h + 'px;--d:' + delay + 's"></div>' +
+                       '<div class="h-pillar p-b" style="--h:' + h + 'px;--d:' + delay + 's"></div>';
+        const base = '<div class="h-base" style="--d:' + delay + 's"></div>';
+        const ring = '<div class="h-ring"></div>';
+        return '<div class="h-blip ' + tone + (selected === s.id ? ' h-sel' : '') + '" data-id="' + s.id + '"' +
+          ' style="--x:' + x.toFixed(2) + '%;--y:' + y.toFixed(2) + '%" tabindex="0" role="button"' +
+          ' aria-label="' + s.label + ', ' + s.dist + ' feet ' + bearingLabel(s.bearing) + ', ' + s.affinity + ' percent match">' +
+          pillar + base + ring + '</div>';
       }).join('');
     }
 
     function paintRings() {
-      svg.querySelectorAll('.radar-ring').forEach(ring => {
-        ring.classList.toggle('radar-ring-active', ring.getAttribute('data-ring') === String(radius));
+      world.querySelectorAll('.holo-ring').forEach(ring => {
+        ring.classList.toggle('holo-ring-active', ring.getAttribute('data-ring') === String(radius));
       });
-      svg.querySelectorAll('.radar-label').forEach(label => {
-        label.classList.toggle('radar-label-active', label.getAttribute('data-ring-label') === String(radius));
+      world.querySelectorAll('.holo-ring-label').forEach(label => {
+        label.classList.toggle('holo-ring-label-active', label.getAttribute('data-ring-label') === String(radius));
       });
     }
 
     function setRadius(next) {
       radius = next;
       if (poolEl) poolEl.textContent = poolByRadius[radius] + ' PATRONS';
-      svg.setAttribute('aria-label', 'Radar sweep showing patron matches around The Amber Room within ' + radius + ' feet');
+      stage.setAttribute('aria-label', '3D proximity world: patron matches and venues around The Amber Room within ' + radius + ' feet.');
+      cam.zoom = ZOOM_BY_RADIUS[next] || 1;
+      paint();
       paintRings();
       if (selected && !signals.some(s => s.id === selected && s.dist <= radius)) {
         clearSelection();
@@ -2550,6 +2805,7 @@
 
     function clearSelection() {
       selected = null;
+      world.classList.remove('h-sel-mode');
       if (detail) detail.classList.add('hidden');
       renderBlips();
     }
@@ -2558,6 +2814,7 @@
       const s = signals.find(sig => sig.id === id);
       if (!s) return;
       selected = id;
+      world.classList.add('h-sel-mode');
       renderBlips();
       if (detail) {
         detailIcon.textContent = s.kind === 'venue' ? 'storefront' : 'person';
@@ -2571,12 +2828,12 @@
     }
 
     blipLayer.addEventListener('click', event => {
-      const target = event.target.closest('.blip');
+      const target = event.target.closest('.h-blip');
       if (target) selectSignal(target.getAttribute('data-id'));
     });
     blipLayer.addEventListener('keydown', event => {
       if (event.key !== 'Enter' && event.key !== ' ') return;
-      const target = event.target.closest('.blip');
+      const target = event.target.closest('.h-blip');
       if (target) {
         event.preventDefault();
         selectSignal(target.getAttribute('data-id'));
@@ -2588,6 +2845,105 @@
     document.querySelectorAll('[data-radius]').forEach(chip => {
       chip.addEventListener('click', () => setRadius(parseInt(chip.getAttribute('data-radius'), 10)));
     });
+
+    /* ----- gestures: drag = orbit + tilt, pinch/scroll = zoom ----- */
+    const pointers = new Map();
+    let pinchDist = 0;
+    let moved = 0;
+    let suppressClick = false;
+    let captured = false;
+
+    function wake() {
+      cam.idle = 0;
+      if (hint) hint.classList.add('hint-off');
+    }
+
+    function capture() {
+      if (captured) return;
+      captured = true;
+      pointers.forEach((_, id) => { if (stage.setPointerCapture) { try { stage.setPointerCapture(id); } catch (e) { /* noop */ } } });
+    }
+
+    stage.addEventListener('pointerdown', event => {
+      pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      moved = 0;
+      cam.vOrbit = 0;
+      wake();
+      if (pointers.size === 2) {
+        capture();
+        const pts = Array.from(pointers.values());
+        pinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      }
+    });
+
+    stage.addEventListener('pointermove', event => {
+      const prev = pointers.get(event.pointerId);
+      if (!prev) return;
+      const dx = event.clientX - prev.x;
+      const dy = event.clientY - prev.y;
+      pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      moved += Math.abs(dx) + Math.abs(dy);
+      if (moved > 6) {
+        suppressClick = true;
+        capture();   // own the gesture only once it becomes a real drag
+      }
+      if (pointers.size === 1) {
+        cam.orbit += dx * 0.45;
+        const instV = Math.max(-3.2, Math.min(3.2, dx * 0.45));  // clamp flick energy
+        cam.vOrbit = cam.vOrbit * 0.7 + instV * 0.3;             // smooth into inertia
+        cam.tilt = Math.min(72, Math.max(38, cam.tilt - dy * 0.22));
+        paint();
+      } else if (pointers.size === 2) {
+        const pts = Array.from(pointers.values());
+        const d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        if (pinchDist > 0) {
+          cam.zoom = Math.min(1.6, Math.max(0.75, cam.zoom * (d / pinchDist)));
+          paint();
+        }
+        pinchDist = d;
+      }
+    });
+
+    function releasePointer(event) {
+      pointers.delete(event.pointerId);
+      pinchDist = 0;
+      if (pointers.size === 0) captured = false;
+    }
+    stage.addEventListener('pointerup', releasePointer);
+    stage.addEventListener('pointercancel', releasePointer);
+
+    stage.addEventListener('wheel', event => {
+      event.preventDefault();
+      wake();
+      cam.zoom = Math.min(1.6, Math.max(0.75, cam.zoom * (event.deltaY > 0 ? 0.93 : 1.075)));
+      paint();
+    }, { passive: false });
+
+    /* a drag should never count as a tap-select */
+    stage.addEventListener('click', event => {
+      if (suppressClick) {
+        event.stopPropagation();
+        event.preventDefault();
+        suppressClick = false;
+      }
+    }, true);
+
+    /* render loop: inertia + idle drift */
+    (function loop() {
+      if (!REDUCE) {
+        if (pointers.size === 0 && Math.abs(cam.vOrbit) > 0.02) {
+          cam.orbit += cam.vOrbit;
+          cam.vOrbit *= 0.92;
+          paint();
+        }
+        cam.idle += 1;
+        if (pointers.size === 0 && cam.idle > 420 && Math.abs(cam.vOrbit) <= 0.02) {
+          cam.orbit += 0.05;    // slow ambient rotation (~0.6 rpm)
+          paint();
+        }
+      }
+      requestAnimationFrame(loop);
+    })();
 
     if (sweepPill && scanPill) {
       let age = 0;
