@@ -2411,9 +2411,9 @@
         <div class="flex items-center justify-between">
           <div class="min-w-0">
             <span class="font-body-md text-body-md text-on-surface font-medium block truncate" data-player-artist>FASSounds</span>
-            <span class="font-body-sm text-on-surface-variant"><a href="https://pixabay.com/music/beats-lofi-study-calm-peaceful-chill-hop-112191/" target="_blank" rel="noopener noreferrer" class="underline decoration-outline-variant underline-offset-2">Calm Peaceful Chill Hop &#8226; Pixabay</a></span>
+            <span class="font-body-sm text-on-surface-variant" data-player-sub><a href="https://pixabay.com/music/beats-lofi-study-calm-peaceful-chill-hop-112191/" target="_blank" rel="noopener noreferrer" class="underline decoration-outline-variant underline-offset-2">Calm Peaceful Chill Hop &#8226; Pixabay</a></span>
           </div>
-          <span class="font-label-caps text-label-caps bg-surface-container-high text-secondary-fixed px-2 py-0.5 rounded-full whitespace-nowrap">CHILL HOP</span>
+          <span class="font-label-caps text-label-caps bg-surface-container-high text-secondary-fixed px-2 py-0.5 rounded-full whitespace-nowrap" data-player-genre>CHILL HOP</span>
         </div>
 
         <!-- Waveform and seek bar reflect actual playback position. -->
@@ -2447,6 +2447,67 @@
     </section>
 
 
+
+    <!-- Daypart Queue -->
+    <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md space-y-space-sm" data-player-queue>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-secondary text-lg">playlist_play</span>
+          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Daypart Queue</span>
+        </div>
+        <span class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded-full">16-20 GOLDEN HR</span>
+      </div>
+
+      <button type="button" class="w-full text-left flex items-center gap-2.5 rounded-lg px-2.5 py-2 bg-surface-container-highest shadow-[0_0_16px_rgba(217,119,54,0.25)] transition-colors" data-queue-track="0" aria-current="true" aria-label="Play Lofi Study">
+        <span class="w-5 flex-shrink-0 flex justify-center" data-row-marker><span class="material-symbols-outlined text-primary text-xl animate-pulse" data-queue-current-icon>graphic_eq</span></span>
+        <div class="flex-1 min-w-0">
+          <span class="font-body-sm text-body-sm text-primary font-semibold block truncate" data-row-title>Lofi Study</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant">FASSOUNDS</span>
+        </div>
+        <div class="text-right flex-shrink-0">
+          <span class="font-label-caps text-label-caps text-secondary block">CHILL HOP</span>
+          <span class="font-label-caps text-label-caps text-outline-variant">2:27</span>
+        </div>
+      </button>
+
+      <button type="button" class="w-full text-left flex items-center gap-2.5 rounded-lg px-2.5 py-2 bg-surface-container/70 transition-colors" data-queue-track="1" aria-current="false" aria-label="Play Async (Piano Version)">
+        <span class="w-5 flex-shrink-0 flex justify-center" data-row-marker><span class="font-label-caps text-label-caps text-on-surface-variant">02</span></span>
+        <div class="flex-1 min-w-0">
+          <span class="font-body-sm text-body-sm text-on-surface block truncate" data-row-title>Async (Piano Version)</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant">RYUICHI SAKAMOTO</span>
+        </div>
+        <div class="text-right flex-shrink-0">
+          <span class="font-label-caps text-label-caps text-secondary block">76 BPM</span>
+          <span class="font-label-caps text-label-caps text-outline-variant">5:12</span>
+        </div>
+      </button>
+
+      <button type="button" class="w-full text-left flex items-center gap-2.5 rounded-lg px-2.5 py-2 bg-surface-container/70 transition-colors" data-queue-track="2" aria-current="false" aria-label="Play Open Soil">
+        <span class="w-5 flex-shrink-0 flex justify-center" data-row-marker><span class="font-label-caps text-label-caps text-on-surface-variant">03</span></span>
+        <div class="flex-1 min-w-0">
+          <span class="font-body-sm text-body-sm text-on-surface block truncate" data-row-title>Open Soil</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant">NALA SINEPHRO</span>
+        </div>
+        <div class="text-right flex-shrink-0">
+          <span class="font-label-caps text-label-caps text-secondary block">84 BPM</span>
+          <span class="font-label-caps text-label-caps text-outline-variant">4:08</span>
+        </div>
+      </button>
+
+      <button type="button" class="w-full text-left flex items-center gap-2.5 rounded-lg px-2.5 py-2 bg-surface-container/70 transition-colors" data-queue-track="3" aria-current="false" aria-label="Play Creek">
+        <span class="w-5 flex-shrink-0 flex justify-center" data-row-marker><span class="font-label-caps text-label-caps text-on-surface-variant">04</span></span>
+        <div class="flex-1 min-w-0">
+          <span class="font-body-sm text-body-sm text-on-surface block truncate" data-row-title>Creek</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant">HIROSHI YOSHIMURA</span>
+        </div>
+        <div class="text-right flex-shrink-0">
+          <span class="font-label-caps text-label-caps text-secondary block">72 BPM</span>
+          <span class="font-label-caps text-label-caps text-outline-variant">6:24</span>
+        </div>
+      </button>
+
+      <p class="font-body-sm text-body-sm text-on-surface-variant text-center pt-1">Ambient sample previews &#8226; tap a track to audition it on the player above<span data-night-countdown></span></p>
+    </section>
 
     <!-- Shift Specials / Menu Engine -->
     <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md space-y-space-sm">
@@ -2544,67 +2605,6 @@
           <span class="font-label-caps text-label-caps tracking-wider">Push Specials to POS</span>
         </button>
       </div>
-    </section>
-
-    <!-- Daypart Queue -->
-    <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md space-y-space-sm" data-player-queue>
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-secondary text-lg">playlist_play</span>
-          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Daypart Queue</span>
-        </div>
-        <span class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded-full">16-20 GOLDEN HR</span>
-      </div>
-
-      <div class="w-full text-left flex items-center gap-2.5 bg-surface-container-highest rounded-lg px-2.5 py-2 shadow-[0_0_16px_rgba(217,119,54,0.25)]" aria-current="true">
-        <span class="material-symbols-outlined text-primary text-xl animate-pulse" data-queue-current-icon>graphic_eq</span>
-        <div class="flex-1 min-w-0">
-          <span class="font-body-sm text-body-sm text-primary font-semibold block truncate">Lofi Study</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant">FASSOUNDS</span>
-        </div>
-        <div class="text-right flex-shrink-0">
-          <span class="font-label-caps text-label-caps text-secondary block">CHILL HOP</span>
-          <span class="font-label-caps text-label-caps text-outline-variant">2:27</span>
-        </div>
-      </div>
-
-      <div class="w-full text-left flex items-center gap-2.5 bg-surface-container/70 rounded-lg px-2.5 py-2" aria-label="Upcoming track">
-        <span class="font-label-caps text-label-caps text-on-surface-variant w-5 flex-shrink-0">02</span>
-        <div class="flex-1 min-w-0">
-          <span class="font-body-sm text-body-sm text-on-surface block truncate">Async (Piano Version)</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant">RYUICHI SAKAMOTO</span>
-        </div>
-        <div class="text-right flex-shrink-0">
-          <span class="font-label-caps text-label-caps text-secondary block">76 BPM</span>
-          <span class="font-label-caps text-label-caps text-outline-variant">5:12</span>
-        </div>
-      </div>
-
-      <div class="w-full text-left flex items-center gap-2.5 bg-surface-container/70 rounded-lg px-2.5 py-2" aria-label="Upcoming track">
-        <span class="font-label-caps text-label-caps text-on-surface-variant w-5 flex-shrink-0">03</span>
-        <div class="flex-1 min-w-0">
-          <span class="font-body-sm text-body-sm text-on-surface block truncate">Open Soil</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant">NALA SINEPHRO</span>
-        </div>
-        <div class="text-right flex-shrink-0">
-          <span class="font-label-caps text-label-caps text-secondary block">84 BPM</span>
-          <span class="font-label-caps text-label-caps text-outline-variant">4:08</span>
-        </div>
-      </div>
-
-      <div class="w-full text-left flex items-center gap-2.5 bg-surface-container/70 rounded-lg px-2.5 py-2" aria-label="Upcoming track">
-        <span class="font-label-caps text-label-caps text-on-surface-variant w-5 flex-shrink-0">04</span>
-        <div class="flex-1 min-w-0">
-          <span class="font-body-sm text-body-sm text-on-surface block truncate">Creek</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant">HIROSHI YOSHIMURA</span>
-        </div>
-        <div class="text-right flex-shrink-0">
-          <span class="font-label-caps text-label-caps text-secondary block">72 BPM</span>
-          <span class="font-label-caps text-label-caps text-outline-variant">6:24</span>
-        </div>
-      </div>
-
-      <p class="font-body-sm text-body-sm text-on-surface-variant text-center pt-1">Ambient sample preview &#8226; night volume starts in 58 min</p>
     </section>
 
     <!-- Menu &amp; Audio Action Suite -->
@@ -2922,7 +2922,15 @@
     const heights = [22, 48, 35, 64, 90, 52, 38, 72, 96, 60, 44, 28, 55, 84, 70, 40, 62, 88, 50, 34, 58, 76, 94, 46, 30, 66, 82, 54, 38, 70, 92, 48, 32, 60, 80, 42, 56, 74, 36, 26];
     waveform.innerHTML = heights.map(height => '<span class="flex-1 rounded-sm bg-surface-container-highest" style="height:' + height + '%"></span>').join('');
     const bars = Array.from(waveform.querySelectorAll('span'));
-    const source = 'audio/lofi-study.mp3';
+    const tracks = [
+      { src: 'audio/lofi-study.mp3', title: 'Lofi Study', artist: 'FASSounds', sub: 'Calm Peaceful Chill Hop \u2022 Pixabay', href: 'https://pixabay.com/music/beats-lofi-study-calm-peaceful-chill-hop-112191/', pill: 'CHILL HOP' },
+      { src: 'audio/async-piano.mp3', title: 'Async (Piano Version)', artist: 'Ryuichi Sakamoto', sub: 'Ambient preview sample \u2022 Attune session', pill: '76 BPM' },
+      { src: 'audio/open-soil.mp3', title: 'Open Soil', artist: 'Nala Sinephro', sub: 'Ambient preview sample \u2022 Attune session', pill: '84 BPM' },
+      { src: 'audio/creek.mp3', title: 'Creek', artist: 'Hiroshi Yoshimura', sub: 'Ambient preview sample \u2022 Attune session', pill: '72 BPM' }
+    ];
+    const queueEl = document.querySelector('[data-player-queue]');
+    const rows = queueEl ? Array.from(queueEl.querySelectorAll('[data-queue-track]')) : [];
+    let currentTrack = 0;
     let seeking = false;
     let playbackIntent = false;
     let announcementActive = false;
@@ -2941,8 +2949,63 @@
       });
     } catch (error) { /* keep in-memory defaults when storage is unavailable */ }
 
-    audio.src = source;
-    audio.loop = true;
+    const ROW_ACTIVE = ['bg-surface-container-highest', 'shadow-[0_0_16px_rgba(217,119,54,0.25)]'];
+    const ROW_IDLE = ['bg-surface-container/70'];
+
+    function trackSubHtml(t) {
+      return t.href
+        ? '<a href="' + t.href + '" target="_blank" rel="noopener noreferrer" class="underline decoration-outline-variant underline-offset-2">' + t.sub + '</a>'
+        : t.sub;
+    }
+
+    function paintQueue() {
+      const playing = !audio.paused && !audio.ended;
+      rows.forEach((row, index) => {
+        const active = index === currentTrack;
+        row.setAttribute('aria-current', active ? 'true' : 'false');
+        ROW_ACTIVE.forEach(name => row.classList.toggle(name, active));
+        ROW_IDLE.forEach(name => row.classList.toggle(name, !active));
+        const title = row.querySelector('[data-row-title]');
+        if (title) {
+          title.classList.toggle('text-primary', active);
+          title.classList.toggle('font-semibold', active);
+          title.classList.toggle('text-on-surface', !active);
+        }
+        const marker = row.querySelector('[data-row-marker]');
+        if (marker) marker.innerHTML = active
+          ? '<span class="material-symbols-outlined text-primary text-xl' + (playing ? ' animate-pulse' : '') + '" data-queue-current-icon>' + (playing ? 'graphic_eq' : 'music_note') + '</span>'
+          : '<span class="font-label-caps text-label-caps text-on-surface-variant">' + String(index + 1).padStart(2, '0') + '</span>';
+      });
+    }
+
+    function paintPanel() {
+      const t = tracks[currentTrack];
+      const hero = player.querySelector('[data-player-title-hero]');
+      const artist = player.querySelector('[data-player-artist]');
+      const sub = player.querySelector('[data-player-sub]');
+      const pill = player.querySelector('[data-player-genre]');
+      if (hero) hero.textContent = t.title;
+      if (artist) artist.textContent = t.artist;
+      if (sub) sub.innerHTML = trackSubHtml(t);
+      if (pill) pill.textContent = t.pill;
+    }
+
+    function loadTrack(index, autoplay) {
+      currentTrack = (index + tracks.length) % tracks.length;
+      playbackIntent = !!autoplay;
+      audio.src = tracks[currentTrack].src;
+      paintPanel();
+      paintQueue();
+      paintProgress();
+      if (autoplay) play();
+    }
+
+    rows.forEach((row, index) => {
+      row.addEventListener('click', () => {
+        if (index === currentTrack) { if (audio.paused) play(); else pause(); }
+        else loadTrack(index, true);
+      });
+    });
 
     function formatTime(seconds) {
       if (!Number.isFinite(seconds)) return '0:00';
@@ -3070,8 +3133,11 @@
       const playing = !audio.paused && !audio.ended;
       toggleIcon.textContent = playing ? 'pause' : 'play_arrow';
       toggle.setAttribute('aria-label', playing ? 'Pause' : 'Play');
-      const queueIcon = player.querySelector('[data-queue-current-icon]');
-      if (queueIcon) queueIcon.textContent = playing ? 'graphic_eq' : 'music_note';
+      const icon = document.querySelector('[data-queue-current-icon]');
+      if (icon) {
+        icon.textContent = playing ? 'graphic_eq' : 'music_note';
+        icon.classList.toggle('animate-pulse', playing);
+      }
     }
 
     async function play() {
@@ -3095,10 +3161,6 @@
     toggle.addEventListener('click', () => {
       if (audio.paused) play();
       else pause();
-    });
-
-    player.addEventListener('click', event => {
-      if (event.target === player.querySelector('[data-queue-current-icon]')) play();
     });
 
     player.querySelector('[data-player-previous]').addEventListener('click', async () => {
@@ -3146,11 +3208,30 @@
     audio.addEventListener('timeupdate', paintProgress);
     audio.addEventListener('play', paintPlayback);
     audio.addEventListener('pause', paintPlayback);
-    audio.addEventListener('ended', paintPlayback);
+    audio.addEventListener('ended', () => {
+      loadTrack(currentTrack + 1, playbackIntent);
+      paintPlayback();
+    });
     audio.addEventListener('error', () => {
       durationTime.textContent = 'Audio unavailable';
       paintPlayback();
     });
+    function paintNightCountdown() {
+      const el = document.querySelector('[data-night-countdown]');
+      if (!el) return;
+      const hour = new Date().getHours();
+      if (hour >= 20 || hour < 2) {
+        el.textContent = ' \u2022 night volume is on';
+        return;
+      }
+      const target = new Date();
+      target.setHours(20, 0, 0, 0);
+      const mins = Math.max(1, Math.round((target - new Date()) / 60000));
+      el.textContent = ' \u2022 night volume starts in ' + mins + ' min';
+    }
+    paintNightCountdown();
+    setInterval(paintNightCountdown, 60000);
+    loadTrack(0, false);
     paintPlayback();
     paintProgress();
   })();
