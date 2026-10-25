@@ -8,7 +8,7 @@ Built for the **Qloo Agentic Hackathon** ("Agents, but with taste"). Mobile-firs
 
 ## The 30-second pitch
 
-> Every block has a taste signature. Your venue sits 800 feet from the places and people that set the block's rhythm. Attune's **playbook agent** reads that signature through Qloo, grounds itself deeper server-side (a cross-domain artist hop off your block anchor, with explainability), and hands the operator a night plan: *anchor to the dive bar two doors down, spin Ersen into the golden-hour set, run the natural-wine flight through the 16–20 swell.* Not a report — a shift plan where every line cites the entity that drove it.
+> Every block has a taste signature. Your venue sits 800 feet from the places and people that set the block's rhythm. Attune's **playbook agent** reads that signature through Qloo, grounds itself deeper server-side (a cross-domain artist hop off your block anchor, with explainability), and hands the operator a night plan: *anchor to the dive bar two doors down, spin a warm-toned artist into the golden-hour set, run the natural-wine flight through the 16–20 swell.* Not a report — a shift plan where every line cites the entity that drove it.
 
 ## Your venue, not a demo venue
 
@@ -72,7 +72,7 @@ The entire pipeline is **retrieval-augmented with Qloo as the retriever**:
 │  • playlist anchor    → Acoustic Architecture (artist + BPM zone)             │
 │  • menu callout       → Recommended Pairing card                              │
 │  Traceability: the driver sentence and chips name the REAL entities          │
-│  (e.g. "Ryuichi Sakamoto 0.96") that produced each recommendation.            │
+│  (e.g. "<artist name> 0.96") that produced each recommendation.            │
 └───────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -131,9 +131,12 @@ environment — `firebase deploy` picks it up automatically.
 
 ### Local development against the live backend
 
+The browser calls the Cloudflare Worker at `https://attune-api.chungu424.workers.dev/api`
+by default. To point it elsewhere (for example a local worker), set:
+
 ```js
 // in the browser console, then reload:
-localStorage.setItem('roomtone.apiBase', 'https://us-central1-qloo-api-1.cloudfunctions.net/api');
+localStorage.setItem('roomtone.apiBase', 'http://localhost:8787/api');
 ```
 
 ## Project layout
@@ -141,8 +144,8 @@ localStorage.setItem('roomtone.apiBase', 'https://us-central1-qloo-api-1.cloudfu
 ```
 index.html          single-file app (UI + Tailwind CDN + live-feed + venue resolution)
 auth.html           hash-routed auth (sign in / create / reset) + one-tap demo login
-functions/index.js  Firebase fn: Qloo proxy + playbook agent (enrich + compose + fallback)
-firebase.json       Hosting rewrites /api/** → api function; cache headers
+worker/             Cloudflare Worker: Qloo proxy + playbook agent (enrich + compose + fallback)
+firebase.json       Static hosting config; cache headers
 Caddyfile           single-origin local stack: file_server + Qloo proxy + agent proxy
 scripts/serve.sh    Caddy launcher (loads .env.local; idempotent sidecar spawn)
 scripts/llm-sidecar.js  playbook agent on 127.0.0.1:3789 (ground→enrich→compose→fallback)

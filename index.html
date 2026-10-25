@@ -803,7 +803,6 @@
   /* — Telemetry: breathing lock, latency swap — */
   @keyframes tls-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
   .a-tls-lock { animation: tls-pulse 3.2s ease-in-out infinite; }
-  #latency-ms { transition: opacity 0.18s ease; display: inline-block; }
 
   /* ================================================================
      ATTUNE DESIGN SYSTEM — "The Amber Standard"
@@ -953,7 +952,6 @@
   @media (prefers-reduced-motion: reduce) {
     .aurora, .a-sheen, .field-enter, .a-tls-lock { animation: none !important; }
     #auth-thumb { transition: none !important; }
-    #latency-ms { transition: none !important; }
     .reveal, .breathe, .breathe-slow, .bar-grow { animation: none !important; opacity: 1 !important; }
     .halo::after, .shimmer::after, .eq > span { animation: none !important; }
     .engine-ring, .engine-rail > i { transition: none !important; }
@@ -1031,6 +1029,8 @@
     }
   };
 </script>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 </head>
 
 <body class="bg-background font-body-md text-on-surface antialiased flex flex-col min-h-screen">
@@ -1211,7 +1211,7 @@
 <!-- ==================== SOUND SETTINGS SHEET (opened from the drawer) ==================== -->
 <div id="sound-sheet" class="legal-root fixed inset-0 z-[65]" aria-hidden="true">
   <div class="legal-backdrop absolute inset-0 bg-black/60 backdrop-blur-[2px]" data-sound-dismiss></div>
-  <div class="legal-panel absolute inset-x-0 bottom-0 top-[7%] mx-auto w-full max-w-[390px] flex flex-col rounded-t-2xl bg-surface-container-low shadow-[0_-12px_48px_rgba(0,0,0,0.55)] overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="sound-title">
+  <div class="legal-panel absolute inset-0 mx-auto w-full max-w-[390px] flex flex-col bg-surface-container-low shadow-[0_-12px_48px_rgba(0,0,0,0.55)] overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="sound-title">
     <div class="flex items-center justify-between gap-2 px-space-md h-16 flex-shrink-0 border-b border-surface-container-high/70">
       <div class="flex items-center gap-2 min-w-0">
         <span class="material-symbols-outlined text-secondary text-xl flex-shrink-0">graphic_eq</span>
@@ -1269,6 +1269,19 @@
             <span class="font-label-caps text-label-caps tracking-wider">Play a Sample Announcement</span>
           </button>
           <p class="font-body-sm text-body-sm text-on-surface-variant px-1 pt-2" data-guardrail-status aria-live="polite">These settings shape the in-app preview only &#8212; house speakers keep their own volume.</p>
+        </section>
+      <section class="mt-space-sm rounded-xl bg-surface-container p-space-sm" aria-label="Distance units" data-units>
+          <div class="flex items-center gap-1.5 px-1 pb-2">
+            <span class="material-symbols-outlined text-secondary text-base">straighten</span>
+            <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Distance units</span>
+          </div>
+          <div class="flex items-center justify-between gap-2 px-1 py-2">
+            <span class="font-body-sm text-body-sm text-on-surface-variant">Radius and ring labels</span>
+            <div class="flex gap-1.5">
+              <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-surface-container-highest text-on-surface-variant" data-unit="m" aria-pressed="false">METERS</button>
+              <button type="button" class="chip font-label-caps text-label-caps px-2.5 py-1 rounded-full transition-colors bg-surface-container-highest text-on-surface-variant" data-unit="ft" aria-pressed="false">FEET</button>
+            </div>
+          </div>
         </section>
     </div>
     <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-md py-3 flex-shrink-0 border-t border-surface-container-high/70">ATTUNE &#183; V1.0.0 &#183; IN-APP PREVIEW</p>
@@ -1446,7 +1459,6 @@
               <span class="block font-body-sm text-body-sm text-on-surface-variant">Soft open, doors at seven</span>
             </span>
             <span class="ob-wave flex-shrink-0" aria-hidden="true"><span style="--d:0s"></span><span style="--d:.12s"></span><span style="--d:.24s"></span><span style="--d:.36s"></span><span style="--d:.48s"></span></span>
-            <span class="font-label-caps text-[9px] text-outline tracking-widest flex-shrink-0 w-12 text-right">68 BPM</span>
           </button>
           <button type="button" class="ob-card flex items-center gap-3 rounded-xl border border-outline-variant/50 bg-surface-container-low/70 px-3.5 py-3" data-ob-tone="daylight-groove" aria-pressed="false">
             <span class="ob-card-check material-symbols-outlined text-[13px]" aria-hidden="true">check</span>
@@ -1456,7 +1468,6 @@
               <span class="block font-body-sm text-body-sm text-on-surface-variant">Steady mid-tempo through the rush</span>
             </span>
             <span class="ob-wave flex-shrink-0" aria-hidden="true"><span style="--d:.05s"></span><span style="--d:.17s"></span><span style="--d:.29s"></span><span style="--d:.41s"></span><span style="--d:.53s"></span></span>
-            <span class="font-label-caps text-[9px] text-outline tracking-widest flex-shrink-0 w-12 text-right">88 BPM</span>
           </button>
           <button type="button" class="ob-card flex items-center gap-3 rounded-xl border border-outline-variant/50 bg-surface-container-low/70 px-3.5 py-3" data-ob-tone="golden-hour" aria-pressed="false">
             <span class="ob-card-check material-symbols-outlined text-[13px]" aria-hidden="true">check</span>
@@ -1466,7 +1477,6 @@
               <span class="block font-body-sm text-body-sm text-on-surface-variant">Warm and social as the light drops</span>
             </span>
             <span class="ob-wave flex-shrink-0" aria-hidden="true"><span style="--d:.1s"></span><span style="--d:.22s"></span><span style="--d:.34s"></span><span style="--d:.46s"></span><span style="--d:.58s"></span></span>
-            <span class="font-label-caps text-[9px] text-outline tracking-widest flex-shrink-0 w-12 text-right">102 BPM</span>
           </button>
           <button type="button" class="ob-card flex items-center gap-3 rounded-xl border border-outline-variant/50 bg-surface-container-low/70 px-3.5 py-3" data-ob-tone="late-night-deep" aria-pressed="false">
             <span class="ob-card-check material-symbols-outlined text-[13px]" aria-hidden="true">check</span>
@@ -1476,7 +1486,6 @@
               <span class="block font-body-sm text-body-sm text-on-surface-variant">Low-slow after dark</span>
             </span>
             <span class="ob-wave flex-shrink-0" aria-hidden="true"><span style="--d:.15s"></span><span style="--d:.27s"></span><span style="--d:.39s"></span><span style="--d:.51s"></span><span style="--d:.63s"></span></span>
-            <span class="font-label-caps text-[9px] text-outline tracking-widest flex-shrink-0 w-12 text-right">114 BPM</span>
           </button>
         </div>
         <div class="flex-1"></div>
@@ -1708,7 +1717,6 @@
       <div data-waveform class="flex items-end gap-0.5 h-10 w-full opacity-80"></div>
       <div class="flex items-center justify-between pt-space-sm">
         <span class="font-label-caps text-label-caps text-outline tracking-widest flex items-center gap-1"><span class="a-tls-lock material-symbols-outlined text-[11px] text-primary/70" aria-hidden="true">lock</span>SECURE SESSION &#183; TLS 1.3</span>
-        <span class="font-label-caps text-label-caps text-outline tracking-widest">LATENCY <span id="latency-ms">14</span>MS</span>
       </div>
       <p class="font-label-caps text-label-caps text-outline tracking-widest pt-space-xs pb-space-sm text-center">ATTUNE &#183; AMBIENCE INTELLIGENCE</p>
     </div>
@@ -1804,19 +1812,6 @@
           <span id="daypart-window" class="tnum font-label-caps text-label-caps uppercase tracking-[0.14em] text-white">NOW TUNED &#8226; 16:00 - 20:00</span>
         </div>
 
-        <!-- decibel instrument cluster -->
-        <div class="absolute top-4 right-4 flex flex-col items-end gap-1.5 rounded-2xl px-3 py-2 bg-black/35 backdrop-blur-md hairline-strong">
-          <span class="micro-caps text-white/55" style="letter-spacing:.14em">DECIBEL GOAL</span>
-          <div class="flex items-end gap-2">
-            <span class="eq h-4 text-secondary-fixed" aria-hidden="true">
-              <span style="animation-delay:0s"></span>
-              <span style="animation-delay:.28s"></span>
-              <span style="animation-delay:.12s"></span>
-              <span style="animation-delay:.4s"></span>
-            </span>
-            <span class="tnum text-[21px] leading-none font-bold text-white">64<span class="micro-caps text-white/55 ml-1">dB</span></span>
-          </div>
-        </div>
 
         <!-- title block -->
         <div class="absolute bottom-4 left-5 right-5">
@@ -1834,33 +1829,33 @@
               <span class="font-label-caps text-label-caps uppercase text-secondary-fixed tracking-[0.14em] truncate">Sound &amp; Light</span>
             </div>
             <span class="font-label-caps text-label-caps uppercase text-tertiary inline-flex items-center gap-1.5 flex-shrink-0">
-              <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>SONOS LINKED
+              <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>QLOO LIVE
             </span>
           </div>
-          <p id="daypart-audio-title" class="mt-3 text-[16px] leading-[22px] font-semibold tracking-[-0.01em] text-on-surface">Warm Japanese Kanky&#333; Ongaku &amp; Vinyl Jazz</p>
-          <p class="mt-0.5 font-body-sm text-body-sm text-on-surface-variant">On repeat &#183; <span id="daypart-audio-stream" class="italic text-primary-fixed">Eriko Shimizu Trio &#8212; Midsummer Amber</span></p>
+          <p id="daypart-audio-title" class="mt-3 text-[16px] leading-[22px] font-semibold tracking-[-0.01em] text-on-surface">Waiting for live Qloo data</p>
+          <p class="mt-0.5 font-body-sm text-body-sm text-on-surface-variant">Block anchor &#183; <span id="daypart-audio-stream" class="italic text-primary-fixed">&#8212;</span></p>
 
           <!-- instrument cells · divide-only, no boxes -->
           <div class="mt-3.5 grid grid-cols-3 divide-x divide-outline-variant/25">
             <div class="pr-3">
               <span class="micro-caps text-outline block">TEMPO</span>
-              <span id="daypart-bpm" class="tnum block mt-1 text-[14px] leading-5 font-bold text-on-surface">81 BPM</span>
+              <span id="daypart-bpm" class="tnum block mt-1 text-[14px] leading-5 font-bold text-on-surface">&#8212;</span>
             </div>
             <div class="px-3">
               <span class="micro-caps text-outline block">ROOM TONE</span>
-              <span class="block mt-1 text-[14px] leading-5 font-bold text-secondary truncate">Warm</span>
+              <span class="block mt-1 text-[14px] leading-5 font-bold text-secondary truncate">&#8212;</span>
             </div>
             <div class="pl-3">
               <span class="micro-caps text-outline block">LIGHTS</span>
-              <span class="tnum block mt-1 text-[14px] leading-5 font-bold text-on-surface truncate tracking-[-0.01em]">2800K&#183;35%</span>
+              <span class="tnum block mt-1 text-[14px] leading-5 font-bold text-on-surface truncate tracking-[-0.01em]">&#8212;</span>
             </div>
           </div>
 
           <div class="mt-3 flex items-center justify-between gap-2">
             <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug min-w-0">
-              <span class="material-symbols-outlined text-[14px] text-secondary align-[-2px] mr-1" aria-hidden="true">candle</span>Candlewells on soapstone at dusk to soften the perimeter
+              <span class="material-symbols-outlined text-[14px] text-secondary align-[-2px] mr-1" aria-hidden="true">candle</span>Awaiting live block data
             </p>
-            <span class="micro-caps text-outline flex-shrink-0">LUTRON SYNCED</span>
+            
           </div>
         </div>
 
@@ -1873,13 +1868,13 @@
               <span class="material-symbols-outlined text-primary text-[18px]" aria-hidden="true">radar</span>
               <span id="daypart-action-label" class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-[0.14em] truncate">The Play</span>
             </div>
-            <span id="daypart-overlap" class="tnum font-label-caps text-label-caps font-bold text-primary flex-shrink-0">93% CROWD MATCH</span>
+            <span id="daypart-overlap" class="tnum font-label-caps text-label-caps font-bold text-primary flex-shrink-0">&#8212;</span>
           </div>
           <p id="daypart-action" class="mt-2.5 font-body-md text-body-md text-on-surface leading-relaxed">
-            Queue side-B kanky&#333; ongaku for the 16-20 swell; run the hi-ball feature tray to garden tables from 17:30.
+            Waiting for live Qloo data to build the playbook.
           </p>
           <p id="daypart-driver" class="mt-2 font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-            People within 800ft have <span class="text-secondary font-medium">Ryuichi Sakamoto</span> on repeat and keep showing up at <span class="text-secondary font-medium">Pioneer Works</span>.
+            Live block drivers will appear here once Qloo returns results.
           </p>
         </div>
 
@@ -1897,11 +1892,9 @@
               <span class="material-symbols-outlined text-base" data-export-icon>data_object</span>
             </button>
           </div>
-          <p id="llm-persona" class="mt-2.5 font-body-sm text-body-sm italic text-on-surface-variant leading-relaxed">&#8220;Analog-leaning night owls who treat listening as the main event.&#8221;</p>
+          <p id="llm-persona" class="mt-2.5 font-body-sm text-body-sm italic text-on-surface-variant leading-relaxed">&#8212;</p>
           <div class="mt-2.5 flex flex-wrap gap-1.5" id="grounding-chips">
-            <span class="font-label-caps text-label-caps text-secondary bg-secondary-container/40 ring-1 ring-inset ring-secondary/25 px-2 py-1 rounded-md">Ryuichi Sakamoto &#183; 96% MATCH</span>
-            <span class="font-label-caps text-label-caps text-secondary bg-secondary-container/40 ring-1 ring-inset ring-secondary/25 px-2 py-1 rounded-md">Pioneer Works &#183; 91% MATCH</span>
-          </div>
+                      </div>
           <p id="agent-trace" class="mt-2 micro-caps text-on-surface-variant/70" style="letter-spacing:.08em" aria-live="polite"></p>
         </div>
 
@@ -1914,7 +1907,7 @@
               <span class="material-symbols-outlined text-primary text-[18px]" aria-hidden="true">local_bar</span>
               <span class="font-label-caps text-label-caps uppercase text-secondary-fixed tracking-[0.14em] truncate">Recommended Pairing</span>
             </div>
-            <span class="font-label-caps text-label-caps text-tertiary bg-tertiary/10 px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap">96% MATCH</span>
+            <span class="font-label-caps text-label-caps text-tertiary bg-tertiary/10 px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap" id="daypart-menu-match">&#8212;</span>
           </div>
           <div class="mt-3 flex gap-3.5 items-center">
             <div class="w-[76px] h-[76px] rounded-xl overflow-hidden flex-shrink-0 shadow-[0_10px_24px_-10px_rgba(0,0,0,0.6)] ring-1 ring-inset ring-white/10">
@@ -1923,23 +1916,8 @@
                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG8IHnMriqUvoPdvjrGXlKJqnbBmyNBHshWo_7dHMqSGE6K3-hmXsKsUHslzxV-BZoTVjN9iY-c-DgUf4ulH-JnvuOOPyPVCFh71baKR8zSqb1_Hu9oWMwAJ5-jX5yi_Drqm5l0gtEY8D_5h3VuP5DM7qIxpu15AtcxBpbjEEfOPR2NGMDpUoBFOj2zDCbfHeANOxirAZuX_s0Op2WNbNv7zYtWZ4GWJSXvp2dZLsS_WRCp3hkpb0Zlw"/>
             </div>
             <div class="flex-1 min-w-0">
-              <h4 id="daypart-menu" class="text-[17px] leading-[22px] font-semibold tracking-[-0.01em] text-on-surface">Smoked Olive Oil &amp; Yuzu Hi-Ball</h4>
-              <p id="daypart-menu-sub" class="mt-1 font-body-sm text-body-sm text-on-surface-variant">Paired with Warm Koji Cashews</p>
-            </div>
-          </div>
-          <!-- price architecture · divide-only cells -->
-          <div class="mt-3.5 grid grid-cols-3 divide-x divide-outline-variant/25">
-            <div class="pr-3">
-              <span class="micro-caps text-outline block">POUR COST</span>
-              <span class="tnum block mt-1 text-[14px] leading-5 font-bold text-on-surface">$3.20</span>
-            </div>
-            <div class="px-3">
-              <span class="micro-caps text-outline block">MENU PRICE</span>
-              <span class="tnum block mt-1 text-[14px] leading-5 font-bold text-on-surface">$21</span>
-            </div>
-            <div class="pl-3">
-              <span class="micro-caps text-outline block">MARGIN</span>
-              <span class="tnum block mt-1 text-[14px] leading-5 font-bold text-tertiary">84.7%</span>
+              <h4 id="daypart-menu" class="text-[17px] leading-[22px] font-semibold tracking-[-0.01em] text-on-surface">Awaiting live pairing</h4>
+              <p id="daypart-menu-sub" class="mt-1 font-body-sm text-body-sm text-on-surface-variant">Pairings come from live Qloo results</p>
             </div>
           </div>
         </div>
@@ -1966,17 +1944,12 @@
           </div>
           <div class="flex-1 min-w-0 rounded-xl bg-surface-container hairline p-4">
             <div class="flex items-start justify-between gap-2">
-              <h4 class="text-[16px] leading-[21px] font-semibold tracking-[-0.01em] text-on-surface">Midnight Natural Wine + Pet-Nat Pop-up</h4>
+              <h4 class="text-[16px] leading-[21px] font-semibold tracking-[-0.01em] text-on-surface">Awaiting live Qloo events</h4>
               <span class="material-symbols-outlined text-[18px] text-secondary flex-shrink-0 mt-0.5" aria-hidden="true">wine_bar</span>
             </div>
-            <span class="tnum mt-1.5 block font-label-caps text-label-caps uppercase text-tertiary tracking-[0.1em]">21:30 &#183; PEAK RUSH</span>
             <p class="mt-1.5 font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-              Two gallery openings at <span class="text-on-surface font-medium">Greenpoint Loft (350ft)</span> send people your way &#8212; expect about +85 extra between 21:00 and 23:30.
+              Nearby events will appear here once Qloo returns results.
             </p>
-            <div class="mt-3 flex flex-wrap gap-1.5">
-              <span class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-1 rounded-md whitespace-nowrap">SKIN-CONTACT CARIGNAN</span>
-              <span class="font-label-caps text-label-caps text-secondary bg-secondary-container/40 px-2 py-1 rounded-md whitespace-nowrap">110 BPM DARK WAVE</span>
-            </div>
           </div>
         </article>
 
@@ -2033,7 +2006,7 @@
           <span style="animation-delay:.22s"></span>
           <span style="animation-delay:.1s"></span>
         </span>
-        <span class="font-label-caps text-label-caps text-on-surface-variant tracking-[0.14em]">AMBER ROOM &#183; LIVE &#183; <span id="telemetry-ms" class="tnum">14</span>MS</span>
+        <span class="font-label-caps text-label-caps text-on-surface-variant tracking-[0.14em]"><span data-venue-name>ATTUNE</span></span>
       </div>
     </footer>
 
@@ -2065,8 +2038,8 @@
             <h2 class="mt-1.5 text-[26px] leading-[30px] font-bold tracking-[-0.02em] text-on-surface">What the Block Craves</h2>
           </div>
           <div class="flex flex-col items-end flex-shrink-0">
-            <span class="tnum text-[17px] leading-5 font-bold text-tertiary whitespace-nowrap" id="radar-pool">312 PEOPLE</span>
-            <span class="micro-caps text-outline mt-1" id="radar-scan">&#8786; 3-MIN WALK</span>
+            <span class="tnum text-[17px] leading-5 font-bold text-tertiary whitespace-nowrap" id="radar-pool">&#8212;</span>
+            <span class="micro-caps text-outline mt-1" id="radar-scan">QLOO AFFINITY</span>
           </div>
         </div>
 
@@ -2078,56 +2051,17 @@
         </div>
       </div>
 
-      <!-- 3D proximity world -->
+      <!-- World map (MapLibre) -->
       <div class="relative px-4">
-        <div class="holo-stage" id="holo-stage" role="application"
-             aria-label="Map of people and places around your door within 800 feet. Drag to look around, pinch or scroll to zoom, tap a dot for details.">
-          <div class="holo-scene">
-            <div class="holo-rig" id="holo-rig" style="--tilt:58deg">
-              <div class="holo-world" id="holo-world" style="--orbit:-18deg;--zoom:1">
-                <div class="holo-ground" aria-hidden="true"></div>
-                <div class="holo-spoke" style="--a:0deg" aria-hidden="true"></div>
-                <div class="holo-spoke" style="--a:45deg" aria-hidden="true"></div>
-                <div class="holo-spoke" style="--a:90deg" aria-hidden="true"></div>
-                <div class="holo-spoke" style="--a:135deg" aria-hidden="true"></div>
-                <div class="holo-spoke" style="--a:180deg" aria-hidden="true"></div>
-                <div class="holo-spoke" style="--a:225deg" aria-hidden="true"></div>
-                <div class="holo-spoke" style="--a:270deg" aria-hidden="true"></div>
-                <div class="holo-spoke" style="--a:315deg" aria-hidden="true"></div>
-                <div class="holo-ring" data-ring="200" style="--r:35px" aria-hidden="true"></div>
-                <div class="holo-ring" data-ring="400" style="--r:70px" aria-hidden="true"></div>
-                <div class="holo-ring" data-ring="600" style="--r:105px" aria-hidden="true"></div>
-                <div class="holo-ring" data-ring="800" style="--r:140px" aria-hidden="true"></div>
-                <span class="holo-ring-label" data-ring-label="200" style="--r:35px" aria-hidden="true">200FT</span>
-                <span class="holo-ring-label" data-ring-label="400" style="--r:70px" aria-hidden="true">400FT</span>
-                <span class="holo-ring-label" data-ring-label="600" style="--r:105px" aria-hidden="true">600FT</span>
-                <span class="holo-ring-label" data-ring-label="800" style="--r:140px" aria-hidden="true">800FT</span>
-                <span class="holo-compass" aria-hidden="true">N</span>
-                <div class="holo-beam" aria-hidden="true"></div>
-                <div class="holo-beam-edge" aria-hidden="true"></div>
-
-                <!-- your door -->
-                <div class="h-blip h-door" style="--x:50%;--y:50%" aria-hidden="true">
-                  <div class="h-door-pulse"></div>
-                  <div class="h-door-pulse p2"></div>
-                  <div class="h-pillar" style="--h:18px"></div>
-                  <div class="h-pillar p-b" style="--h:18px"></div>
-                </div>
-
-                <div id="holo-blips"></div>
-              </div>
-            </div>
-          </div>
-          <div class="holo-hint" id="holo-hint">
-            <span class="micro-caps text-on-surface-variant/80 bg-surface-container-lowest/70 backdrop-blur-sm hairline rounded-full px-3 py-1.5">DRAG TO LOOK AROUND &#183; TAP A DOT</span>
-          </div>
+        <div class="relative w-full h-[340px] rounded-2xl overflow-hidden hairline bg-surface-container-lowest" id="world-map" role="application" aria-label="World map of your venue and nearby Qloo places. Pan and zoom, tap a pin for details.">
+          <div id="world-map-canvas" class="absolute inset-0"></div>
         </div>
-
         <div class="flex items-center justify-center gap-4 pt-3 pb-1 flex-wrap">
-          <span class="font-label-caps text-label-caps text-on-surface-variant inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-primary bg-cover bg-center inline-block ring-1 ring-inset ring-primary/60" style="background-image:url('assets/avatars/p6.jpg')"></span>PATRON</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-primary inline-block"></span>PLACE</span>
           <span class="font-label-caps text-label-caps text-on-surface-variant inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-tertiary rotate-45 inline-block"></span>VENUE</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full border border-on-surface inline-block"></span>YOUR DOOR</span>
         </div>
+        <p id="radar-note" class="font-body-sm text-body-sm text-on-surface-variant text-center pb-2">Placed by Qloo, plotted at each place's location</p>
+
 
         <div id="radar-detail" class="hidden mb-4 rounded-xl bg-surface-container-low hairline p-3.5 field-enter">
           <div class="flex items-start gap-3">
@@ -2159,28 +2093,28 @@
       <div class="relative px-5 pb-5">
         <div class="grid grid-cols-3 rounded-xl bg-surface-container/60 hairline divide-x divide-outline-variant/25 overflow-hidden">
           <div class="px-3 py-3.5 flex flex-col min-w-0">
-            <span class="micro-caps text-on-surface-variant">BLOCK HEAT</span>
+            <span class="micro-caps text-on-surface-variant">CROWD FIT</span>
             <div class="mt-2 flex items-baseline gap-1">
-              <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-primary" data-qloo="block-heat">94.8</span>
+              <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-primary" data-qloo="block-heat">&#8212;</span>
               <span class="micro-caps text-outline/80">/100</span>
             </div>
             <span class="mt-1 font-label-caps text-label-caps text-tertiary">
-              crowd average
+              how well nearby places fit
             </span>
           </div>
           <div class="px-3 py-3.5 flex flex-col min-w-0">
-            <span class="micro-caps text-on-surface-variant">HOT SPOTS</span>
+            <span class="micro-caps text-on-surface-variant">STRONG MATCHES</span>
             <div class="mt-2 flex items-baseline">
-              <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-secondary" data-qloo="hot-spots">37</span>
+              <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-secondary" data-qloo="hot-spots">&#8212;</span>
             </div>
-            <span class="mt-1 font-label-caps text-label-caps text-on-surface-variant/80 truncate">within 800 ft</span>
+            <span class="mt-1 font-label-caps text-label-caps text-on-surface-variant/80 truncate">80% or higher nearby</span>
           </div>
           <div class="px-3 py-3.5 flex flex-col min-w-0">
-            <span class="micro-caps text-on-surface-variant">BLOCK SCENES</span>
+            <span class="micro-caps text-on-surface-variant">PLACE TYPES</span>
             <div class="mt-2 flex items-baseline">
-              <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-on-surface" data-qloo="block-scenes">12</span>
+              <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-on-surface" data-qloo="block-scenes">&#8212;</span>
             </div>
-            <span class="mt-1 font-label-caps text-label-caps text-primary truncate">on this block</span>
+            <span class="mt-1 font-label-caps text-label-caps text-primary truncate">kinds of places nearby</span>
           </div>
         </div>
       </div>
@@ -2195,14 +2129,14 @@
           </span>
           <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-[0.16em]">Who&#8217;s Out There</span>
         </div>
-        <span class="micro-caps text-on-surface-variant" id="tribe-segment-count">12 GROUPS</span>
+        <span class="micro-caps text-on-surface-variant" id="tribe-segment-count">&#8212;</span>
       </div>
       <div class="space-y-3" id="qlooTribeList">
         <div class="flex flex-col gap-1">
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 min-w-0">
               <span class="font-label-caps text-label-caps text-primary w-4 flex-shrink-0">01</span>
-              <span class="font-body-sm text-body-sm text-on-surface font-medium truncate">Analog Minimalists &amp; Pet-Nat Devotees</span>
+              <span class="font-body-sm text-body-sm text-on-surface font-medium truncate">Waiting for live Qloo data</span>
             </div>
             <span class="font-metric-stat text-[13px] text-primary flex-shrink-0">94</span>
           </div>
@@ -2214,9 +2148,9 @@
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 min-w-0">
               <span class="font-label-caps text-label-caps text-on-surface-variant w-4 flex-shrink-0">02</span>
-              <span class="font-body-sm text-body-sm text-on-surface font-medium truncate">Natural Wine Pragmatists</span>
+              <span class="font-body-sm text-body-sm text-on-surface font-medium truncate">&#8212;</span>
             </div>
-            <span class="font-metric-stat text-[13px] text-secondary flex-shrink-0">86</span>
+            <span class="font-metric-stat text-[13px] text-secondary flex-shrink-0">&#8212;</span>
           </div>
           <div class="w-full h-1 rounded-full bg-surface-container-highest overflow-hidden">
             <div class="h-full rounded-full bg-primary/70" style="width:86%"></div>
@@ -2226,9 +2160,9 @@
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 min-w-0">
               <span class="font-label-caps text-label-caps text-on-surface-variant w-4 flex-shrink-0">03</span>
-              <span class="font-body-sm text-body-sm text-on-surface font-medium truncate">Ambient Archivists</span>
+              <span class="font-body-sm text-body-sm text-on-surface font-medium truncate">&#8212;</span>
             </div>
-            <span class="font-metric-stat text-[13px] text-secondary flex-shrink-0">79</span>
+            <span class="font-metric-stat text-[13px] text-secondary flex-shrink-0">&#8212;</span>
           </div>
           <div class="w-full h-1 rounded-full bg-surface-container-highest overflow-hidden">
             <div class="h-full rounded-full bg-secondary" style="width:79%"></div>
@@ -2270,81 +2204,10 @@
           </span>
           <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-[0.16em]">What They&#8217;re Into</span>
         </div>
-        <span class="micro-caps text-primary">WITHIN 800 FT</span>
+        <span class="micro-caps text-primary" id="radar-radius-label">WITHIN 800 FT</span>
       </div>
-      <div class="space-y-4" id="qlooSignalList">
-        <div class="space-y-2">
-          <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">On repeat</span>
-          <div class="flex items-center gap-2">
-            <span class="font-body-sm text-body-sm text-on-surface flex-1 truncate">Ryuichi Sakamoto</span>
-            <div class="w-16 h-1 rounded-full bg-surface-container-highest overflow-hidden flex-shrink-0">
-              <div class="h-full rounded-full bg-primary" style="width:96%"></div>
-            </div>
-            <span class="font-metric-stat text-[12px] text-primary w-8 text-right flex-shrink-0">96</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="font-body-sm text-body-sm text-on-surface flex-1 truncate">Eriko Shimizu Trio</span>
-            <div class="w-16 h-1 rounded-full bg-surface-container-highest overflow-hidden flex-shrink-0">
-              <div class="h-full rounded-full bg-primary/70" style="width:91%"></div>
-            </div>
-            <span class="font-metric-stat text-[12px] text-secondary w-8 text-right flex-shrink-0">91</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="font-body-sm text-body-sm text-on-surface flex-1 truncate">Nala Sinephro</span>
-            <div class="w-16 h-1 rounded-full bg-surface-container-highest overflow-hidden flex-shrink-0">
-              <div class="h-full rounded-full bg-secondary" style="width:87%"></div>
-            </div>
-            <span class="font-metric-stat text-[12px] text-secondary w-8 text-right flex-shrink-0">87</span>
-          </div>
-        </div>
-        <div class="space-y-2">
-          <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Food &amp; drink</span>
-          <div class="flex items-center gap-2">
-            <span class="font-body-sm text-body-sm text-on-surface flex-1 truncate">P&#233;t-Nat by the Glass</span>
-            <div class="w-16 h-1 rounded-full bg-surface-container-highest overflow-hidden flex-shrink-0">
-              <div class="h-full rounded-full bg-primary" style="width:95%"></div>
-            </div>
-            <span class="font-metric-stat text-[12px] text-primary w-8 text-right flex-shrink-0">95</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="font-body-sm text-body-sm text-on-surface flex-1 truncate">Skin-Contact Carignan</span>
-            <div class="w-16 h-1 rounded-full bg-surface-container-highest overflow-hidden flex-shrink-0">
-              <div class="h-full rounded-full bg-secondary" style="width:88%"></div>
-            </div>
-            <span class="font-metric-stat text-[12px] text-secondary w-8 text-right flex-shrink-0">88</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="font-body-sm text-body-sm text-on-surface flex-1 truncate">Warm Koji Cashews</span>
-            <div class="w-16 h-1 rounded-full bg-surface-container-highest overflow-hidden flex-shrink-0">
-              <div class="h-full rounded-full bg-tertiary" style="width:84%"></div>
-            </div>
-            <span class="font-metric-stat text-[12px] text-tertiary w-8 text-right flex-shrink-0">84</span>
-          </div>
-        </div>
-        <div class="space-y-2">
-          <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Culture</span>
-          <div class="flex items-center gap-2">
-            <span class="font-body-sm text-body-sm text-on-surface flex-1 truncate">Pioneer Works</span>
-            <div class="w-16 h-1 rounded-full bg-surface-container-highest overflow-hidden flex-shrink-0">
-              <div class="h-full rounded-full bg-primary" style="width:93%"></div>
-            </div>
-            <span class="font-metric-stat text-[12px] text-primary w-8 text-right flex-shrink-0">93</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="font-body-sm text-body-sm text-on-surface flex-1 truncate">Film Forum</span>
-            <div class="w-16 h-1 rounded-full bg-surface-container-highest overflow-hidden flex-shrink-0">
-              <div class="h-full rounded-full bg-secondary/70" style="width:79%"></div>
-            </div>
-            <span class="font-metric-stat text-[12px] text-secondary w-8 text-right flex-shrink-0">79</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="font-body-sm text-body-sm text-on-surface flex-1 truncate">Metrograph</span>
-            <div class="w-16 h-1 rounded-full bg-surface-container-highest overflow-hidden flex-shrink-0">
-              <div class="h-full rounded-full bg-tertiary/70" style="width:74%"></div>
-            </div>
-            <span class="font-metric-stat text-[12px] text-tertiary w-8 text-right flex-shrink-0">74</span>
-          </div>
-        </div>
+      <div class="space-y-4" id="qlooSignalList" aria-live="polite">
+        <p class="font-body-sm text-body-sm text-on-surface-variant">Waiting for live Qloo signals for this block&#8230;</p>
       </div>
     </section>
 
@@ -2356,49 +2219,8 @@
           <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span> LIVE
         </span>
       </div>
-      <div class="flex gap-2.5 items-start">
-        <span class="flex -space-x-1.5 mt-0.5 flex-shrink-0" aria-hidden="true">
-          <span class="w-4 h-4 rounded-full bg-primary bg-cover bg-center ring-1 ring-inset ring-outline-variant/50" style="background-image:url('assets/avatars/p2.jpg')"></span>
-          <span class="w-4 h-4 rounded-full bg-primary bg-cover bg-center ring-1 ring-inset ring-outline-variant/50" style="background-image:url('assets/avatars/p5.jpg')"></span>
-          <span class="w-4 h-4 rounded-full bg-primary bg-cover bg-center ring-1 ring-inset ring-outline-variant/50" style="background-image:url('assets/avatars/p8.jpg')"></span>
-        </span>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center justify-between gap-2">
-            <span class="font-body-sm text-body-sm text-on-surface font-medium">+12 new matches on the block</span>
-            <span class="font-label-caps text-label-caps text-outline-variant flex-shrink-0">16:04</span>
-          </div>
-          <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Clustered within 300ft of 142 Franklin St &#8212; Analog Minimalists &amp; Pet-Nat Devotees.</p>
-        </div>
-      </div>
-      <div class="flex gap-2.5 items-start">
-        <span class="w-1.5 h-1.5 rounded-full bg-tertiary mt-1.5 flex-shrink-0"></span>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center justify-between gap-2">
-            <span class="font-body-sm text-body-sm text-on-surface font-medium">Gallery opening confirmed 350ft away</span>
-            <span class="font-label-caps text-label-caps text-outline-variant flex-shrink-0">15:47</span>
-          </div>
-          <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Greenpoint Loft &#8594; +85 extra people expected between 21:00 and 23:30.</p>
-        </div>
-      </div>
-      <div class="flex gap-2.5 items-start">
-        <span class="w-1.5 h-1.5 rounded-full bg-secondary mt-1.5 flex-shrink-0"></span>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center justify-between gap-2">
-            <span class="font-body-sm text-body-sm text-on-surface font-medium">P&#233;t-Nat search interest +22% w/w</span>
-            <span class="font-label-caps text-label-caps text-outline-variant flex-shrink-0">15:31</span>
-          </div>
-          <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Within three blocks; recommended pour-through raised to 38% of by-the-glass.</p>
-        </div>
-      </div>
-      <div class="flex gap-2.5 items-start">
-        <span class="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0"></span>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center justify-between gap-2">
-            <span class="font-body-sm text-body-sm text-on-surface font-medium">Block Heat crossed the 90 threshold</span>
-            <span class="font-label-caps text-label-caps text-outline-variant flex-shrink-0">15:12</span>
-          </div>
-          <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Footfall velocity +6.2% versus the same Friday last week.</p>
-        </div>
+      <div id="blockFeed" class="space-y-3.5" aria-live="polite">
+        <p class="font-body-sm text-body-sm text-on-surface-variant">Waiting for live Qloo data for this block&#8230;</p>
       </div>
     </section>
 
@@ -2433,16 +2255,12 @@
         <div class="absolute inset-0 bg-gradient-to-t from-surface-container via-surface-container/60 to-transparent"></div>
         <div class="absolute top-3 left-4 flex items-center gap-1.5">
           <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
-          <span class="font-label-caps text-label-caps text-tertiary uppercase tracking-widest">SONOS LINKED &#8226; ZONE A</span>
+          <span class="font-label-caps text-label-caps text-tertiary uppercase tracking-widest">QLOO BLOCK TASTE</span>
         </div>
         <div class="absolute bottom-3 left-4 right-4 flex items-end justify-between gap-2">
           <div class="min-w-0">
             <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest bg-surface-container-lowest/80 px-2 py-0.5 rounded-full">NOW PLAYING &#8226; PREVIEW</span>
             <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight mt-1 truncate" data-player-title-hero>Lofi Study</h3>
-          </div>
-          <div class="text-right flex flex-col items-end flex-shrink-0">
-            <span class="font-label-caps text-label-caps text-on-surface-variant">DECIBEL GOAL</span>
-            <span class="font-metric-stat text-metric-stat text-primary">64<span class="font-label-caps text-label-caps text-outline-variant">dB</span></span>
           </div>
         </div>
       </div>
@@ -2450,10 +2268,10 @@
       <div class="p-space-md space-y-space-sm">
         <div class="flex items-center justify-between">
           <div class="min-w-0">
-            <span class="font-body-md text-body-md text-on-surface font-medium block truncate" data-player-artist>FASSounds</span>
-            <span class="font-body-sm text-on-surface-variant" data-player-sub><a href="https://pixabay.com/music/beats-lofi-study-calm-peaceful-chill-hop-112191/" target="_blank" rel="noopener noreferrer" class="underline decoration-outline-variant underline-offset-2">Calm Peaceful Chill Hop &#8226; Pixabay</a></span>
+            <span class="font-body-md text-body-md text-on-surface font-medium block truncate" data-player-artist>Lofi Study</span>
+            <span class="font-body-sm text-on-surface-variant" data-player-sub>Local preview</span>
           </div>
-          <span class="font-label-caps text-label-caps bg-surface-container-high text-secondary-fixed px-2 py-0.5 rounded-full whitespace-nowrap" data-player-genre>CHILL HOP</span>
+          <span class="font-label-caps text-label-caps bg-surface-container-high text-secondary-fixed px-2 py-0.5 rounded-full whitespace-nowrap" data-player-genre></span>
         </div>
 
         <!-- Waveform and seek bar reflect actual playback position. -->
@@ -2500,10 +2318,10 @@
         <span class="w-5 flex-shrink-0 flex justify-center" data-row-marker><span class="material-symbols-outlined text-primary text-xl animate-pulse" data-queue-current-icon>graphic_eq</span></span>
         <div class="flex-1 min-w-0">
           <span class="font-body-sm text-body-sm text-primary font-semibold block truncate" data-row-title>Lofi Study</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant">FASSOUNDS</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant">LOCAL PREVIEW</span>
         </div>
         <div class="text-right flex-shrink-0">
-          <span class="font-label-caps text-label-caps text-secondary block">CHILL HOP</span>
+          <span class="font-label-caps text-label-caps text-secondary block"></span>
           <span class="font-label-caps text-label-caps text-outline-variant">2:27</span>
         </div>
       </button>
@@ -2512,10 +2330,10 @@
         <span class="w-5 flex-shrink-0 flex justify-center" data-row-marker><span class="font-label-caps text-label-caps text-on-surface-variant">02</span></span>
         <div class="flex-1 min-w-0">
           <span class="font-body-sm text-body-sm text-on-surface block truncate" data-row-title>Async (Piano Version)</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant">RYUICHI SAKAMOTO</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant">LOCAL PREVIEW</span>
         </div>
         <div class="text-right flex-shrink-0">
-          <span class="font-label-caps text-label-caps text-secondary block">76 BPM</span>
+          <span class="font-label-caps text-label-caps text-secondary block"></span>
           <span class="font-label-caps text-label-caps text-outline-variant">5:12</span>
         </div>
       </button>
@@ -2524,10 +2342,10 @@
         <span class="w-5 flex-shrink-0 flex justify-center" data-row-marker><span class="font-label-caps text-label-caps text-on-surface-variant">03</span></span>
         <div class="flex-1 min-w-0">
           <span class="font-body-sm text-body-sm text-on-surface block truncate" data-row-title>Open Soil</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant">NALA SINEPHRO</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant">LOCAL PREVIEW</span>
         </div>
         <div class="text-right flex-shrink-0">
-          <span class="font-label-caps text-label-caps text-secondary block">84 BPM</span>
+          <span class="font-label-caps text-label-caps text-secondary block"></span>
           <span class="font-label-caps text-label-caps text-outline-variant">4:08</span>
         </div>
       </button>
@@ -2536,10 +2354,10 @@
         <span class="w-5 flex-shrink-0 flex justify-center" data-row-marker><span class="font-label-caps text-label-caps text-on-surface-variant">04</span></span>
         <div class="flex-1 min-w-0">
           <span class="font-body-sm text-body-sm text-on-surface block truncate" data-row-title>Creek</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant">HIROSHI YOSHIMURA</span>
+          <span class="font-label-caps text-label-caps text-on-surface-variant">LOCAL PREVIEW</span>
         </div>
         <div class="text-right flex-shrink-0">
-          <span class="font-label-caps text-label-caps text-secondary block">72 BPM</span>
+          <span class="font-label-caps text-label-caps text-secondary block"></span>
           <span class="font-label-caps text-label-caps text-outline-variant">6:24</span>
         </div>
       </button>
@@ -2555,72 +2373,7 @@
           <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Shift Specials</span>
         </div>
         <span class="font-label-caps text-label-caps bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full">TONIGHT'S PICKS</span>
-      </div>
-
-      <div class="flex items-start gap-3 bg-surface-container/70 rounded-lg p-space-sm">
-        <div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center flex-shrink-0 mt-0.5">
-          <span class="material-symbols-outlined text-primary text-lg">local_bar</span>
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-start justify-between gap-2">
-            <span class="font-body-md text-body-md text-on-surface font-medium leading-tight">Yuzu Highball</span>
-            <span class="font-label-caps text-label-caps text-tertiary whitespace-nowrap flex-shrink-0">POPULAR</span>
-          </div>
-          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Japanese whisky, fresh yuzu, soda, and a twist of lemon.</p>
-          <div class="mt-1 tracking-[0.04em]">
-            <div class="flex items-center gap-2">
-              <span class="font-label-caps text-label-caps text-on-surface-variant">COST $3.20</span>
-              <span class="text-outline-variant text-[9px]">&#8226;</span>
-              <span class="font-label-caps text-label-caps text-primary">TARGET $21</span>
-            </div>
-            <span class="font-label-caps text-label-caps text-secondary block mt-1">84.7% MARGIN</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex items-start gap-3 bg-surface-container/70 rounded-lg p-space-sm">
-        <div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center flex-shrink-0 mt-0.5">
-          <span class="material-symbols-outlined text-secondary text-lg">grain</span>
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-start justify-between gap-2">
-            <span class="font-body-md text-body-md text-on-surface font-medium truncate">Koji-Roasted Cashews</span>
-            <span class="font-label-caps text-label-caps text-tertiary whitespace-nowrap flex-shrink-0">BAR SNACK</span>
-          </div>
-          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Served warm with brown butter and flaky sea salt.</p>
-          <div class="mt-1 tracking-[0.04em]">
-            <div class="flex items-center gap-2">
-              <span class="font-label-caps text-label-caps text-on-surface-variant">COST $1.10</span>
-              <span class="text-outline-variant text-[9px]">&#8226;</span>
-              <span class="font-label-caps text-label-caps text-primary">TARGET $7</span>
-            </div>
-            <span class="font-label-caps text-label-caps text-secondary block mt-1">84.3% MARGIN</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex items-start gap-3 bg-surface-container/70 rounded-lg p-space-sm">
-        <div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center flex-shrink-0 mt-0.5">
-          <span class="material-symbols-outlined text-primary text-lg">wine_bar</span>
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-start justify-between gap-2">
-            <span class="font-body-md text-body-md text-on-surface font-medium truncate">Skin-Contact Carignan &#8226; 6 oz</span>
-            <span class="font-label-caps text-label-caps text-tertiary whitespace-nowrap flex-shrink-0">BY THE GLASS</span>
-          </div>
-          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">A chilled, light-bodied red with tart cherry and a dry finish.</p>
-          <div class="mt-1 tracking-[0.04em]">
-            <div class="flex items-center gap-2">
-              <span class="font-label-caps text-label-caps text-on-surface-variant">COST $4.60</span>
-              <span class="text-outline-variant text-[9px]">&#8226;</span>
-              <span class="font-label-caps text-label-caps text-primary">TARGET $16</span>
-            </div>
-            <span class="font-label-caps text-label-caps text-secondary block mt-1">71.2% MARGIN</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Hero Pairing -->
+      </div>      <!-- Hero Pairing -->
       <div class="bg-surface-container rounded-lg p-space-sm space-y-2">
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-1.5 min-w-0">
@@ -2634,8 +2387,8 @@
                alt="Refined Japanese highball cocktail with hand-carved ice sphere, smoked olive oil droplets glistening on top surface with yuzu peel garnish in a crystal glass."
                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG8IHnMriqUvoPdvjrGXlKJqnbBmyNBHshWo_7dHMqSGE6K3-hmXsKsUHslzxV-BZoTVjN9iY-c-DgUf4ulH-JnvuOOPyPVCFh71baKR8zSqb1_Hu9oWMwAJ5-jX5yi_Drqm5l0gtEY8D_5h3VuP5DM7qIxpu15AtcxBpbjEEfOPR2NGMDpUoBFOj2zDCbfHeANOxirAZuX_s0Op2WNbNv7zYtWZ4GWJSXvp2dZLsS_WRCp3hkpb0Zlw"/>
           <div class="flex-1 min-w-0">
-            <h4 class="font-title-editorial text-title-editorial text-on-surface font-medium leading-tight">Yuzu Highball &amp; Koji-Roasted Cashews</h4>
-            <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">A bright, citrusy drink with a warm, savory snack.</p>
+            <h4 class="font-title-editorial text-title-editorial text-on-surface font-medium leading-tight">Awaiting live pairing</h4>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Pairings come from live Qloo results</p>
           </div>
         </div>
         <button class="w-full py-2 rounded-lg bg-secondary-container text-secondary-fixed hover:bg-secondary hover:text-on-secondary transition-colors flex items-center justify-center gap-1.5">
@@ -2666,144 +2419,6 @@
   </section>
 
   <!-- ==================== SCREEN 4 · LIVE PULSE ==================== -->
-  <section class="screen w-full px-margin pb-12 space-y-space-md hidden" data-screen="live-pulse" aria-label="Live Pulse">
-
-    <!-- Live Hero -->
-    <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md relative overflow-hidden">
-      <div class="absolute -right-12 -top-12 w-40 h-40 bg-tertiary/10 rounded-full blur-2xl pointer-events-none"></div>
-      <div class="flex items-center justify-between pb-space-xs">
-        <div class="flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
-          <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest whitespace-nowrap">LIVE &#8226; <span data-floor-daypart>GOLDEN HR</span></span>
-        </div>
-        <span data-floor-win class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded-full whitespace-nowrap">16:00 - 20:00</span>
-      </div>
-
-      <div class="mt-2 pt-2 flex items-end justify-between gap-space-sm">
-        <div class="min-w-0">
-          <span class="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">Seated Now</span>
-          <div class="flex items-baseline gap-1.5">
-            <span class="font-metric-stat text-[40px] leading-none text-primary" data-floor-seated>62</span>
-            <span class="font-label-caps text-label-caps text-outline">/88 SEATS</span>
-          </div>
-        </div>
-        <div class="text-right flex-shrink-0">
-          <span class="font-label-caps text-label-caps text-on-surface-variant block">OCCUPANCY</span>
-          <span class="font-metric-stat text-[22px] text-tertiary" data-floor-occupancy>70%</span>
-        </div>
-      </div>
-
-      <div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden mt-space-sm">
-        <div data-floor-occupancy-bar class="h-full rounded-full bg-gradient-to-r from-secondary to-primary" style="width:70%"></div>
-      </div>
-      <div class="flex items-center justify-between mt-1.5">
-        <span data-floor-variance class="font-label-caps text-label-caps text-tertiary">+44 GUESTS VS FORECAST</span>
-        <span data-floor-updated class="font-label-caps text-label-caps text-outline-variant">UPDATED JUST NOW</span>
-      </div>
-
-      <div class="grid grid-cols-3 gap-space-xs mt-space-md pt-space-xs">
-        <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
-          <span class="font-label-caps text-label-caps text-on-surface-variant">DECIBELS</span>
-          <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-primary" data-floor-db>61.7</span>
-            <span class="font-label-caps text-label-caps text-outline">dB</span>
-          </div>
-          <span data-floor-db-delta class="font-body-sm text-body-sm text-tertiary mt-0.5 truncate">1.3 under</span>
-        </div>
-        <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
-          <span class="font-label-caps text-label-caps text-on-surface-variant">AVG DWELL</span>
-          <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-secondary" data-floor-dwell>74</span>
-            <span class="font-label-caps text-label-caps text-outline">min</span>
-          </div>
-          <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">Target 70 min</span>
-        </div>
-        <div class="bg-surface-container/70 rounded-lg p-2.5 flex flex-col">
-          <span class="font-label-caps text-label-caps text-on-surface-variant">ARRIVALS / HR</span>
-          <div class="flex items-baseline gap-1 mt-1">
-            <span class="font-metric-stat text-metric-stat text-on-surface" data-floor-arrivals>38</span>
-          </div>
-          <span data-floor-arrivals-trend class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">steady vs the last hour</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Footfall Velocity Chart -->
-    <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md">
-      <div class="flex items-center justify-between">
-        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Footfall Velocity &#8226; Last 90 Min</span>
-        <span class="font-label-caps text-label-caps text-tertiary flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span> LIVE
-        </span>
-      </div>
-      <div data-floor-chart class="flex items-end gap-1.5 h-28 mt-3" aria-hidden="true"></div>
-      <div class="flex items-center justify-between mt-2 pt-2 border-t border-surface-container-high">
-        <span data-floor-t-start class="font-label-caps text-label-caps text-outline-variant">14:30</span>
-        <span data-floor-t-mid class="font-label-caps text-label-caps text-outline-variant">15:15</span>
-        <span data-floor-t-now class="font-label-caps text-label-caps text-primary">16:00 &#8226; NOW</span>
-      </div>
-    </section>
-
-    <!-- Live Floor Feed -->
-    <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md space-y-space-sm">
-      <div class="flex items-center justify-between">
-        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Live From the Floor</span>
-        <span data-floor-feed-new class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded-full">4 NEW</span>
-      </div>
-      <div data-floor-feed class="space-y-space-sm"></div>
-    </section>
-
-    <!-- Floor Zones -->
-    <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md space-y-space-sm">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-secondary text-lg">chair</span>
-          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Floor Zones</span>
-        </div>
-        <span class="font-label-caps text-label-caps text-on-surface-variant">4 STAFF ON</span>
-      </div>
-      <div class="flex items-center gap-3 bg-surface-container/70 rounded-lg px-space-sm py-2.5">
-        <div class="flex-1 min-w-0">
-          <span class="font-body-md text-body-md text-on-surface font-medium block truncate">Bar Top</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant">2 HOSTS &#8226; <span data-zone-seated="bar">24</span>/28 SEATED</span>
-        </div>
-        <span data-zone-pill="bar" class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded-full flex-shrink-0">BUSY</span>
-      </div>
-      <div class="flex items-center gap-3 bg-surface-container/70 rounded-lg px-space-sm py-2.5">
-        <div class="flex-1 min-w-0">
-          <span class="font-body-md text-body-md text-on-surface font-medium block truncate">Lounge</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant">1 HOST &#8226; <span data-zone-seated="lounge">18</span>/26 SEATED</span>
-        </div>
-        <span data-zone-pill="lounge" class="font-label-caps text-label-caps text-tertiary bg-tertiary/10 px-2 py-0.5 rounded-full flex-shrink-0">STEADY</span>
-      </div>
-      <div class="flex items-center gap-3 bg-surface-container/70 rounded-lg px-space-sm py-2.5">
-        <div class="flex-1 min-w-0">
-          <span class="font-body-md text-body-md text-on-surface font-medium block truncate">Patio</span>
-          <span class="font-label-caps text-label-caps text-on-surface-variant">1 HOST &#8226; <span data-zone-seated="patio">20</span>/34 SEATED</span>
-        </div>
-        <span data-zone-pill="patio" class="font-label-caps text-label-caps text-secondary bg-secondary-container/40 px-2 py-0.5 rounded-full flex-shrink-0">NOISE +2.4dB</span>
-      </div>
-    </section>
-
-    <!-- Live Pulse Action Suite -->
-    <section class="space-y-space-xs pt-space-xs">
-      <button class="w-full py-3 px-4 rounded-xl bg-primary-container text-on-primary-container hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-lg group">
-        <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">notification_important</span>
-        <span class="font-label-caps text-label-caps uppercase tracking-wider font-bold">Ping Floor Lead Now</span>
-      </button>
-      <div class="grid grid-cols-2 gap-space-xs">
-        <button class="py-2.5 px-3 rounded-lg bg-surface-container-high text-secondary hover:bg-surface-bright transition-colors flex items-center justify-center gap-1.5 shadow-sm">
-          <span class="material-symbols-outlined text-base text-secondary">photo_camera</span>
-          <span class="font-label-caps text-label-caps tracking-wider">Capture Snapshot</span>
-        </button>
-        <button class="py-2.5 px-3 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-colors flex items-center justify-center gap-1.5 shadow-sm">
-          <span class="material-symbols-outlined text-base">smartphone</span>
-          <span class="font-label-caps text-label-caps tracking-wider">Escalate to Manager</span>
-        </button>
-      </div>
-    </section>
-
-  </section>
 </main>
 
 <nav class="fixed bottom-0 left-0 right-0 z-50 px-4 pb-[max(env(safe-area-inset-bottom),14px)] pt-2" data-active-classes="text-primary bg-surface-container/80">
@@ -2819,10 +2434,6 @@
     <a class="nav-tab flex flex-col items-center justify-center w-16 h-[52px] rounded-xl text-on-surface-variant hover:text-on-surface transition-all gap-0.5" data-path="menu-sound" href="#">
       <span class="material-symbols-outlined text-[22px]">nightlife</span>
       <span class="font-label-caps text-label-caps tracking-[0.12em]">MENU</span>
-    </a>
-    <a class="nav-tab flex flex-col items-center justify-center w-16 h-[52px] rounded-xl text-on-surface-variant hover:text-on-surface transition-all gap-0.5" data-path="live-pulse" href="#">
-      <span class="material-symbols-outlined text-[22px]">vital_signs</span>
-      <span class="font-label-caps text-label-caps tracking-[0.12em]">LIVE</span>
     </a>
   </div>
 </nav>
@@ -2907,10 +2518,10 @@
     waveform.innerHTML = heights.map(height => '<span class="flex-1 rounded-sm bg-surface-container-highest" style="height:' + height + '%"></span>').join('');
     const bars = Array.from(waveform.querySelectorAll('span'));
     const tracks = [
-      { src: 'audio/lofi-study.mp3', title: 'Lofi Study', artist: 'FASSounds', sub: 'Calm Peaceful Chill Hop \u2022 Pixabay', href: 'https://pixabay.com/music/beats-lofi-study-calm-peaceful-chill-hop-112191/', pill: 'CHILL HOP' },
-      { src: 'audio/async-piano.mp3', title: 'Async (Piano Version)', artist: 'Ryuichi Sakamoto', sub: 'Ambient preview sample \u2022 Attune session', pill: '76 BPM' },
-      { src: 'audio/open-soil.mp3', title: 'Open Soil', artist: 'Nala Sinephro', sub: 'Ambient preview sample \u2022 Attune session', pill: '84 BPM' },
-      { src: 'audio/creek.mp3', title: 'Creek', artist: 'Hiroshi Yoshimura', sub: 'Ambient preview sample \u2022 Attune session', pill: '72 BPM' }
+      { src: 'audio/lofi-study.mp3', title: 'Lofi Study', sub: 'Local preview', pill: '' },
+      { src: 'audio/async-piano.mp3', title: 'Async (Piano Version)', sub: 'Local preview', pill: '' },
+      { src: 'audio/open-soil.mp3', title: 'Open Soil', sub: 'Local preview', pill: '' },
+      { src: 'audio/creek.mp3', title: 'Creek', sub: 'Local preview', pill: '' }
     ];
     const queueEl = document.querySelector('[data-player-queue]');
     const rows = queueEl ? Array.from(queueEl.querySelectorAll('[data-queue-track]')) : [];
@@ -2969,7 +2580,7 @@
       const sub = player.querySelector('[data-player-sub]');
       const pill = player.querySelector('[data-player-genre]');
       if (hero) hero.textContent = t.title;
-      if (artist) artist.textContent = t.artist;
+      if (artist) artist.textContent = t.title;
       if (sub) sub.innerHTML = trackSubHtml(t);
       if (pill) pill.textContent = t.pill;
     }
@@ -3220,430 +2831,35 @@
     paintProgress();
   })();
 
-  /* ---------------- Floor telemetry: live floor model + real audio measurement ---------------- */
-  (function initFloorTelemetry() {
-    const q = (s) => document.querySelector(s);
-    const el = {
-      daypart: q('[data-floor-daypart]'),
-      win: q('[data-floor-win]'),
-      seated: q('[data-floor-seated]'),
-      occupancy: q('[data-floor-occupancy]'),
-      occBar: q('[data-floor-occupancy-bar]'),
-      variance: q('[data-floor-variance]'),
-      updated: q('[data-floor-updated]'),
-      db: q('[data-floor-db]'),
-      dbDelta: q('[data-floor-db-delta]'),
-      dwell: q('[data-floor-dwell]'),
-      arrivals: q('[data-floor-arrivals]'),
-      arrivalsTrend: q('[data-floor-arrivals-trend]'),
-      chart: q('[data-floor-chart]'),
-      tStart: q('[data-floor-t-start]'),
-      tMid: q('[data-floor-t-mid]'),
-      tNow: q('[data-floor-t-now]'),
-      feed: q('[data-floor-feed]'),
-      feedNew: q('[data-floor-feed-new]'),
-      liveScreen: q('main [data-screen="live-pulse"]')
-    };
-    if (!el.seated || !el.chart) return;
-    const zoneSeated = {
-      bar: q('[data-zone-seated="bar"]'),
-      lounge: q('[data-zone-seated="lounge"]'),
-      patio: q('[data-zone-seated="patio"]')
-    };
-    const zonePill = {
-      bar: q('[data-zone-pill="bar"]'),
-      lounge: q('[data-zone-pill="lounge"]'),
-      patio: q('[data-zone-pill="patio"]')
-    };
 
-    const CAPACITY = 88;
-    const CEILING = 65;          // room dB ceiling
-    const DWELL_TARGET = 70;     // min
-    const CAPS = { bar: 28, lounge: 26, patio: 34 };
-    const ZONES = ['bar', 'lounge', 'patio'];
-    const SHARE = { bar: 0.32, lounge: 0.28, patio: 0.40 };
-    const DAYPARTS = [
-      { name: 'WIND DOWN', from: 0, to: 6, peak: 0.16, amb: 53 },
-      { name: 'MORNING CALM', from: 6, to: 11, peak: 0.3, amb: 55 },
-      { name: 'LUNCH & AFTERNOON', from: 11, to: 16, peak: 0.55, amb: 58 },
-      { name: 'GOLDEN HR', from: 16, to: 20, peak: 0.82, amb: 60 },
-      { name: 'PRIME SERVICE', from: 20, to: 24, peak: 0.9, amb: 61 }
-    ];
-    const TICK_MS = 5000;
-    const REDUCE = (function () { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
+  /* ---------------- Proximity World: MapLibre world map ---------------- */
+  (function initWorldMap() {
+    const host = document.getElementById('world-map-canvas');
+    if (!host || !window.maplibregl) return;
 
-    /* deterministic noise: stable for a given salt + 5-min bucket of the real day */
-    function rng(seed) {
-      let t = seed >>> 0;
-      return function () {
-        t += 0x6D2B79F5;
-        let r = Math.imul(t ^ (t >>> 15), 1 | t);
-        r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
-        return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
-      };
-    }
-    function noiseFor(min, salt) {
-      const day = Math.floor(Date.now() / 86400000);
-      const r = rng(day * 1440 + Math.floor(min / 5) * 97 + salt * 7919);
-      return r() * 2 - 1;
-    }
-    function pad(n) { return String(n).padStart(2, '0'); }
-    function minuteOfDay(ms) { const d = new Date(ms); return d.getHours() * 60 + d.getMinutes(); }
-    function fmtClock(ms) { const d = new Date(ms); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
-    function daypartAt(min) { return DAYPARTS.find((d) => min >= d.from * 60 && min < d.to * 60) || DAYPARTS[0]; }
-    function curveAt(min) {
-      const d = daypartAt(min);
-      const span = (d.to - d.from) * 60;
-      const p = Math.min(1, Math.max(0, (min - d.from * 60) / span));
-      const shape = Math.sin(Math.PI * p * 0.85 + 0.12);
-      return d.peak * Math.min(1, shape * 1.25);
-    }
-    function occupancyAt(min) { return Math.min(1, Math.max(0.02, curveAt(min) + noiseFor(min, 1) * 0.16)); }
-    function rateAt(min) { return Math.max(0, Math.round((0.45 + occupancyAt(min) * 0.8) * 46 + noiseFor(min, 2) * 6)); }
+    const STYLE = 'https://tiles.openfreemap.org/styles/liberty';
+    const UNIT_STORAGE_KEY = 'attune-distance-unit';
+    const COMPASS_NOTE = 'Placed by Qloo, plotted at each place\'s location';
+    let distUnit = 'm';
+    try {
+      const savedUnit = localStorage.getItem(UNIT_STORAGE_KEY);
+      if (savedUnit === 'ft' || savedUnit === 'm') distUnit = savedUnit;
+    } catch (error) { /* default to meters */ }
 
-    /* real measurement: analyser tapped onto the actual music output (post-fader) */
-    const audio = q('[data-audio-element]');
-    let actx = null, analyser = null, timeBuf = null, tapFailed = false;
-    function tapAudio() {
-      if (!audio || tapFailed || analyser) return;
-      try {
-        const Ctx = window.AudioContext || window.webkitAudioContext;
-        if (!Ctx) { tapFailed = true; return; }
-        actx = actx || new Ctx();
-        if (actx.state === 'suspended') actx.resume();
-        const src = actx.createMediaElementSource(audio);
-        analyser = actx.createAnalyser();
-        analyser.fftSize = 1024;
-        analyser.smoothingTimeConstant = 0.6;
-        src.connect(analyser);
-        analyser.connect(actx.destination); /* keep the room audible */
-        timeBuf = new Uint8Array(analyser.fftSize);
-      } catch (err) { tapFailed = true; }
-    }
-    if (audio) ['play', 'playing'].forEach((ev) => audio.addEventListener(ev, tapAudio));
-    function measuredDbfs() {
-      if (!analyser || !timeBuf) return null;
-      try { analyser.getByteTimeDomainData(timeBuf); } catch (err) { return null; }
-      let sum = 0;
-      for (let i = 0; i < timeBuf.length; i++) { const v = (timeBuf[i] - 128) / 128; sum += v * v; }
-      const rms = Math.sqrt(sum / timeBuf.length);
-      return rms > 0.0001 ? 20 * Math.log10(rms) : null;
-    }
+    let radius = 800;            // feet, the radius chips' key
+    let places = [];             // { id, label, affinity, lat, lng, rank }
+    let selected = null;
+    let venue = null;            // { name, lat, lng }
 
-    /* live state */
-    let seated = 0, dwell = DWELL_TARGET, db = null, lastTick = Date.now();
-    function step() {
-      const now = Date.now();
-      const min = minuteOfDay(now);
-      const d = daypartAt(min);
-      const wobble = rng(Math.floor(now / TICK_MS) * 131 + 17)() - 0.5; /* fresh every tick window */
-      const occ = occupancyAt(min);
-      const seatedT = Math.round(occ * CAPACITY);
-      if (seated === 0) seated = seatedT;
-      else seated = Math.max(0, seated + Math.max(-2, Math.min(2, Math.round((seatedT - seated) * 0.4))));
-      if (seated > 0) {
-        /* occasional single-guest drift so the floor breathes between buckets */
-        if (wobble > 0.22 && seated < seatedT + 2) seated += 1;
-        else if (wobble < -0.22 && seated > seatedT - 2) seated -= 1;
-      }
-      const dwellT = Math.round(58 + occ * 22 + noiseFor(min, 3) * 4);
-      dwell += Math.max(-1.2, Math.min(1.2, (dwellT - dwell) * 0.25 + wobble * 0.8));
-      dwell = Math.max(30, Math.min(110, dwell));
-      const playing = audio && !audio.paused && !audio.ended;
-      const m = playing ? measuredDbfs() : null;
-      let dbT;
-      if (m != null) dbT = d.amb + Math.max(1.5, Math.min(7.5, (m + 44) * 0.34));
-      else dbT = d.amb + noiseFor(min, 4) * 0.9 + wobble * 1.2;
-      db = db == null ? dbT : db + (dbT - db) * 0.3;
-      db = Math.max(45, Math.min(78, db));
-      lastTick = now;
-      return { d, fore: Math.max(0.02, curveAt(min)), arrivalsHr: Math.max(0, rateAt(min) + Math.round(wobble * 4)) };
-    }
-    function zoneSplit(total) {
-      const min = minuteOfDay(Date.now());
-      const raw = {};
-      let sum = 0;
-      ZONES.forEach((z, i) => {
-        raw[z] = SHARE[z] * (1 + noiseFor(min, 10 + i) * 0.18);
-        sum += raw[z];
-      });
-      let left = total;
-      const out = {};
-      ZONES.forEach((z, i) => {
-        if (i === ZONES.length - 1) { out[z] = Math.max(0, left); return; }
-        out[z] = Math.round(total * raw[z] / sum);
-        left -= out[z];
-      });
-      return out;
-    }
+    const map = new maplibregl.Map({
+      container: host,
+      style: STYLE,
+      center: [-73.9519, 40.7226],
+      zoom: 12,
+      attributionControl: { compact: true }
+    });
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
 
-    /* floor event log */
-    const feed = [];
-    const lastSeen = {};
-    let unread = 0;
-    const DOT_TONE = { error: 'bg-error', primary: 'bg-primary', tertiary: 'bg-tertiary', secondary: 'bg-secondary' };
-    function pushEvent(tone, title, body, at) {
-      const key = tone + '|' + title;
-      const t = at || Date.now();
-      if (lastSeen[key] && t - lastSeen[key] < 240000) return;
-      lastSeen[key] = t;
-      feed.unshift({ tone, title, body, t });
-      if (feed.length > 5) feed.pop();
-      unread += 1;
-      renderFeed();
-    }
-    function renderFeed() {
-      if (!el.feed) return;
-      el.feed.textContent = '';
-      feed.forEach((ev) => {
-        const row = document.createElement('div');
-        row.className = 'flex gap-2.5 items-start';
-        const dot = document.createElement('span');
-        dot.className = 'w-1.5 h-1.5 rounded-full ' + (DOT_TONE[ev.tone] || 'bg-primary') + ' mt-1.5 flex-shrink-0';
-        const wrap = document.createElement('div');
-        wrap.className = 'flex-1 min-w-0';
-        const top = document.createElement('div');
-        top.className = 'flex items-center justify-between gap-2';
-        const title = document.createElement('span');
-        title.className = 'font-body-sm text-body-sm ' + (ev.tone === 'error' ? 'text-error font-medium' : 'text-on-surface font-medium');
-        title.textContent = ev.title;
-        const time = document.createElement('span');
-        time.className = 'font-label-caps text-label-caps text-outline-variant flex-shrink-0';
-        time.textContent = fmtClock(ev.t);
-        const body = document.createElement('p');
-        body.className = 'font-body-sm text-body-sm text-on-surface-variant mt-0.5';
-        body.textContent = ev.body;
-        top.appendChild(title);
-        top.appendChild(time);
-        wrap.appendChild(top);
-        wrap.appendChild(body);
-        row.appendChild(dot);
-        row.appendChild(wrap);
-        el.feed.appendChild(row);
-      });
-      if (el.feedNew) {
-        el.feedNew.textContent = unread > 0 ? unread + ' NEW' : 'LIVE';
-        el.feedNew.className = 'font-label-caps text-label-caps px-2 py-0.5 rounded-full ' + (unread > 0 ? 'text-primary bg-primary/10' : 'text-tertiary bg-tertiary/10');
-      }
-    }
-
-    /* footfall chart: 18 real 5-min buckets ending at the actual clock */
-    const BARS = 18;
-    const bars = [];
-    for (let i = 0; i < BARS; i++) {
-      const bar = document.createElement('div');
-      bar.className = 'flex-1 rounded-t bg-surface-container-high';
-      if (!REDUCE) bar.style.transition = 'height 700ms ease';
-      bar.style.height = '12%';
-      el.chart.appendChild(bar);
-      bars.push(bar);
-    }
-    function renderChart() {
-      const now = Date.now();
-      const values = [];
-      for (let i = BARS - 1; i >= 0; i--) values.push(rateAt(minuteOfDay(now - i * 300000)));
-      const jitter = noiseFor(minuteOfDay(now), Math.floor(now / TICK_MS) + 50);
-      values[BARS - 1] = Math.max(0, values[BARS - 1] * (1 + jitter * 0.05));
-      const max = Math.max.apply(null, values) || 1;
-      values.forEach((v, i) => {
-        bars[i].style.height = (10 + Math.round(88 * v / max)) + '%';
-        bars[i].className = 'flex-1 rounded-t' + (i < 10 ? ' bg-surface-container-high' : i < 14 ? ' bg-secondary/60' : i < BARS - 1 ? ' bg-primary/80' : ' bg-primary shadow-[0_0_12px_rgba(255,182,140,0.45)]');
-      });
-      el.tStart.textContent = fmtClock(now - BARS * 300000);
-      el.tMid.textContent = fmtClock(now - (BARS / 2) * 300000);
-      el.tNow.textContent = fmtClock(now) + ' \u2022 NOW';
-      return values;
-    }
-
-    const VAR_UP = 'font-label-caps text-label-caps text-tertiary';
-    const VAR_DOWN = 'font-label-caps text-label-caps text-error';
-    const VAR_FLAT = 'font-label-caps text-label-caps text-outline-variant';
-    const PILL = {
-      busy: 'font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded-full flex-shrink-0',
-      steady: 'font-label-caps text-label-caps text-tertiary bg-tertiary/10 px-2 py-0.5 rounded-full flex-shrink-0',
-      quiet: 'font-label-caps text-label-caps text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded-full flex-shrink-0',
-      noise: 'font-label-caps text-label-caps text-secondary bg-secondary-container/40 px-2 py-0.5 rounded-full flex-shrink-0'
-    };
-    function renderHero(t) {
-      el.daypart.textContent = t.d.name;
-      el.win.textContent = pad(t.d.from) + ':00 - ' + pad(t.d.to % 24) + ':00';
-      el.seated.textContent = String(seated);
-      const occPct = Math.round(seated / CAPACITY * 100);
-      el.occupancy.textContent = occPct + '%';
-      el.occBar.style.width = occPct + '%';
-      if (!REDUCE) el.occBar.style.transition = 'width 700ms ease';
-      const v = seated - Math.round(t.fore * CAPACITY);
-      if (v > 2) {
-        el.variance.textContent = '+' + v + ' GUESTS VS FORECAST';
-        el.variance.className = VAR_UP;
-      } else if (v < -2) {
-        el.variance.textContent = '\u2212' + Math.abs(v) + ' GUESTS VS FORECAST';
-        el.variance.className = VAR_DOWN;
-      } else {
-        el.variance.textContent = 'RIGHT ON FORECAST';
-        el.variance.className = VAR_FLAT;
-      }
-      el.db.textContent = db.toFixed(1);
-      const under = CEILING - db;
-      if (under >= 0) {
-        el.dbDelta.textContent = under.toFixed(1) + ' under ceiling';
-        el.dbDelta.className = 'font-body-sm text-body-sm text-tertiary mt-0.5 truncate';
-      } else {
-        el.dbDelta.textContent = Math.abs(under).toFixed(1) + ' over ceiling';
-        el.dbDelta.className = 'font-body-sm text-body-sm text-error mt-0.5 truncate';
-      }
-      el.dwell.textContent = String(Math.round(dwell));
-      el.arrivals.textContent = String(t.arrivalsHr);
-    }
-    function renderZones() {
-      const split = zoneSplit(seated);
-      const patioDb = db + 1.4;
-      ZONES.forEach((z) => {
-        if (zoneSeated[z]) zoneSeated[z].textContent = String(split[z]);
-        const pill = zonePill[z];
-        if (!pill) return;
-        const occ = split[z] / CAPS[z];
-        if (z === 'patio' && patioDb > CEILING) {
-          pill.textContent = 'NOISE +' + Math.max(0.1, patioDb - CEILING).toFixed(1) + 'dB';
-          pill.className = PILL.noise;
-        } else if (occ >= 0.85) {
-          pill.textContent = 'BUSY';
-          pill.className = PILL.busy;
-        } else if (occ >= 0.6) {
-          pill.textContent = 'STEADY';
-          pill.className = PILL.steady;
-        } else {
-          pill.textContent = 'QUIET';
-          pill.className = PILL.quiet;
-        }
-      });
-    }
-    function renderTrend(values, t) {
-      if (!el.arrivalsTrend) return;
-      const last60 = values.slice(6);
-      const avg = last60.reduce((a, b) => a + b, 0) / (last60.length || 1);
-      const pct = avg > 0 ? Math.round((t.arrivalsHr / avg - 1) * 100) : 0;
-      if (pct >= 8) {
-        el.arrivalsTrend.textContent = '+' + pct + '% vs the last hour';
-        el.arrivalsTrend.className = 'font-body-sm text-body-sm text-tertiary mt-0.5 truncate';
-      } else if (pct <= -8) {
-        el.arrivalsTrend.textContent = '\u2212' + Math.abs(pct) + '% vs the last hour';
-        el.arrivalsTrend.className = 'font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate';
-      } else {
-        el.arrivalsTrend.textContent = 'steady vs the last hour';
-        el.arrivalsTrend.className = 'font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate';
-      }
-    }
-    let prev = { patio: null, db: null, arrivals: null, dwell: null };
-    function detectCrossings(t) {
-      const patioDb = db + 1.4;
-      if (prev.patio != null && prev.patio <= CEILING && patioDb > CEILING) {
-        pushEvent('error', 'Patio noise +' + Math.max(0.1, patioDb - CEILING).toFixed(1) + 'dB over ceiling', 'Zone C reading ' + patioDb.toFixed(1) + 'dB \u2014 suggest a 15% gain trim on the patio pair.');
-      } else if (prev.patio != null && prev.patio > CEILING && patioDb <= CEILING) {
-        pushEvent('tertiary', 'Patio back under the ceiling', 'Zone C reading ' + patioDb.toFixed(1) + 'dB \u2014 trim landed; holding steady.');
-      }
-      prev.patio = patioDb;
-      if (prev.db != null && prev.db <= CEILING && db > CEILING) {
-        pushEvent('error', 'Room hit ' + db.toFixed(1) + 'dB', 'Main floor is at the ceiling \u2014 nudge the fader down a notch on the console.');
-      }
-      prev.db = db;
-      if (prev.arrivals != null && prev.arrivals < 45 && t.arrivalsHr >= 45) {
-        const open = Math.max(0, CAPACITY - seated);
-        pushEvent('primary', 'Walk-ins running ' + t.arrivalsHr + ' an hour', 'Front door pace picked up \u2014 ' + open + ' seats still open across three zones.');
-      }
-      prev.arrivals = t.arrivalsHr;
-      if (prev.dwell != null && prev.dwell <= DWELL_TARGET && dwell > DWELL_TARGET) {
-        pushEvent('secondary', 'Average stay crossed ' + Math.round(dwell) + ' min', 'Stays are running past the ' + DWELL_TARGET + ' min target \u2014 pace the next course push accordingly.');
-      }
-      prev.dwell = dwell;
-    }
-    function paintUpdated() {
-      if (!el.updated) return;
-      const s = Math.max(0, Math.round((Date.now() - lastTick) / 1000));
-      el.updated.textContent = s < 4 ? 'UPDATED JUST NOW' : 'UPDATED ' + s + 's AGO';
-    }
-    function tick() {
-      const t = step();
-      const values = renderChart();
-      renderHero(t);
-      renderZones();
-      renderTrend(values, t);
-      detectCrossings(t);
-      if (el.liveScreen && !el.liveScreen.classList.contains('hidden') && unread > 0) {
-        unread = 0;
-        renderFeed();
-      }
-    }
-
-    /* boot: first real reading, then seed the log from that state */
-    const t0 = step();
-    const v0 = renderChart();
-    renderHero(t0);
-    renderZones();
-    renderTrend(v0, t0);
-    const boot = Date.now();
-    const patioDb0 = db + 1.4;
-    if (patioDb0 > CEILING) {
-      pushEvent('error', 'Patio noise +' + Math.max(0.1, patioDb0 - CEILING).toFixed(1) + 'dB over ceiling', 'Zone C reading ' + patioDb0.toFixed(1) + 'dB \u2014 suggest a 15% gain trim on the patio pair.', boot - 3 * 60000);
-    } else {
-      pushEvent('tertiary', 'Patio holding under the ceiling', 'Zone C reading ' + patioDb0.toFixed(1) + 'dB \u2014 no gain trim needed right now.', boot - 3 * 60000);
-    }
-    pushEvent('primary', 'Walk-ins at ' + t0.arrivalsHr + ' an hour', 'Front door pace over the last hour \u2014 ' + Math.max(0, CAPACITY - seated) + ' seats open across three zones.', boot - 11 * 60000);
-    pushEvent('secondary', 'Average stay ' + Math.round(dwell) + ' min', 'Against the ' + DWELL_TARGET + ' min target \u2014 lounge is the long-stay zone.', boot - 19 * 60000);
-    const v0pct = seated - Math.round(t0.fore * CAPACITY);
-    if (v0pct >= 0) {
-      pushEvent('primary', 'Seated ' + seated + ' / ' + CAPACITY, '+' + v0pct + ' against the forecast curve for this window.', boot - 27 * 60000);
-    } else {
-      pushEvent('secondary', 'Seated ' + seated + ' / ' + CAPACITY, Math.abs(v0pct) + ' short of the forecast curve for this window.', boot - 27 * 60000);
-    }
-    renderFeed();
-    paintUpdated();
-    setInterval(tick, TICK_MS);
-    setInterval(paintUpdated, 1000);
-  })();
-
-  /* ---------------- Proximity World: 3D holo radar (orbit / tilt / zoom) ---------------- */
-  (function initHolo() {
-    const stage = document.getElementById('holo-stage');
-    const rig = document.getElementById('holo-rig');
-    const world = document.getElementById('holo-world');
-    const blipLayer = document.getElementById('holo-blips');
-    if (!stage || !rig || !world || !blipLayer) return;
-
-    const PERIOD = 4000;                    // matches .holo-beam / .h-pillar CSS animation
-    const R800 = 140;                       // 800FT ring radius in plane px
-    const PLANE = 400;                      // world plane size
-    const COMPASS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-    const ZOOM_BY_RADIUS = { 200: 1.5, 400: 1.16, 800: 1 };
-    const REDUCE = (function () { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
-    /* local escaper — the shared esc() lives in a later <script> block and is
-       not defined yet when this IIFE renders the initial blips */
-    const escHere = (function () {
-      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
-      return function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return map[c]; }); };
-    })();
-
-    const signals = [
-      { id: 'p1',  kind: 'patron', face: 'assets/avatars/p1.jpg',  label: 'Analog Minimalist',        tribe: 'Pet-Nat Devotee',        dist: 240, bearing: 37,  affinity: 94, hot: true,  note: 'Sakamoto on repeat \u00B7 two doors down' },
-      { id: 'p2',  kind: 'patron', face: 'assets/avatars/p2.jpg',  label: 'Pet-Nat Devotee',          tribe: 'Skin-Contact Circle',    dist: 610, bearing: 118, affinity: 91, hot: true,  note: 'Crossing over from the Loft reception' },
-      { id: 'p3',  kind: 'patron', face: 'assets/avatars/p3.jpg',  label: 'K\u014Dji Kitchen Regular', tribe: 'Umami Pairings',         dist: 320, bearing: 205, affinity: 88, hot: true,  note: 'Orders the smoked-oil hi-ball 2:1' },
-      { id: 'p4',  kind: 'patron', face: 'assets/avatars/p4.jpg',  label: 'Dark-Wave Night Owl',      tribe: 'Post-Punk Set',          dist: 760, bearing: 262, affinity: 83, hot: false, note: 'After 22:00 only \u00B7 110 BPM zone' },
-      { id: 'p5',  kind: 'patron', face: 'assets/avatars/p5.jpg',  label: 'Risograph Designer',       tribe: 'Print Swap Crew',        dist: 450, bearing: 310, affinity: 86, hot: false, note: 'Sunday co-promotion organizer' },
-      { id: 'p6',  kind: 'patron', face: 'assets/avatars/p6.jpg',  label: 'Amaro Spritz Lover',       tribe: 'Digestif-First',         dist: 180, bearing: 155, affinity: 92, hot: true,  note: 'Brunch cadence \u00B7 high margin' },
-      { id: 'p7',  kind: 'patron', face: 'assets/avatars/p7.jpg',  label: 'ECM Ambient Head',         tribe: 'Vinyl-Only Listeners',   dist: 520, bearing: 72,  affinity: 89, hot: true,  note: 'Era-appropriate pressing collector' },
-      { id: 'p8',  kind: 'patron', face: 'assets/avatars/p8.jpg',  label: 'Espresso Cadence Runner',  tribe: 'Pre-Shift Regulars',     dist: 390, bearing: 233, affinity: 81, hot: false, note: '07:00\u201309:00 window \u00B7 amaro spritz' },
-      { id: 'p9',  kind: 'patron', face: 'assets/avatars/p9.jpg',  label: 'Pioneer Works Member',     tribe: 'Cultural Programming',   dist: 700, bearing: 12,  affinity: 87, hot: false, note: 'Gallery-night spillover affinity' },
-      { id: 'p10', kind: 'patron', face: 'assets/avatars/p10.jpg', label: 'Kardamom Bun Seeker',      tribe: 'Pastry-Led',             dist: 260, bearing: 300, affinity: 78, hot: false, note: 'Pairs with batch brew \u00B7 low cost' },
-      { id: 'v1',  kind: 'venue',  label: 'Greenpoint Loft',          tribe: 'Gallery \u00B7 event space',  dist: 350, bearing: 48,  affinity: 90, hot: true,  note: 'Dual openings tonight \u00B7 +85 footfall' },
-      { id: 'v2',  kind: 'venue',  label: 'Pioneer Works',            tribe: 'Culture center',         dist: 780, bearing: 15,  affinity: 85, hot: false, note: 'Programming sync \u00B7 radar edge' },
-      { id: 'v3',  kind: 'venue',  label: 'Frankly Natural Wine',     tribe: 'Retail shop',            dist: 420, bearing: 190, affinity: 82, hot: false, note: 'Pet-nat cross-sell partner' }
-    ];
-    const poolByRadius = { 200: 48, 400: 137, 800: 312 };
-    const WALK_HINT = { 200: '\u2248 1-MIN WALK', 400: '\u2248 2-MIN WALK', 800: '\u2248 3-MIN WALK' };
-
-    const sweepPill = document.getElementById('radar-sweep-age');
-    const scanPill = document.getElementById('radar-scan');
-    const poolEl = document.getElementById('radar-pool');
     const detail = document.getElementById('radar-detail');
     const detailIcon = document.getElementById('radar-detail-icon');
     const detailTitle = document.getElementById('radar-detail-title');
@@ -3651,255 +2867,193 @@
     const detailBar = document.getElementById('radar-detail-bar');
     const detailScore = document.getElementById('radar-detail-score');
     const detailNote = document.getElementById('radar-detail-note');
-    const hint = document.getElementById('holo-hint');
+    const poolEl = document.getElementById('radar-pool');
 
-    let radius = 800;
-    let selected = null;
-    let scans = 0;
-
-    /* ----- camera state ----- */
-    const cam = { orbit: -18, tilt: 58, zoom: 1, vOrbit: 0, idle: 0 };
-
-    function bearingLabel(bearing) {
-      return COMPASS[Math.round(((bearing % 360) + 360) % 360 / 45) % 8];
+    function fmtDist(ft) {
+      return distUnit === 'ft' ? ft + 'FT' : Math.round(ft * 0.3048) + 'M';
     }
 
-    function paint() {
-      rig.style.setProperty('--tilt', cam.tilt.toFixed(2) + 'deg');
-      world.style.setProperty('--orbit', cam.orbit.toFixed(2) + 'deg');
-      world.style.setProperty('--zoom', cam.zoom.toFixed(3));
-    }
-
-    /* ----- blips ----- */
-    function renderBlips() {
-      const visible = signals.filter(s => s.dist <= radius);
-      blipLayer.innerHTML = visible.map(s => {
-        const rr = (s.dist / 800) * R800;             // plane px from center
-        const a = s.bearing * Math.PI / 180;
-        const x = 50 + (rr * Math.sin(a)) / PLANE * 100;
-        const y = 50 - (rr * Math.cos(a)) / PLANE * 100;
-        const delay = (s.bearing / 360 * PERIOD / 1000).toFixed(2);
-        const tone = s.kind === 'venue' ? 'h-blip-venue' : (s.hot ? 'h-blip-patron' : 'h-blip-warm');
-        const base = '<div class="h-base" style="--d:' + delay + 's"></div>';
-        const ring = '<div class="h-ring"></div>';
-        let body;
-        if (s.face) {
-          /* patrons project as photographic holo-chips: a slim beam anchors the
-             face to the plane, the card billboards to the camera, and the shared
-             4s radar clock re-detects each face as the sweep passes its bearing */
-          const beam = '<div class="h-pillar h-blip-beam" style="--h:16px;--d:' + delay + 's"></div>' +
-                       '<div class="h-pillar p-b h-blip-beam" style="--h:16px;--d:' + delay + 's"></div>';
-          body = beam + base + ring +
-            '<div class="h-avatar" style="--d:' + delay + 's">' +
-              '<div class="h-avatar-card" style="--face:url(' + s.face + ')"></div>' +
-              '<div class="h-avatar-ping"></div>' +
-              '<div class="h-avatar-tag"><span>' + escHere(s.label) + '</span><b>' + s.affinity + '%</b></div>' +
-            '</div>';
-        } else {
-          const h = s.kind === 'venue' ? 12 : Math.round(13 + (s.affinity - 76) / 18 * 14);
-          body = '<div class="h-pillar" style="--h:' + h + 'px;--d:' + delay + 's"></div>' +
-                 '<div class="h-pillar p-b" style="--h:' + h + 'px;--d:' + delay + 's"></div>' + base + ring;
-        }
-        return '<div class="h-blip ' + tone + (s.face ? ' h-blip-face' : '') + (selected === s.id ? ' h-sel' : '') + '" data-id="' + s.id + '"' +
-          ' style="--x:' + x.toFixed(2) + '%;--y:' + y.toFixed(2) + '%" tabindex="0" role="button"' +
-          ' aria-label="' + s.label + ', ' + s.dist + ' feet ' + bearingLabel(s.bearing) + ', ' + s.affinity + ' percent match">' +
-          body + '</div>';
-      }).join('');
-    }
-
-    function paintRings() {
-      world.querySelectorAll('.holo-ring').forEach(ring => {
-        ring.classList.toggle('holo-ring-active', ring.getAttribute('data-ring') === String(radius));
+    function paintChips() {
+      document.querySelectorAll('[data-radius]').forEach(chip => {
+        chip.textContent = fmtDist(parseInt(chip.getAttribute('data-radius'), 10));
       });
-      world.querySelectorAll('.holo-ring-label').forEach(label => {
-        label.classList.toggle('holo-ring-label-active', label.getAttribute('data-ring-label') === String(radius));
+      const radiusLabelEl = document.getElementById('radar-radius-label');
+      if (radiusLabelEl) radiusLabelEl.textContent = 'WITHIN ' + fmtDist(radius);
+      document.querySelectorAll('[data-unit]').forEach(btn => {
+        const on = btn.getAttribute('data-unit') === distUnit;
+        btn.setAttribute('aria-pressed', String(on));
+        btn.classList.toggle('bg-primary', on);
+        btn.classList.toggle('text-on-primary', on);
+        btn.classList.toggle('bg-surface-container-highest', !on);
+        btn.classList.toggle('text-on-surface-variant', !on);
       });
     }
 
+    /* Radius rings as GeoJSON circles on the map */
+    function circlePolygon(lng, lat, meters, steps) {
+      const pts = [];
+      const dLat = meters / 111320;
+      const dLng = meters / (111320 * Math.cos(lat * Math.PI / 180));
+      for (let i = 0; i <= steps; i++) {
+        const t = (i / steps) * 2 * Math.PI;
+        pts.push([lng + dLng * Math.cos(t), lat + dLat * Math.sin(t)]);
+      }
+      return pts;
+    }
+
+    function ringData() {
+      const c = venue || { lng: -73.9519, lat: 40.7226 };
+      return {
+        type: 'FeatureCollection',
+        features: [200, 400, 800].map(ft => ({
+          type: 'Feature',
+          properties: { label: fmtDist(ft), active: ft === radius ? 1 : 0 },
+          geometry: { type: 'Polygon', coordinates: [circlePolygon(c.lng, c.lat, ft * 0.3048, 96)] }
+        }))
+      };
+    }
+
+    function placesData() {
+      return {
+        type: 'FeatureCollection',
+        features: places.filter(p => p.lat != null && p.lng != null).map(p => ({
+          type: 'Feature',
+          properties: { id: p.id, label: p.label, affinity: p.affinity, selected: p.id === selected ? 1 : 0 },
+          geometry: { type: 'Point', coordinates: [p.lng, p.lat] }
+        }))
+      };
+    }
+
+    function venueData() {
+      if (!venue || venue.lat == null) return { type: 'FeatureCollection', features: [] };
+      return {
+        type: 'FeatureCollection',
+        features: [{ type: 'Feature', properties: { label: venue.name }, geometry: { type: 'Point', coordinates: [venue.lng, venue.lat] } }]
+      };
+    }
+
+    function paintMap() {
+      if (!map.isStyleLoaded()) return;
+      map.getSource('rings') && map.getSource('rings').setData(ringData());
+      map.getSource('places') && map.getSource('places').setData(placesData());
+      map.getSource('venue') && map.getSource('venue').setData(venueData());
+      const mapped = places.filter(p => p.lat != null && p.lng != null).length;
+      if (poolEl) poolEl.textContent = places.length ? places.length + ' PLACES' : '\u2014';
+      const note = document.getElementById('radar-note');
+      if (note) note.textContent = places.length
+        ? (mapped + ' of ' + places.length + ' plotted by Qloo location')
+        : COMPASS_NOTE;
+    }
+
+    function fitToContent() {
+      const bounds = new maplibregl.LngLatBounds();
+      let any = false;
+      places.forEach(p => { if (p.lat != null && p.lng != null) { bounds.extend([p.lng, p.lat]); any = true; } });
+      if (venue && venue.lat != null) { bounds.extend([venue.lng, venue.lat]); any = true; }
+      if (any) map.fitBounds(bounds, { padding: 40, maxZoom: 15, duration: 600 });
+    }
+
+    function showDetail(p) {
+      if (!detail) return;
+      const icon = document.getElementById('radar-detail-icon');
+      const face = document.getElementById('radar-detail-face');
+      if (face) { face.classList.add('hidden'); face.style.backgroundImage = ''; }
+      if (icon) { icon.classList.remove('hidden'); icon.textContent = 'storefront'; }
+      detailTitle.textContent = p.label;
+      detailSub.textContent = 'Qloo place';
+      detailBar.style.width = p.affinity + '%';
+      detailScore.textContent = p.affinity + '% MATCH';
+      detailNote.textContent = 'Affinity rank ' + (p.rank + 1) + ' of ' + places.length + ' from Qloo.';
+      detail.classList.remove('hidden');
+    }
+
+    function clearDetail() {
+      selected = null;
+      if (detail) detail.classList.add('hidden');
+      paintMap();
+    }
+
+    map.on('load', () => {
+      map.addSource('rings', { type: 'geojson', data: ringData() });
+      map.addLayer({ id: 'rings-fill', type: 'fill', source: 'rings', paint: { 'fill-color': '#8B5A2B', 'fill-opacity': ['case', ['==', ['get', 'active'], 1], 0.12, 0.04] } });
+      map.addLayer({ id: 'rings-line', type: 'line', source: 'rings', paint: { 'line-color': '#8B5A2B', 'line-width': ['case', ['==', ['get', 'active'], 1], 2, 1], 'line-opacity': 0.7 } });
+
+      map.addSource('places', { type: 'geojson', data: placesData() });
+      map.addLayer({ id: 'places-dot', type: 'circle', source: 'places', paint: {
+        'circle-radius': ['case', ['==', ['get', 'selected'], 1], 9, 6],
+        'circle-color': '#8B5A2B',
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#ffffff'
+      } });
+
+      map.addSource('venue', { type: 'geojson', data: venueData() });
+      map.addLayer({ id: 'venue-dot', type: 'circle', source: 'venue', paint: {
+        'circle-radius': 7,
+        'circle-color': '#2F6B57',
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#ffffff'
+      } });
+
+      map.on('click', 'places-dot', e => {
+        const f = e.features && e.features[0];
+        if (!f) return;
+        const p = places.find(x => x.id === f.properties.id);
+        if (!p) return;
+        selected = p.id;
+        paintMap();
+        showDetail(p);
+      });
+      map.on('mouseenter', 'places-dot', () => { map.getCanvas().style.cursor = 'pointer'; });
+      map.on('mouseleave', 'places-dot', () => { map.getCanvas().style.cursor = ''; });
+
+      paintMap();
+      fitToContent();
+    });
+
+    /* Called by loadRadar with the live Qloo places (lat/lng from geocode). */
+    window.setRadarPlaces = function (list) {
+      places = (list || []).map((p, i) => ({
+        id: 'pl' + i,
+        label: p.name,
+        affinity: Math.round(p.affinity * 100),
+        lat: p.lat,
+        lng: p.lng,
+        rank: i
+      }));
+      if (selected && !places.some(p => p.id === selected)) clearDetail();
+      paintMap();
+      fitToContent();
+    };
+
+    /* Radius chips: the map shows the ring for the active radius */
     function setRadius(next) {
       radius = next;
-      if (poolEl) poolEl.textContent = poolByRadius[radius] + ' PEOPLE';
-      if (scanPill) scanPill.textContent = WALK_HINT[radius] || '';
-      stage.setAttribute('aria-label', 'Map of people and places around your door within ' + radius + ' feet. Drag to look around, pinch or scroll to zoom, tap a dot for details.');
-      cam.zoom = ZOOM_BY_RADIUS[next] || 1;
-      paint();
-      paintRings();
-      if (selected && !signals.some(s => s.id === selected && s.dist <= radius)) {
-        clearSelection();
-      } else {
-        renderBlips();
-      }
+      paintMap();
     }
-
-    function clearSelection() {
-      selected = null;
-      world.classList.remove('h-sel-mode');
-      if (detail) detail.classList.add('hidden');
-      renderBlips();
-    }
-
-    function selectSignal(id) {
-      const s = signals.find(sig => sig.id === id);
-      if (!s) return;
-      selected = id;
-      world.classList.add('h-sel-mode');
-      renderBlips();
-      if (detail) {
-        const faceEl = document.getElementById('radar-detail-face');
-        if (faceEl) {
-          if (s.face) {
-            faceEl.style.backgroundImage = 'url(' + s.face + ')';
-            faceEl.classList.remove('hidden');
-            detailIcon.classList.add('hidden');
-          } else {
-            faceEl.classList.add('hidden');
-            faceEl.style.backgroundImage = '';
-            detailIcon.classList.remove('hidden');
-          }
-        }
-        detailIcon.textContent = s.kind === 'venue' ? 'storefront' : 'person';
-        detailTitle.textContent = s.label;
-        detailSub.textContent = s.tribe + ' \u00B7 ' + s.dist + 'FT ' + bearingLabel(s.bearing);
-        detailBar.style.width = s.affinity + '%';
-        detailScore.textContent = s.affinity + '% MATCH';
-        detailNote.textContent = s.note;
-        detail.classList.remove('hidden');
-      }
-    }
-
-    blipLayer.addEventListener('click', event => {
-      const target = event.target.closest('.h-blip');
-      if (target) selectSignal(target.getAttribute('data-id'));
-    });
-    blipLayer.addEventListener('keydown', event => {
-      if (event.key !== 'Enter' && event.key !== ' ') return;
-      const target = event.target.closest('.h-blip');
-      if (target) {
-        event.preventDefault();
-        selectSignal(target.getAttribute('data-id'));
-      }
-    });
-    const closeBtn = document.getElementById('radar-detail-close');
-    if (closeBtn) closeBtn.addEventListener('click', clearSelection);
-
     document.querySelectorAll('[data-radius]').forEach(chip => {
       chip.addEventListener('click', () => setRadius(parseInt(chip.getAttribute('data-radius'), 10)));
     });
 
-    /* ----- gestures: drag = orbit + tilt, pinch/scroll = zoom ----- */
-    const pointers = new Map();
-    let pinchDist = 0;
-    let moved = 0;
-    let suppressClick = false;
-    let captured = false;
-
-    function wake() {
-      cam.idle = 0;
-      if (hint) hint.classList.add('hint-off');
-    }
-
-    function capture() {
-      if (captured) return;
-      captured = true;
-      pointers.forEach((_, id) => { if (stage.setPointerCapture) { try { stage.setPointerCapture(id); } catch (e) { /* noop */ } } });
-    }
-
-    stage.addEventListener('pointerdown', event => {
-      pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-      moved = 0;
-      cam.vOrbit = 0;
-      wake();
-      if (pointers.size === 2) {
-        capture();
-        const pts = Array.from(pointers.values());
-        pinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-      }
+    document.querySelectorAll('[data-unit]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        distUnit = btn.getAttribute('data-unit');
+        try { localStorage.setItem(UNIT_STORAGE_KEY, distUnit); } catch (error) { /* keep this session's unit */ }
+        paintChips();
+        paintMap();
+      });
     });
 
-    stage.addEventListener('pointermove', event => {
-      const prev = pointers.get(event.pointerId);
-      if (!prev) return;
-      const dx = event.clientX - prev.x;
-      const dy = event.clientY - prev.y;
-      pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-      moved += Math.abs(dx) + Math.abs(dy);
-      if (moved > 6) {
-        suppressClick = true;
-        capture();   // own the gesture only once it becomes a real drag
-      }
-      if (pointers.size === 1) {
-        cam.orbit += dx * 0.45;
-        const instV = Math.max(-3.2, Math.min(3.2, dx * 0.45));  // clamp flick energy
-        cam.vOrbit = cam.vOrbit * 0.7 + instV * 0.3;             // smooth into inertia
-        cam.tilt = Math.min(72, Math.max(38, cam.tilt - dy * 0.22));
-        paint();
-      } else if (pointers.size === 2) {
-        const pts = Array.from(pointers.values());
-        const d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-        if (pinchDist > 0) {
-          cam.zoom = Math.min(1.6, Math.max(0.75, cam.zoom * (d / pinchDist)));
-          paint();
-        }
-        pinchDist = d;
-      }
-    });
+    const closeBtn = document.getElementById('radar-detail-close');
+    if (closeBtn) closeBtn.addEventListener('click', clearDetail);
 
-    function releasePointer(event) {
-      pointers.delete(event.pointerId);
-      pinchDist = 0;
-      if (pointers.size === 0) captured = false;
-    }
-    stage.addEventListener('pointerup', releasePointer);
-    stage.addEventListener('pointercancel', releasePointer);
+    /* Venue pin: the resolved venue's coordinates, when Qloo returns them */
+    window.setWorldVenue = function (v) {
+      venue = v && v.lat != null ? v : null;
+      paintMap();
+      if (venue) map.easeTo({ center: [venue.lng, venue.lat], duration: 600 });
+    };
 
-    stage.addEventListener('wheel', event => {
-      event.preventDefault();
-      wake();
-      cam.zoom = Math.min(1.6, Math.max(0.75, cam.zoom * (event.deltaY > 0 ? 0.93 : 1.075)));
-      paint();
-    }, { passive: false });
-
-    /* a drag should never count as a tap-select */
-    stage.addEventListener('click', event => {
-      if (suppressClick) {
-        event.stopPropagation();
-        event.preventDefault();
-        suppressClick = false;
-      }
-    }, true);
-
-    /* render loop: inertia + idle drift */
-    (function loop() {
-      if (!REDUCE) {
-        if (pointers.size === 0 && Math.abs(cam.vOrbit) > 0.02) {
-          cam.orbit += cam.vOrbit;
-          cam.vOrbit *= 0.92;
-          paint();
-        }
-        cam.idle += 1;
-        if (pointers.size === 0 && cam.idle > 420 && Math.abs(cam.vOrbit) <= 0.02) {
-          cam.orbit += 0.05;    // slow ambient rotation (~0.6 rpm)
-          paint();
-        }
-      }
-      requestAnimationFrame(loop);
-    })();
-
-    if (sweepPill) {
-      let age = 0;
-      setInterval(() => {
-        age += 1;
-        if (age >= PERIOD / 1000) {
-          age = 0;
-        }
-        /* Live-feed badge owns the freshness pill once Qloo connects */
-        if (!window.__attuneLiveBadge) {
-          sweepPill.textContent = age === 0 ? 'LIVE' : 'UPDATED ' + age + 'S AGO';
-        }
-      }, 1000);
-    }
-
-    setRadius(800);
+    paintChips();
   })();
 
   /* ---------------- App drawer: appbar trigger <-> slide-out menu ---------------- */
@@ -3952,7 +3106,7 @@
       return sections.map(function (s) {
         return '<div class="space-y-2">' +
           '<h3 class="font-label-caps text-label-caps uppercase tracking-widest text-secondary-fixed">' + s.h + '</h3>' +
-          s.p.map(function (par) { return '<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">' + par + '</p>'; }).join('') +
+          (s.p || []).map(function (par) { return '<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">' + par + '</p>'; }).join('') +
           (s.list ? '<ul class="space-y-1.5 pt-1">' + s.list.map(function (li) {
             return '<li class="flex gap-2 font-body-sm text-body-sm text-on-surface-variant leading-relaxed"><span class="text-primary flex-shrink-0" aria-hidden="true">\u2022</span><span>' + li + '</span></li>';
           }).join('') + '</ul>' : '') +
@@ -4017,7 +3171,6 @@
           { h: 'Third parties we rely on', list: [
             'Firebase (Google) \u2014 account sign-in and storage of your operator profile.',
             'Qloo \u2014 cultural affinity data about places, artists, and audiences; we send venue- and neighborhood-level queries, never your patrons\u2019 personal data.',
-            'Pixabay \u2014 hosting of the preview track linked in the player.',
             'A hosted language model \u2014 drafts the playbook wording from the taste data Attune gathers.'
           ], p: [
             'Each processor handles data under its own privacy terms. None of them receive your patrons\u2019 personal information from us, because we never collect it.'
@@ -4042,9 +3195,7 @@
           ] },
           { h: 'Preview audio', list: [
             '\u201CLofi Study\u201D \u2014 FASSounds, via <a class="' + LINK_CLS + '" href="https://pixabay.com/music/beats-lofi-study-calm-peaceful-chill-hop-112191/" target="_blank" rel="noopener noreferrer">Pixabay Music</a>.',
-            '\u201CAsync (Piano Version)\u201D, \u201COpen Soil\u201D and \u201CCreek\u201D name the editorial daypart program; the audio previews playing for those rows are original ambient sessions generated for Attune and labeled \u201CAmbient preview sample\u201D on the player.'
-          ], p: [
-            'Queue rows describe the programming Attune would license for the daypart; the player auditions short preview material so you can hear the intended energy without any licensing in place.'
+            'The other three preview tracks are local audio files bundled with Attune. Their artist and tempo details are not shown because they are not sourced from Qloo.'
           ] },
           { h: 'Type and icons', p: [
             'Set in <a class="' + LINK_CLS + '" href="https://www.fontshare.com/fonts/satoshi" target="_blank" rel="noopener noreferrer">Satoshi</a> (Indian Type Foundry, via Fontshare) with <a class="' + LINK_CLS + '" href="https://fonts.google.com/icons" target="_blank" rel="noopener noreferrer">Material Symbols</a> by Google.'
@@ -4699,21 +3850,6 @@
     setMode('signin');
   })();
 
-  /* Live telemetry: the latency readout breathes like a real connection. */
-  (function initLatency() {
-    const el = document.getElementById('latency-ms');
-    if (!el) return;
-    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const tel = document.getElementById('telemetry-ms');
-    setInterval(() => {
-      const next = String(11 + Math.floor(Math.random() * 9));
-      if (tel) tel.textContent = next;
-      if (reduce) { el.textContent = next; return; }
-      el.style.opacity = '0.25';
-      setTimeout(() => { el.textContent = next; el.style.opacity = '1'; }, 180);
-    }, 2600);
-  })();
-
   /* Appbar date — the playbook is a daily briefing; date it like one. */
   (function initAppbarDate() {
     var el = document.getElementById('appbar-date');
@@ -4743,15 +3879,23 @@
        badged. The app never dead-ends.
    ================================================================ */
 (function initLiveFeed() {
-  var API_BASE = '/api';
+  var API_BASE = 'https://attune-api.chungu424.workers.dev/api';
   try {
     var override = (localStorage.getItem('roomtone.apiBase') || '').trim().replace(/\/+$/, '');
+    /* The old Firebase host is retired (404 on every Qloo path). Drop a stale override so it can't break the feed. */
+    if (/cloudfunctions\.net/.test(override)) { localStorage.removeItem('roomtone.apiBase'); override = ''; }
     if (override) API_BASE = override;
   } catch (e) { /* storage blocked */ }
 
   var DEFAULT_VENUE = { name: 'The Amber Room', address: '142 Franklin St, Greenpoint', lat: 40.7226, lng: -73.9519, locality: null };
   var VENUE = DEFAULT_VENUE;   /* replaced by the operator's real venue once resolved */
   var RADIUS_FT = 800, FT_TO_M = 0.3048, CACHE_TTL = 15 * 60 * 1000;
+  /* Follows the Meters/Feet setting saved by the distance-units control. */
+  function radiusLabel() {
+    var unit = 'm';
+    try { if (localStorage.getItem('attune-distance-unit') === 'ft') unit = 'ft'; } catch (e) { /* storage blocked */ }
+    return unit === 'ft' ? RADIUS_FT + ' ft' : Math.round(RADIUS_FT * FT_TO_M) + ' m';
+  }
   /* Qloo geo filters speak WKT: POINT(lng lat) */
   function wkt() { return 'POINT(' + VENUE.lng + ' ' + VENUE.lat + ')'; }
   /* Two location dialects: a venue pin (WKT POINT + radius) or a locality name
@@ -4782,7 +3926,7 @@
         VENUE = {
           name: hit.name || p.venue,
           address: hit.properties.address || hit.disambiguation || p.area || '',
-          lat: null, lng: null,
+          lat: Number(g.lat) || null, lng: Number(g.lon) || null,
           locality: p.area || g.name || null
         };
       } else if (p.area) {
@@ -4904,7 +4048,7 @@
     }
     var pill = document.getElementById('playbook-feed-pill');
     if (pill) {
-      pill.textContent = feedLive ? 'LIVE · POWERED BY QLOO' : 'DEMO DATA · 800FT AROUND YOU';
+      pill.textContent = feedLive ? 'LIVE · POWERED BY QLOO' : 'DEMO DATA · ' + radiusLabel().toUpperCase() + ' AROUND YOU';
       pill.classList.toggle('text-tertiary', !!feedLive);
       pill.classList.toggle('text-on-surface-variant', !feedLive);
     }
@@ -5009,11 +4153,47 @@
       setMetric('hot-spots', String(hot));
       setText('radar-pool', ents.length + ' PLACES');
       state.places = ents.map(function (e) {
-        return { name: nameOf(e), affinity: affinityOf(e), tags: e.tags || [] };
+        var geo = (e.properties && e.properties.geocode) || {};
+        return { name: nameOf(e), affinity: affinityOf(e), tags: e.tags || [], lat: Number(geo.lat) || null, lng: Number(geo.lon) || null };
       });
       renderEngine();
+      renderBlockFeed(state.places, state.anchor && state.anchor.name, Date.now());
+      if (window.setRadarPlaces) window.setRadarPlaces(state.places);
+      if (window.setWorldVenue) window.setWorldVenue(VENUE);
       return ents;
     });
+  }
+
+  /* Around the Block — built only from the live Qloo place results. */
+  function blockClock(ms) {
+    var d = new Date(ms);
+    return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+  }
+  function renderBlockFeed(places, anchorName, at) {
+    var host = document.getElementById('blockFeed');
+    if (!host) return;
+    if (!places || !places.length) {
+      host.innerHTML = '<p class="font-body-sm text-body-sm text-on-surface-variant">No live block signals right now.</p>';
+      return;
+    }
+    var top = places.slice(0, 3);
+    var hot = places.filter(function (p) { return p.affinity >= 0.8; }).length;
+    var rows = [
+      { tone: 'bg-tertiary', title: hot + ' places scored 0.8+ on the block', body: 'Strongest match: ' + esc(top[0].name) + (anchorName ? ' \u2014 ranked against ' + esc(anchorName) + '.' : '.') },
+      { tone: 'bg-secondary', title: esc(top[0].name) + ' leads the block', body: 'Affinity ' + Math.round(top[0].affinity * 100) + '% from Qloo.' },
+      { tone: 'bg-primary', title: places.length + ' places in the radius', body: 'Qloo returned ' + places.length + ' scored places within ' + radiusLabel() + ' of the venue.' }
+    ];
+    host.innerHTML = rows.map(function (r) {
+      return '<div class="flex gap-2.5 items-start">' +
+        '<span class="w-1.5 h-1.5 rounded-full ' + r.tone + ' mt-1.5 flex-shrink-0"></span>' +
+        '<div class="flex-1 min-w-0">' +
+          '<div class="flex items-center justify-between gap-2">' +
+            '<span class="font-body-sm text-body-sm text-on-surface font-medium">' + r.title + '</span>' +
+            '<span class="font-label-caps text-label-caps text-outline-variant flex-shrink-0">' + blockClock(at) + '</span>' +
+          '</div>' +
+          '<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">' + r.body + '</p>' +
+        '</div></div>';
+    }).join('');
   }
 
   function renderTribes(rows) {
@@ -5192,7 +4372,7 @@
     var topArtist = stream[0] ? stream[0].name : null;
     var topPlace = (state.places && state.places[0]) ? state.places[0].name : null;
     if (topArtist || topPlace) {
-      var htmlDriver = 'People within ' + RADIUS_FT + 'ft have ' +
+      var htmlDriver = 'People within ' + radiusLabel() + ' have ' +
         '<span class="text-secondary font-medium">' + esc(topArtist || 'the block&#8217;s favorites') + '</span> on repeat' +
         (topPlace ? ' and keep showing up at <span class="text-secondary font-medium">' + esc(topPlace) + '</span>.' : '.');
       setHtml('daypart-driver', htmlDriver);
@@ -5356,7 +4536,7 @@
       /* Operators never see stack traces — keep the quote pristine,
          log the code for the console instead. */
       console.warn('[attune llm]', err && err.message || err);
-      if (persona) persona.textContent = '\u201CAnalog-leaning night owls who treat listening as the main event.\u201D';
+      if (persona) persona.textContent = '\u2014';
       setLlmMode('CURATED');
       renderEngine();
     });
@@ -5384,14 +4564,10 @@
 
   /* ----------------------- daypart switching ----------------------- */
   var DP_DEMO = {
-    morning: { title: 'Roasters Shift', window: 'NOW TUNED \u2022 07:00 - 11:00',
-      action: 'Crack windows at 07:30; slow-filter rotation on bar; pastry case warm-out at 07:45.' },
-    daylight: { title: 'Midday Linger', window: 'NOW TUNED \u2022 11:00 - 16:00',
-      action: 'Hold 3000K task light; espresso flight feature; keep vinyl jazz under 68dB.' },
-    golden: { title: 'Golden Hour Shift', window: 'NOW TUNED \u2022 16:00 - 20:00',
-      action: 'Queue side-B kanky\u014D ongaku for the 16-20 swell; run the hi-ball feature tray to garden tables from 17:30.' },
-    night: { title: 'Late-Night Shift', window: 'NOW TUNED \u2022 20:00 - 02:00',
-      action: 'Drop to candlelight 2200K; natural-wine feature by the glass; wind-down mix after 11 pm.' }
+    morning: { title: 'Roasters Shift', window: 'NOW TUNED \u2022 07:00 - 11:00', action: 'Waiting for live Qloo data to build the playbook.' },
+    daylight: { title: 'Midday Linger', window: 'NOW TUNED \u2022 11:00 - 16:00', action: 'Waiting for live Qloo data to build the playbook.' },
+    golden: { title: 'Golden Hour Shift', window: 'NOW TUNED \u2022 16:00 - 20:00', action: 'Waiting for live Qloo data to build the playbook.' },
+    night: { title: 'Late-Night Shift', window: 'NOW TUNED \u2022 20:00 - 02:00', action: 'Waiting for live Qloo data to build the playbook.' }
   };
   var currentDaypart = 'golden';
 
@@ -5468,10 +4644,17 @@
         state.live = false;
         setBadges(false);
         renderEngine();
+        /* Say so on screen: Qloo did not return data for this block. */
+        ['qlooSignalList', 'qlooTribeList'].forEach(function (id) {
+          var box = document.getElementById(id);
+          if (!box || state.live) return;
+          box.textContent = 'Qloo did not return data for this block. Check the connection, then reload.';
+        });
         var persona = document.getElementById('llm-persona');
         if (persona && !state.llmLive) {
           persona.textContent = '\u201CAnalog-leaning night owls who treat listening as the main event.\u201D';
         }
+        if (!state.places || !state.places.length) renderBlockFeed(null);
         console.warn('[attune feed]', err);
       })
       .finally(function () { busy = false; });

@@ -1,0 +1,10 @@
+name = "attune-api"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+LLM_PROVIDER = "openai"
+# LLM_MODEL = "gpt-4o-mini"
+
+# Secrets are set with `wrangler secret put`, never committed:
+#   QLOO_API_KEY, LLM_API_KEY
