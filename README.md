@@ -44,7 +44,7 @@ The entire pipeline is **retrieval-augmented with Qloo as the retriever**:
 ┌────────────────────────────────────────────────▼──────────────────────────────┐
 │  UI RENDER — every LLM line lands where the operator acts:                    │
 │  • persona            → "Grounded by Qloo" strip (with source-entity chips)   │
-│  • daypart actions    → Daypart Play card, swapped per daypart button         │
+│  • daypart actions    → Daypart Play card (Golden Hour deep-dive)             │
 │  • playlist anchor    → Acoustic Architecture (artist + BPM zone)             │
 │  • menu callout       → Recommended Pairing card                              │
 │  Traceability: the driver sentence and chips name the REAL entities          │
@@ -67,17 +67,25 @@ Responses are cached client-side for 15 minutes (sessionStorage) to stay gentle 
 ## Run it
 
 ```bash
-# frontend only (demo feed)
+# option A — quickest: static demo feed
 npm run dev          # serves on http://localhost:3000
+
+# option B — production-shaped local stack (recommended)
+#   single-origin Caddy: static files + key-injecting Qloo proxy + LLM stub
+echo 'QLOO_API_KEY=your_key' > .env.local   # gitignored
+./scripts/serve.sh   # → http://localhost:3000  (LIVE badge)
 
 # sign in: tap "EXPLORE THE DEMO ROOM • NO ACCOUNT" (one-tap demo login)
 ```
 
 ### Full stack (live Qloo + LLM)
 
+The repo is deploy-ready: `firebase.json` rewrites `/api/**` to the `api`
+function, and `functions/` ships with `node_modules` installed.
+
 ```bash
-npm i -g firebase-tools
-firebase login
+npm i -g firebase-tools      # v15 tested
+firebase login               # interactive Google OAuth (deployer only)
 firebase use qloo-api-1
 
 # secrets never touch the repo or the browser
@@ -90,6 +98,10 @@ firebase functions:secrets:set LLM_API_KEY    # OpenAI / Gemini / Anthropic key
 firebase deploy --only functions,hosting
 # → https://qloo-api-1.web.app  (same-origin /api/** rewrite keeps keys server-side)
 ```
+
+CI-style deploy from a headless box: run `firebase login:ci` where you have a
+browser, then export the printed token as `FIREBASE_TOKEN` in the deploy
+environment — `firebase deploy` picks it up automatically.
 
 ### Local development against the live backend
 
@@ -105,6 +117,9 @@ index.html          single-file app (UI + Tailwind CDN + live-feed integration)
 auth.html           hash-routed auth (sign in / create / reset) + one-tap demo login
 functions/index.js  Firebase fn: Qloo proxy + /api/llm/playbook (3 providers)
 firebase.json       Hosting rewrites /api/** → api function; cache headers
+Caddyfile           single-origin local stack: file_server + Qloo proxy + LLM stub
+scripts/serve.sh    Caddy launcher (loads .env.local, injects X-Api-Key server-side)
+scripts/local-api.js  zero-dependency Node fallback server (static + proxy + LLM)
 logo/               Attune mark + lockups (SVG)
 audio/              venue soundtrack asset (Pixabay, credited in-app)
 .verify/            dev verification scripts (not part of the app)

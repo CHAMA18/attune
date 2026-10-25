@@ -67,9 +67,40 @@
   }
   .auth-screen.rise { animation: rise-in 0.35s cubic-bezier(0.2, 0, 0, 1); }
 
+  /* Attune lockup — the struck fork. On page load the mark vibrates like a freshly
+     struck tuning fork, emits two sound rings, then the halo settles into a slow breathe. */
+  .logo-dot { fill: #d97736; transform-box: fill-box; transform-origin: center; }
+  .lockup-rise { animation: lockup-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  @keyframes lockup-rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fork-strike { transform-box: view-box; transform-origin: 50% 74%; animation: fork-strike 1.7s cubic-bezier(0.36, 0.07, 0.19, 0.97) 0.3s both; }
+  @keyframes fork-strike {
+    0% { transform: rotate(0deg); }
+    8% { transform: rotate(2.1deg); }
+    17% { transform: rotate(-1.7deg); }
+    27% { transform: rotate(1.15deg); }
+    39% { transform: rotate(-0.65deg); }
+    53% { transform: rotate(0.3deg); }
+    72%, 100% { transform: rotate(0deg); }
+  }
+  .strike-ring { animation: ring-strike 1.15s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both; }
+  .strike-ring.sr2 { animation-delay: 0.55s; }
+  @keyframes ring-strike {
+    0% { opacity: 0.65; transform: scale(0.62); }
+    100% { opacity: 0; transform: scale(1.65); }
+  }
+  .lockup-halo { animation: halo-breathe 3.6s ease-in-out 1.8s infinite; }
+  @keyframes halo-breathe {
+    0%, 100% { opacity: 0.45; transform: scale(0.97); }
+    50% { opacity: 0.85; transform: scale(1.05); }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .eq-bar, .animate-radar-dot, .animate-pulse, .animate-ping { animation: none !important; }
     .auth-screen.rise, .shake { animation: none !important; }
+    .lockup-rise, .fork-strike, .strike-ring, .lockup-halo { animation: none !important; }
   }
 
   /* Mobile view enforcement: on screens wider than a phone, present the app
@@ -164,18 +195,33 @@
 <!-- ==================== AUTH SHELL ==================== -->
 <main class="flex-1 flex flex-col relative z-10 w-full px-margin pt-14 pb-10 bg-transparent">
 
-  <!-- Brand Lockup -->
-  <header class="flex flex-col items-center text-center">
-    <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-[0.28em] flex items-center gap-1.5">
-      <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-radar-dot"></span>
-      AMBIENT INTELLIGENCE
-    </span>
-    <div class="mt-4 w-14 h-14 flex items-center justify-center rounded-xl bg-surface-container-high/60 shadow-[0_0_24px_rgba(217,119,54,0.18)]">
-      <span class="material-symbols-outlined text-primary text-3xl">graphic_eq</span>
+  <!-- Brand Lockup — the struck fork -->
+  <header class="lockup-rise flex flex-col items-center text-center" role="img" aria-label="Attune &#8212; Ambience Intelligence">
+    <div class="relative w-16 h-16" aria-hidden="true">
+      <span class="lockup-halo absolute -inset-2.5 rounded-[20px] bg-primary/20 blur-xl pointer-events-none"></span>
+      <span class="strike-ring absolute inset-0 rounded-2xl border border-primary/50 pointer-events-none"></span>
+      <span class="strike-ring sr2 absolute inset-0 rounded-2xl border border-primary/30 pointer-events-none"></span>
+      <div class="relative w-16 h-16 flex items-center justify-center rounded-2xl bg-surface-container-high/70 backdrop-blur-sm border border-outline-variant/40 ring-1 ring-primary/15 shadow-[0_0_32px_rgba(217,119,54,0.16),inset_0_1px_0_rgba(255,201,163,0.10)]">
+        <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none">
+          <defs>
+            <linearGradient id="attune-g" x1="6" y1="3" x2="18" y2="20" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#ffc9a3"/>
+              <stop offset="1" stop-color="#d97736"/>
+            </linearGradient>
+          </defs>
+          <g class="fork-strike">
+            <path d="M9 3.5 V10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+            <path d="M15 3.5 V10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+            <path d="M9 10 C9 13.4 15 13.4 15 10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+            <path d="M12 12.4 V16.9" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+            <circle cx="12" cy="6.6" r="1.2" class="logo-dot animate-radar-dot"/>
+          </g>
+        </svg>
+      </div>
     </div>
-    <div class="mt-3 flex flex-col items-center">
-      <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-[0.3em]">ATTUNE</span>
-    </div>
+    <span class="pt-space-sm font-label-caps text-[15px] font-bold leading-none text-secondary-fixed uppercase tracking-[0.42em] pl-[0.42em]">ATTUNE</span>
+    <span class="pt-1.5 font-label-caps text-label-caps text-outline uppercase tracking-[0.34em] pl-[0.34em]">AMBIENCE INTELLIGENCE</span>
+    <span class="mt-3 h-px w-10 bg-gradient-to-r from-transparent via-primary/60 to-transparent" aria-hidden="true"></span>
     <!-- Room tone equalizer -->
     <div class="mt-5 flex items-end justify-center gap-[3px] h-9 w-56 opacity-80" aria-hidden="true" id="eqStrip"></div>
   </header>
