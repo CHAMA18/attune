@@ -2686,12 +2686,15 @@
 
   var VENUE = { name: 'The Amber Room', address: '142 Franklin St, Greenpoint', lat: 40.7226, lng: -73.9519 };
   var RADIUS_FT = 800, FT_TO_M = 0.3048, CACHE_TTL = 15 * 60 * 1000;
+  /* Qloo geo filters speak WKT: POINT(lng lat) */
+  function wkt() { return 'POINT(' + VENUE.lng + ' ' + VENUE.lat + ')'; }
 
   var state = {
     live: false,       /* Qloo feed reached */
     llmLive: false,    /* LLM playbook rendered */
     provider: null, model: null,
     places: [], artists: [], palate: [], tribes: [],
+    anchor: null,      /* block taste anchor { id, name } — seeds affinity queries */
     llm: null          /* parsed playbook */
   };
 
@@ -2703,7 +2706,9 @@
   }
   function pct(aff) { return Math.round(Math.min(1, Math.max(0, Number(aff) || 0)) * 100); }
   function affinityOf(e) {
-    var a = e.affinity !== undefined ? e.affinity : (e.score !== undefined ? e.score : 0);
+    var a = (e.query && e.query.affinity !== undefined) ? e.query.affinity
+          : e.affinity !== undefined ? e.affinity
+          : (e.score !== undefined ? e.score : 0);
     return typeof a === 'number' ? a : parseFloat(a) || 0;
   }
   function nameOf(e) { return e.name || (e.attributes && e.attributes.name) || e.title || 'Unknown'; }
@@ -2780,11 +2785,27 @@
   /* ----------------------- loaders ----------------------- */
   function loadRadar() {
     var radiusM = Math.max(60, Math.round(RADIUS_FT * FT_TO_M));
+    /* Hop 1 — block anchor: the most popular venue inside the radius (Qloo popularity) */
     return qlooFetch('/v2/insights', {
       'filter.type': 'urn:entity:place',
-      'filter.location': VENUE.lat + ',' + VENUE.lng,
+      'filter.location': wkt(),
       'filter.location.radius': String(radiusM),
-      'take': '30'
+      'take': '10'
+    }).then(function (res) {
+      var pool = entitiesOf(res);
+      if (!pool.length) throw new Error('EMPTY');
+      var anchor = pool.slice().sort(function (a, b) {
+        return (Number(b.popularity) || 0) - (Number(a.popularity) || 0);
+      })[0];
+      state.anchor = { id: anchor.entity_id || anchor.id, name: nameOf(anchor) };
+      /* Hop 2 — Qloo affinity-ranks the whole block against its own anchor */
+      return qlooFetch('/v2/insights', {
+        'signal.interests.entities': state.anchor.id,
+        'filter.type': 'urn:entity:place',
+        'filter.location': wkt(),
+        'filter.location.radius': String(radiusM),
+        'take': '30'
+      });
     }).then(function (res) {
       var ents = entitiesOf(res).filter(function (e) { return affinityOf(e) > 0; });
       if (!ents.length) throw new Error('EMPTY');
@@ -2832,7 +2853,12 @@
   }
 
   function loadTribes(placeEntities) {
-    return qlooFetch('/v2/audiences', { 'take': '10' }).then(function (res) {
+    /* Leisure segments are the venue-relevant slice of Qloo's audience taxonomy
+       (food, arts, going out). Segment order is Qloo's own. */
+    return qlooFetch('/v2/audiences', {
+      'filter.audience.types': 'urn:audience:leisure',
+      'take': '10'
+    }).then(function (res) {
       var ents = entitiesOf(res);
       if (!ents.length) throw new Error('EMPTY');
       renderTribes(ents.map(function (e, i) {
@@ -2898,13 +2924,15 @@
   }
 
   function loadSignals(placeEntities) {
-    var radiusM = Math.max(60, Math.round(RADIUS_FT * FT_TO_M));
-    return qlooFetch('/v2/insights', {
-      'filter.type': 'urn:entity:artist',
-      'filter.location': VENUE.lat + ',' + VENUE.lng,
-      'filter.location.radius': String(radiusM),
-      'take': '10'
-    }).then(function (res) {
+    /* Artists have no geography — rank them by affinity to the block's anchor venue */
+    var params = { 'filter.type': 'urn:entity:artist', 'take': '10' };
+    if (state.anchor && state.anchor.id) {
+      params['signal.interests.entities'] = state.anchor.id;
+    } else {
+      params['filter.location'] = wkt();
+      params['filter.location.radius'] = String(Math.max(60, Math.round(RADIUS_FT * FT_TO_M)));
+    }
+    return qlooFetch('/v2/insights', params).then(function (res) {
       var stream = entitiesOf(res).filter(function (e) { return affinityOf(e) > 0; }).slice(0, 3);
       var palateTags = {};
       (placeEntities || []).forEach(function (e) {

@@ -6,3 +6,4 @@ functions/.env
 .runtimeconfig.json
 firebase-debug.log
 ui-debug.log
+.env.local
