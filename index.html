@@ -763,42 +763,6 @@
       </div>
     </section>
 
-    <!-- Daypart Timeline Navigator -->
-    <section class="flex flex-col space-y-space-xs">
-      <div class="flex items-center justify-between px-1">
-        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">FRIDAY OCT 25 CADENCE</span>
-        <span class="font-label-caps text-label-caps text-primary flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span> LIVE SYNC
-        </span>
-      </div>
-      <div class="grid grid-cols-4 gap-1.5 pt-1" id="daypart-selector">
-        <!-- 1: Morning -->
-        <button class="daypart-btn bg-surface-container rounded-lg p-2 text-left transition-all hover:bg-surface-container-high opacity-70" data-daypart="morning">
-          <span class="font-label-caps text-label-caps text-on-surface-variant block">07-11</span>
-          <span class="font-body-sm text-body-sm text-on-surface font-medium truncate block mt-0.5">Roasters</span>
-        </button>
-        <!-- 2: Daylight -->
-        <button class="daypart-btn bg-surface-container rounded-lg p-2 text-left transition-all hover:bg-surface-container-high opacity-70" data-daypart="daylight">
-          <span class="font-label-caps text-label-caps text-on-surface-variant block">11-16</span>
-          <span class="font-body-sm text-body-sm text-on-surface font-medium truncate block mt-0.5">Linger</span>
-        </button>
-        <!-- 3: Golden Hour (Active) -->
-        <button class="daypart-btn bg-surface-container-highest text-on-surface rounded-lg p-2 text-left relative overflow-hidden shadow-[0_0_16px_rgba(217,119,54,0.25)] ring-0" data-daypart="golden">
-          <div class="absolute inset-x-0 top-0 h-0.5 bg-primary"></div>
-          <span class="font-label-caps text-label-caps text-primary block flex items-center gap-1 font-semibold">
-            16-20
-            <span class="w-1 h-1 rounded-full bg-primary animate-pulse"></span>
-          </span>
-          <span class="font-body-sm text-body-sm text-secondary-fixed font-semibold truncate block mt-0.5">Golden Hr</span>
-        </button>
-        <!-- 4: Night Descent -->
-        <button class="daypart-btn bg-surface-container rounded-lg p-2 text-left transition-all hover:bg-surface-container-high opacity-70" data-daypart="night">
-          <span class="font-label-caps text-label-caps text-on-surface-variant block">20-02</span>
-          <span class="font-body-sm text-body-sm text-on-surface font-medium truncate block mt-0.5">Descent</span>
-        </button>
-      </div>
-    </section>
-
     <!-- Deep Dive Golden Hour Card -->
     <section class="w-full bg-surface-container rounded-xl shadow-xl overflow-hidden relative">
       <!-- Atmospheric Header Glow -->
@@ -1823,22 +1787,6 @@
     </a>
   </div>
 </nav>
-
-<script>
-  (function initPlaybook() {
-    const buttons = document.querySelectorAll('.daypart-btn');
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        buttons.forEach(b => {
-          b.classList.remove('bg-surface-container-highest', 'shadow-[0_0_16px_rgba(217,119,54,0.25)]', 'opacity-100');
-          b.classList.add('bg-surface-container', 'opacity-70');
-        });
-        btn.classList.remove('opacity-70', 'bg-surface-container');
-        btn.classList.add('bg-surface-container-highest', 'opacity-100', 'shadow-[0_0_16px_rgba(217,119,54,0.25)]');
-      });
-    });
-  })();
-</script>
 
 <script>
   /* ---------------- Tab router: bottom navbar <-> screens ---------------- */
@@ -3022,10 +2970,6 @@
       setText('daypart-menu-sub', 'LLM pairing \u00B7 palate: ' + (state.palate[0] || 'block signals'));
     }
   }
-
-  document.querySelectorAll('.daypart-btn').forEach(function (btn) {
-    btn.addEventListener('click', function () { applyDaypart(btn.getAttribute('data-daypart')); });
-  });
 
   /* ----------------------- grounding export ----------------------- */
   var exportBtn = document.getElementById('grounding-export');
