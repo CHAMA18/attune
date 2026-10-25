@@ -882,9 +882,9 @@
     animation: attune-eq 1.05s ease-in-out infinite;
   }
 
-  /* Pilot ring gauge draw-in */
-  @keyframes ring-draw { from { stroke-dashoffset: 125.66; } }
-  .ring-draw { animation: ring-draw 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both; }
+  /* Engine ring + pipeline rail — fill to live values, drawn on data arrival */
+  .engine-ring { transition: stroke-dashoffset 1.1s cubic-bezier(0.22, 1, 0.36, 1); }
+  .engine-rail > i { transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1); }
 
   /* Progress bar grow-in */
   @keyframes bar-grow { from { width: 0; } }
@@ -943,8 +943,9 @@
     .aurora, .a-sheen, .field-enter, .a-tls-lock { animation: none !important; }
     #auth-thumb { transition: none !important; }
     #latency-ms { transition: none !important; }
-    .reveal, .breathe, .breathe-slow, .ring-draw, .bar-grow { animation: none !important; opacity: 1 !important; }
+    .reveal, .breathe, .breathe-slow, .bar-grow { animation: none !important; opacity: 1 !important; }
     .halo::after, .shimmer::after, .eq > span { animation: none !important; }
+    .engine-ring, .engine-rail > i { transition: none !important; }
     .press:active { transform: none; }
   }
 </style>
@@ -1687,7 +1688,7 @@
   <!-- ==================== SCREEN 1 · PLAYBOOK ==================== -->
   <section class="screen w-full px-margin pb-12 space-y-5" data-screen="playbook" aria-label="Week Playbook">
 
-    <!-- ── The Engine · 30-day pilot ── -->
+    <!-- ── The Engine · live agent run (every value computed from this session's Qloo data) ── -->
     <section class="reveal relative overflow-hidden rounded-2xl p-5 shadow-[0_28px_56px_-26px_rgba(0,0,0,0.75)]" style="--d:.05s; background: linear-gradient(150deg, #2e1c07 0%, #402608 46%, #1d1104 100%);">
       <div class="pointer-events-none absolute top-0 left-8 right-8 h-px" style="background:linear-gradient(90deg,transparent,rgba(255,201,163,0.5),transparent)" aria-hidden="true"></div>
       <div class="pointer-events-none absolute inset-0 rounded-2xl hairline-strong" aria-hidden="true"></div>
@@ -1695,53 +1696,52 @@
       <div class="grain absolute inset-0" aria-hidden="true"></div>
 
       <div class="relative flex items-center gap-4">
-        <!-- ring gauge · day 12 of 30 -->
-        <div class="relative w-[52px] h-[52px] flex-shrink-0" role="img" aria-label="Day 12 of your first 30 days">
+        <!-- ring gauge · anchor pull from Qloo explainability (live) -->
+        <div id="engine-ring-wrap" class="relative w-[52px] h-[52px] flex-shrink-0" role="img" aria-label="Anchor pull pending">
           <svg viewBox="0 0 48 48" class="w-[52px] h-[52px] -rotate-90">
             <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3"/>
-            <circle cx="24" cy="24" r="20" fill="none" stroke="url(#attune-g)" stroke-width="3" stroke-linecap="round"
-                    stroke-dasharray="125.66" stroke-dashoffset="75.4" class="ring-draw"/>
+            <circle id="engine-ring" class="engine-ring" cx="24" cy="24" r="20" fill="none" stroke="url(#attune-g)" stroke-width="3" stroke-linecap="round"
+                    stroke-dasharray="125.66" stroke-dashoffset="125.66"/>
           </svg>
           <div class="absolute inset-0 flex flex-col items-center justify-center">
-            <span class="tnum text-[15px] leading-none font-bold text-[#ffd9ae]">12</span>
-            <span class="micro-caps text-[#cdbba2] mt-0.5" style="letter-spacing:.08em">OF 30</span>
+            <span id="engine-pull" class="tnum text-[15px] leading-none font-bold text-[#ffd9ae]">&#8212;</span>
+            <span class="micro-caps text-[#cdbba2] mt-0.5" style="letter-spacing:.08em">PULL</span>
           </div>
         </div>
 
-        <div class="min-w-0 flex-1">
-          <span class="font-label-caps text-label-caps uppercase text-[#cdbba2] tracking-[0.14em] block truncate">Your First 30 Days</span>
-          <div class="mt-1 flex items-baseline gap-2 whitespace-nowrap">
-            <span class="tnum text-[22px] leading-7 font-bold text-[#f7ecdc] tracking-[-0.01em]">Day 12</span>
-            <span class="font-body-sm text-body-sm text-[#cdbba2] italic">in motion</span>
+        <div class="min-w-0 flex-1 overflow-hidden">
+          <span class="font-label-caps text-label-caps uppercase text-[#cdbba2] tracking-[0.14em] block truncate">The Engine &#183; Qloo Run</span>
+          <div class="mt-1 flex items-baseline gap-2 whitespace-nowrap overflow-hidden">
+            <span id="engine-chain" class="truncate text-[22px] leading-7 font-bold text-[#f7ecdc] tracking-[-0.01em]">Waiting for Qloo</span>
           </div>
         </div>
 
         <div class="flex flex-col items-end flex-shrink-0">
           <span class="tnum inline-flex items-baseline rounded-full px-3 py-1 text-[15px] leading-5 font-bold text-[#241503] shadow-[0_6px_18px_-6px_rgba(255,182,140,0.55)]" style="background:linear-gradient(135deg,#ffd9ae,#ea9a5b)">
-            +$<span data-countup="1420" data-commas="1">1,420</span><span class="text-[10px] font-bold opacity-70">/WK</span>
+            <span id="engine-signals">&#8212;</span><span class="text-[10px] font-bold opacity-70">&nbsp;FED</span>
           </span>
-          <span class="micro-caps text-[#cdbba2] mt-1.5" style="letter-spacing:.12em">THIS PACE</span>
+          <span class="micro-caps text-[#cdbba2] mt-1.5" style="letter-spacing:.12em">TO THE AGENT</span>
         </div>
       </div>
 
-      <!-- pilot economics · hairline instrument cells -->
+      <!-- grounding instrument cells · live session values -->
       <div class="relative mt-4 grid grid-cols-2 rounded-xl bg-white/[0.05] hairline-strong divide-x divide-white/10 overflow-hidden">
         <div class="px-3.5 py-2.5 min-w-0">
-          <span class="micro-caps text-[#cdbba2] block" style="letter-spacing:.14em">PROFIT MARGIN</span>
-          <span class="tnum block mt-1 text-[15px] leading-5 font-bold text-[#6fe3b0] whitespace-nowrap">+18.4% GROSS</span>
+          <span class="micro-caps text-[#cdbba2] block" style="letter-spacing:.14em">BLOCK ANCHOR</span>
+          <span id="engine-anchor" class="block mt-1 text-[15px] leading-5 font-bold text-[#6fe3b0] whitespace-nowrap truncate">&#8212;</span>
         </div>
         <div class="px-3.5 py-2.5 min-w-0">
-          <span class="micro-caps text-[#cdbba2] block" style="letter-spacing:.14em">RENEWAL</span>
-          <span class="tnum block mt-1 text-[15px] leading-5 font-bold text-[#f7ecdc] whitespace-nowrap">$189/MO <span class="text-[#cdbba2] font-medium text-[12px]">PER VENUE</span></span>
+          <span class="micro-caps text-[#cdbba2] block" style="letter-spacing:.14em">AGENT RUN TIME</span>
+          <span class="tnum block mt-1 text-[15px] leading-5 font-bold text-[#f7ecdc] whitespace-nowrap"><span id="engine-lat">&#8212;</span> <span class="text-[#cdbba2] font-medium text-[12px]">END TO END</span></span>
         </div>
       </div>
 
-      <!-- progress rail -->
+      <!-- pipeline rail · GROUND -> READ -> WRITE, lit as each stage lands -->
       <div class="relative mt-4 flex items-center gap-3">
-        <div class="relative flex-1 h-1 rounded-full bg-white/10 overflow-hidden">
-          <div class="absolute inset-y-0 left-0 rounded-full bar-grow shimmer" style="width:40%; background:linear-gradient(90deg,#c65f1f,#ffcf9e)"></div>
+        <div class="engine-rail relative flex-1 h-1 rounded-full bg-white/10 overflow-hidden">
+          <i id="engine-rail-fill" class="absolute inset-y-0 left-0 rounded-full shimmer" style="width:0%; background:linear-gradient(90deg,#c65f1f,#ffcf9e)"></i>
         </div>
-        <span class="tnum micro-caps text-[#cdbba2] flex-shrink-0" style="letter-spacing:.1em">40% COMPLETE</span>
+        <span id="engine-steps" class="tnum micro-caps text-[#cdbba2] flex-shrink-0" style="letter-spacing:.1em">0/3 STEPS</span>
       </div>
     </section>
 
@@ -4094,32 +4094,6 @@
 </script>
 
 <script>
-  /* ---------------- Count-up engine: [data-countup] numerals ---------------- */
-  (function initCountups() {
-    var els = document.querySelectorAll('[data-countup]');
-    if (!els.length) return;
-    var reduce = false;
-    try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { /* keep motion */ }
-    if (reduce) return;
-    els.forEach(function (el) {
-      var to = parseFloat(el.getAttribute('data-countup'));
-      if (isNaN(to)) return;
-      var commas = el.hasAttribute('data-commas');
-      function fmt(n) { return commas ? Math.round(n).toLocaleString('en-US') : String(Math.round(n)); }
-      var t0 = null, dur = 1200;
-      function step(ts) {
-        if (t0 === null) t0 = ts;
-        var p = Math.min(1, (ts - t0) / dur);
-        var e = 1 - Math.pow(1 - p, 4); /* ease-out quart */
-        el.textContent = fmt(to * e);
-        if (p < 1) requestAnimationFrame(step);
-      }
-      requestAnimationFrame(step);
-    });
-  })();
-</script>
-
-<script>
 /* ================================================================
    ATTUNE LIVE FEED — Qloo Taste AI + LLM playbook
    ----------------------------------------------------------------
@@ -4194,6 +4168,8 @@
   var state = {
     live: false,       /* Qloo feed reached */
     llmLive: false,    /* LLM playbook rendered */
+    llmAttempted: false, /* /llm/playbook round trip finished (AI, curated or failed) */
+    llmLatency: null,  /* measured end-to-end agent run time (ms) */
     provider: null, model: null,
     places: [], artists: [], palate: [], tribes: [],
     anchor: null,      /* block taste anchor { id, name } — seeds affinity queries */
@@ -4310,6 +4286,54 @@
     }).join('');
   }
 
+  /* ------------------- the engine card · live agent run -------------------
+     Every number on this card is computed from this session's real data:
+     anchor pull = Qloo explainability average, latency = the measured
+     /llm/playbook round trip, signals = entities actually handed to the
+     agent. No hardcoded business metrics anywhere. */
+  function prettyModel(m) {
+    var s = String(m || '').trim();
+    if (!s) return 'Curated';
+    return s.split(/[-_.\s]+/).filter(Boolean).map(function (w) {
+      if (/^glm/i.test(w)) return w.toUpperCase();
+      return w.length <= 3 ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1);
+    }).join('-');
+  }
+  function renderEngine() {
+    var p = (state.anchorPull == null) ? null : Math.max(0, Math.min(1, Number(state.anchorPull) || 0));
+    var ring = document.getElementById('engine-ring');
+    if (ring) ring.style.strokeDashoffset = String(125.66 * (1 - (p == null ? 0 : p)));
+    var pull = document.getElementById('engine-pull');
+    if (pull) {
+      if (p == null) pull.textContent = '\u2014';
+      else tweenTo(pull, String(Math.round(p * 100)));
+    }
+    var wrap = document.getElementById('engine-ring-wrap');
+    if (wrap) wrap.setAttribute('aria-label', p == null ? 'Anchor pull pending'
+      : 'Anchor pull ' + Math.round(p * 100) + '% \u2014 how strongly the anchor place drives this block ranking');
+    var chain = document.getElementById('engine-chain');
+    if (chain) {
+      if (state.llmLive && state.model) chain.textContent = prettyModel(state.model);
+      else if (state.llmAttempted) chain.textContent = 'Curated fallback';
+      else if (state.live) chain.textContent = 'Composing\u2026';
+      else chain.textContent = 'Waiting\u2026';
+    }
+    var sig = document.getElementById('engine-signals');
+    if (sig) {
+      var n = state.places.length + state.artists.length + state.tribes.length + state.palate.length;
+      if (n) tweenTo(sig, String(n)); else sig.textContent = '\u2014';
+    }
+    var lat = document.getElementById('engine-lat');
+    if (lat) lat.textContent = (state.llmLatency != null) ? (Number(state.llmLatency) / 1000).toFixed(1) + 'S' : '\u2014';
+    var anch = document.getElementById('engine-anchor');
+    if (anch) anch.textContent = state.anchor ? state.anchor.name : '\u2014';
+    var steps = (state.places.length ? 1 : 0) + (state.tribes.length ? 1 : 0) + (state.llmAttempted ? 1 : 0);
+    var fill = document.getElementById('engine-rail-fill');
+    if (fill) fill.style.width = Math.round(steps / 3 * 100) + '%';
+    var st = document.getElementById('engine-steps');
+    if (st) st.textContent = steps + '/3 STEPS';
+  }
+
   /* ----------------------- loaders ----------------------- */
   function loadRadar() {
     var radiusM = Math.max(60, Math.round(RADIUS_FT * FT_TO_M));
@@ -4355,6 +4379,7 @@
       state.places = ents.map(function (e) {
         return { name: nameOf(e), affinity: affinityOf(e), tags: e.tags || [] };
       });
+      renderEngine();
       return ents;
     });
   }
@@ -4384,6 +4409,7 @@
       }
     }
     state.tribes = rows;
+    renderEngine();
   }
 
   /* Crowd phrases — Qloo place genres translated into plain-English groups a
@@ -4655,6 +4681,7 @@
     var persona = document.getElementById('llm-persona');
     if (persona) persona.textContent = 'Qloo grounding delivered \u2014 LLM is composing the playbook\u2026';
     setLlmMode('WRITING');
+    var t0 = Date.now();
     var ctrl = ('AbortController' in window) ? new AbortController() : null;
     var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 25000) : null;
     return fetch(API_BASE + '/llm/playbook', {
@@ -4667,6 +4694,7 @@
       if (!res.ok) throw new Error('LLM_HTTP_' + res.status);
       return res.json();
     }).then(function (data) {
+      state.llmAttempted = true;
       var text = (data && data.playbook) || '';
       var parsed = parsePlaybook(text);
       if (!parsed.actions) throw new Error('LLM_PARSE');
@@ -4674,6 +4702,7 @@
       state.llmLive = true;
       state.provider = data.provider || null;
       state.model = data.model || null;
+      state.llmLatency = Date.now() - t0;
       if (persona) persona.textContent = '\u201C' + parsed.persona + '\u201D';
       setLlmMode(data.engine === 'llm' ? 'AI LIVE' : 'LIVE DATA');
       /* Agent trace — what the playbook agent actually did, in order. */
@@ -4688,6 +4717,7 @@
       }
       setText('daypart-action-label', 'The Play \u00B7 AI');
       applyDaypart(currentDaypart);
+      renderEngine();
     }).catch(function (err) {
       if (timer) clearTimeout(timer);
       state.llmLive = false;
@@ -4696,6 +4726,7 @@
       console.warn('[attune llm]', err && err.message || err);
       if (persona) persona.textContent = '\u201CAnalog-leaning night owls who treat listening as the main event.\u201D';
       setLlmMode('CURATED');
+      renderEngine();
     });
   }
 
@@ -4804,6 +4835,7 @@
       .catch(function (err) {
         state.live = false;
         setBadges(false);
+        renderEngine();
         var persona = document.getElementById('llm-persona');
         if (persona && !state.llmLive) {
           persona.textContent = '\u201CAnalog-leaning night owls who treat listening as the main event.\u201D';
@@ -4820,8 +4852,9 @@
     try { sessionStorage.clear(); } catch (e) { /* quota */ }
     resolveVenueFromProfile().then(function (changed) {
       if (changed) {
-        state.anchor = null; state.places = []; state.artists = []; state.tribes = [];
-        state.live = false; state.llmLive = false;
+        state.anchor = null; state.anchorPull = null; state.places = []; state.artists = []; state.tribes = []; state.palate = [];
+        state.live = false; state.llmLive = false; state.llmAttempted = false; state.llmLatency = null;
+        renderEngine();
       }
       window.dispatchEvent(new CustomEvent('attune:venue-resolved'));
       refresh();
