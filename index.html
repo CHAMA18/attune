@@ -1128,7 +1128,102 @@
           </div>
         </section>
 
-        <section class="mt-space-lg mb-space-md rounded-xl bg-surface-container p-space-sm" aria-label="Sound settings" data-guardrails>
+        
+
+        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">SUPPORT &amp; LEGAL</p>
+        <div class="flex flex-col gap-1 pb-space-md">
+          <button type="button" data-legal-open="terms"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">description</span>
+            <span class="font-body-md text-body-md">Terms &amp; Conditions</span>
+          </button>
+          <button type="button" data-legal-open="privacy"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">privacy_tip</span>
+            <span class="font-body-md text-body-md">Privacy Policy</span>
+          </button>
+          <button type="button" data-legal-open="credits"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">library_music</span>
+            <span class="font-body-md text-body-md">Music &amp; Data Credits</span>
+          </button>
+          <a href="https://github.com/CHAMA18/roomtone-os/issues" target="_blank" rel="noopener noreferrer"
+             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">support_agent</span>
+            <span class="font-body-md text-body-md">Feedback &amp; Support</span>
+          </a>
+        </div>
+
+                <div class="flex flex-col gap-1 pb-space-md">
+          <button type="button" data-sound-open aria-haspopup="dialog" aria-controls="sound-sheet"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">graphic_eq</span>
+            <span class="font-body-md text-body-md">Sound Settings</span>
+          </button>
+        </div>
+
+<p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">PREFERENCES</p>
+        <div class="flex flex-col gap-1 pb-space-md">
+          <button type="button" id="theme-toggle" aria-pressed="true"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl" data-theme-icon>dark_mode</span>
+            <span class="font-body-md text-body-md" data-theme-label>Dark Mode</span>
+            <span class="ml-auto relative inline-flex h-4 w-8 items-center rounded-full bg-primary flex-shrink-0 transition-colors" data-theme-track>
+              <span class="absolute left-0.5 h-3 w-3 rounded-full bg-on-primary transition-transform translate-x-4" data-theme-knob></span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-space-md pt-space-sm pb-safe flex-shrink-0 border-t border-surface-container-high/70">
+        <button type="button" id="drawer-signout"
+                class="w-full flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-surface-container transition-colors">
+          <span class="material-symbols-outlined text-xl">logout</span>
+          <span class="font-body-md text-body-md">Sign Out</span>
+        </button>
+        <p class="font-label-caps text-label-caps text-outline px-space-sm pt-space-xs pb-space-sm">ATTUNE &#183; V1.0.0</p>
+      </div>
+
+    </aside>
+  </div>
+</div>
+
+<!-- ==================== LEGAL SHEET (terms / privacy / credits) ==================== -->
+<div id="legal-sheet" class="legal-root fixed inset-0 z-[65]" aria-hidden="true">
+  <div class="legal-backdrop absolute inset-0 bg-black/60 backdrop-blur-[2px]" data-legal-dismiss></div>
+  <div class="legal-panel absolute inset-x-0 bottom-0 top-[7%] mx-auto w-full max-w-[390px] flex flex-col rounded-t-2xl bg-surface-container-low shadow-[0_-12px_48px_rgba(0,0,0,0.55)] overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="legal-title">
+    <div class="flex items-center justify-between gap-2 px-space-md h-16 flex-shrink-0 border-b border-surface-container-high/70">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="material-symbols-outlined text-secondary text-xl flex-shrink-0" data-legal-icon>description</span>
+        <h2 id="legal-title" class="font-title-editorial text-title-editorial text-on-surface truncate">Terms &amp; Conditions</h2>
+      </div>
+      <button type="button" data-legal-close aria-label="Close document"
+              class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container-high/60 transition-colors flex-shrink-0">
+        <span class="material-symbols-outlined text-on-surface-variant text-2xl">close</span>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto px-space-md py-space-md space-y-5" data-legal-body></div>
+    <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-md py-3 flex-shrink-0 border-t border-surface-container-high/70">ATTUNE &#183; V1.0.0 &#183; UPDATED OCTOBER 2026</p>
+  </div>
+</div>
+
+<!-- ==================== SOUND SETTINGS SHEET (opened from the drawer) ==================== -->
+<div id="sound-sheet" class="legal-root fixed inset-0 z-[65]" aria-hidden="true">
+  <div class="legal-backdrop absolute inset-0 bg-black/60 backdrop-blur-[2px]" data-sound-dismiss></div>
+  <div class="legal-panel absolute inset-x-0 bottom-0 top-[7%] mx-auto w-full max-w-[390px] flex flex-col rounded-t-2xl bg-surface-container-low shadow-[0_-12px_48px_rgba(0,0,0,0.55)] overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="sound-title">
+    <div class="flex items-center justify-between gap-2 px-space-md h-16 flex-shrink-0 border-b border-surface-container-high/70">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="material-symbols-outlined text-secondary text-xl flex-shrink-0">graphic_eq</span>
+        <h2 id="sound-title" class="font-title-editorial text-title-editorial text-on-surface truncate">Sound Settings</h2>
+      </div>
+      <button type="button" data-sound-close aria-label="Close sound settings"
+              class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container-high/60 transition-colors flex-shrink-0">
+        <span class="material-symbols-outlined text-on-surface-variant text-2xl">close</span>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto px-space-md py-space-md">
+      <section class="rounded-xl bg-surface-container p-space-sm" aria-label="Sound settings" data-guardrails>
           <div class="flex items-center gap-1.5 px-1 pb-2">
             <span class="material-symbols-outlined text-secondary text-base">graphic_eq</span>
             <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Sound Settings</span>
@@ -1175,74 +1270,8 @@
           </button>
           <p class="font-body-sm text-body-sm text-on-surface-variant px-1 pt-2" data-guardrail-status aria-live="polite">These settings shape the in-app preview only &#8212; house speakers keep their own volume.</p>
         </section>
-
-        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">SUPPORT &amp; LEGAL</p>
-        <div class="flex flex-col gap-1 pb-space-md">
-          <button type="button" data-legal-open="terms"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">description</span>
-            <span class="font-body-md text-body-md">Terms &amp; Conditions</span>
-          </button>
-          <button type="button" data-legal-open="privacy"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">privacy_tip</span>
-            <span class="font-body-md text-body-md">Privacy Policy</span>
-          </button>
-          <button type="button" data-legal-open="credits"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">library_music</span>
-            <span class="font-body-md text-body-md">Music &amp; Data Credits</span>
-          </button>
-          <a href="https://github.com/CHAMA18/roomtone-os/issues" target="_blank" rel="noopener noreferrer"
-             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">support_agent</span>
-            <span class="font-body-md text-body-md">Feedback &amp; Support</span>
-          </a>
-        </div>
-
-        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">PREFERENCES</p>
-        <div class="flex flex-col gap-1 pb-space-md">
-          <button type="button" id="theme-toggle" aria-pressed="true"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl" data-theme-icon>dark_mode</span>
-            <span class="font-body-md text-body-md" data-theme-label>Dark Mode</span>
-            <span class="ml-auto relative inline-flex h-4 w-8 items-center rounded-full bg-primary flex-shrink-0 transition-colors" data-theme-track>
-              <span class="absolute left-0.5 h-3 w-3 rounded-full bg-on-primary transition-transform translate-x-4" data-theme-knob></span>
-            </span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Footer -->
-      <div class="px-space-md pt-space-sm pb-safe flex-shrink-0 border-t border-surface-container-high/70">
-        <button type="button" id="drawer-signout"
-                class="w-full flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-surface-container transition-colors">
-          <span class="material-symbols-outlined text-xl">logout</span>
-          <span class="font-body-md text-body-md">Sign Out</span>
-        </button>
-        <p class="font-label-caps text-label-caps text-outline px-space-sm pt-space-xs pb-space-sm">ATTUNE &#183; V1.0.0</p>
-      </div>
-
-    </aside>
-  </div>
-</div>
-
-<!-- ==================== LEGAL SHEET (terms / privacy / credits) ==================== -->
-<div id="legal-sheet" class="legal-root fixed inset-0 z-[65]" aria-hidden="true">
-  <div class="legal-backdrop absolute inset-0 bg-black/60 backdrop-blur-[2px]" data-legal-dismiss></div>
-  <div class="legal-panel absolute inset-x-0 bottom-0 top-[7%] mx-auto w-full max-w-[390px] flex flex-col rounded-t-2xl bg-surface-container-low shadow-[0_-12px_48px_rgba(0,0,0,0.55)] overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="legal-title">
-    <div class="flex items-center justify-between gap-2 px-space-md h-16 flex-shrink-0 border-b border-surface-container-high/70">
-      <div class="flex items-center gap-2 min-w-0">
-        <span class="material-symbols-outlined text-secondary text-xl flex-shrink-0" data-legal-icon>description</span>
-        <h2 id="legal-title" class="font-title-editorial text-title-editorial text-on-surface truncate">Terms &amp; Conditions</h2>
-      </div>
-      <button type="button" data-legal-close aria-label="Close document"
-              class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container-high/60 transition-colors flex-shrink-0">
-        <span class="material-symbols-outlined text-on-surface-variant text-2xl">close</span>
-      </button>
     </div>
-    <div class="flex-1 overflow-y-auto px-space-md py-space-md space-y-5" data-legal-body></div>
-    <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-md py-3 flex-shrink-0 border-t border-surface-container-high/70">ATTUNE &#183; V1.0.0 &#183; UPDATED OCTOBER 2026</p>
+    <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-md py-3 flex-shrink-0 border-t border-surface-container-high/70">ATTUNE &#183; V1.0.0 &#183; IN-APP PREVIEW</p>
   </div>
 </div>
 
@@ -2456,8 +2485,6 @@
         </div>
       </div>
     </section>
-
-
 
     <!-- Daypart Queue -->
     <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md space-y-space-sm" data-player-queue>
@@ -3904,7 +3931,9 @@
     });
     document.addEventListener('keydown', event => {
       const sheet = document.getElementById('legal-sheet');
-      if (event.key === 'Escape' && root.classList.contains('drawer-open') && !(sheet && sheet.classList.contains('legal-open'))) setOpen(false);
+      const soundSheet = document.getElementById('sound-sheet');
+      const sheetOpen = (sheet && sheet.classList.contains('legal-open')) || (soundSheet && soundSheet.classList.contains('legal-open'));
+      if (event.key === 'Escape' && root.classList.contains('drawer-open') && !sheetOpen) setOpen(false);
     });
   })();
 
@@ -4045,6 +4074,38 @@
         setOpen(true);
         if (closeBtn) closeBtn.focus();
       });
+    });
+
+    function dismiss() {
+      setOpen(false);
+      if (lastTrigger) lastTrigger.focus();
+    }
+    if (closeBtn) closeBtn.addEventListener('click', dismiss);
+    if (backdrop) backdrop.addEventListener('click', dismiss);
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && root.classList.contains('legal-open')) dismiss();
+    });
+  })();
+
+  /* ---------------- Sound settings sheet: opened from the drawer button ---------------- */
+  (function initSoundSheet() {
+    const root = document.getElementById('sound-sheet');
+    const openBtn = document.querySelector('[data-sound-open]');
+    const closeBtn = root && root.querySelector('[data-sound-close]');
+    const backdrop = root && root.querySelector('[data-sound-dismiss]');
+    if (!root || !openBtn) return;
+    let lastTrigger = null;
+
+    function setOpen(open) {
+      root.classList.toggle('legal-open', open);
+      root.setAttribute('aria-hidden', open ? 'false' : 'true');
+      document.body.style.overflow = open ? 'hidden' : '';
+    }
+
+    openBtn.addEventListener('click', () => {
+      lastTrigger = openBtn;
+      setOpen(true);
+      if (closeBtn) closeBtn.focus();
     });
 
     function dismiss() {
