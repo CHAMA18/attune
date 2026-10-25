@@ -524,6 +524,101 @@
     .auth-shell.auth-visible .lockup-halo { animation: none; }
   }
 
+  /* ==================== FIRST-RUN ONBOARDING — tune the room ====================
+     The struck-fork motion language continues: strike, resonate, settle.
+     Steps slide direction-aware on the brand curve (0.22, 1, 0.36, 1);
+     every surface is token-driven (light + dark first-class) and all
+     motion honors prefers-reduced-motion. */
+
+  .ob-shell {
+    visibility: hidden; opacity: 0;
+    transition: opacity 0.32s ease, visibility 0s linear 0.32s;
+  }
+  .ob-shell.ob-visible {
+    visibility: visible; opacity: 1;
+    transition: opacity 0.32s ease;
+  }
+  .ob-shell .ob-rise { animation: auth-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+  /* — Struck-fork lockup (re-armed on each step entry via .ob-strike-live) — */
+  .ob-shell .fork-strike { transform-box: view-box; transform-origin: 50% 74%; }
+  .ob-shell .ob-strike-live .fork-strike { animation: fork-strike 1.7s cubic-bezier(0.36, 0.07, 0.19, 0.97) 0.2s both; }
+  .ob-shell .ob-strike-live .strike-ring { animation: ring-strike 1.15s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both; }
+  .ob-shell .ob-strike-live .strike-ring.sr2 { animation-delay: 0.45s; }
+  .ob-shell .ob-strike-live .lockup-halo { animation: halo-breathe 3.6s ease-in-out 1.6s infinite; }
+
+  /* — Step choreography: leave is absolute (no height flash), enter slides on the brand curve — */
+  #ob-stage { --ob-shift: 30px; }
+  /* Utility display classes must never resurrect a hidden step panel. */
+  #ob-stage [data-ob-step][hidden] { display: none !important; }
+  /* Programmatic heading focus is for AT context — no visible ring. */
+  #ob-stage h1:focus, #ob-stage h2:focus { outline: none; }
+  @keyframes ob-in-fwd { from { opacity: 0; transform: translateX(var(--ob-shift)); } to { opacity: 1; transform: none; } }
+  @keyframes ob-in-bwd { from { opacity: 0; transform: translateX(calc(var(--ob-shift) * -1)); } to { opacity: 1; transform: none; } }
+  @keyframes ob-out-fwd { to { opacity: 0; transform: translateX(calc(var(--ob-shift) * -1)); } }
+  @keyframes ob-out-bwd { to { opacity: 0; transform: translateX(var(--ob-shift)); } }
+  .ob-leave { position: absolute; top: 0; left: 0; right: 0; pointer-events: none; }
+  .ob-leave.ob-fwd { animation: ob-out-fwd 0.26s cubic-bezier(0.55, 0, 0.55, 0.2) both; }
+  .ob-leave.ob-bwd { animation: ob-out-bwd 0.26s cubic-bezier(0.55, 0, 0.55, 0.2) both; }
+  .ob-enter.ob-fwd { animation: ob-in-fwd 0.38s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .ob-enter.ob-bwd { animation: ob-in-bwd 0.38s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+  /* — Progress rail: three tuning segments fill with the attune gradient — */
+  .ob-seg { position: relative; height: 3px; flex: 1; border-radius: 9999px; background: rgb(var(--c-surface-container-highest)); overflow: hidden; }
+  .ob-seg i { position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(90deg, rgb(var(--c-primary)), rgb(var(--c-secondary))); transform: scaleX(0); transform-origin: left; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+  .ob-seg.on i { transform: scaleX(1); }
+
+  /* — Choice cards: quiet at rest, lifted + ringed when tuned in — */
+  .ob-card {
+    position: relative; text-align: left; cursor: pointer;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.25s ease;
+  }
+  .ob-card:hover { border-color: rgb(var(--c-primary) / 0.4); }
+  .ob-card:active { transform: scale(0.985); }
+  .ob-card[aria-pressed="true"] {
+    border-color: rgb(var(--c-primary) / 0.65);
+    background-color: rgb(var(--c-primary) / 0.06);
+    box-shadow: 0 0 0 1px rgb(var(--c-primary) / 0.5), 0 12px 32px -14px rgb(var(--c-primary) / 0.5);
+  }
+  .ob-card[aria-pressed="true"]:hover { transform: none; }
+  .ob-card:focus-visible { outline: none; box-shadow: 0 0 0 2px rgb(var(--c-background)), 0 0 0 4px rgb(var(--c-primary) / 0.65); }
+  .ob-card-check {
+    position: absolute; top: 8px; right: 8px; width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 9999px; background: rgb(var(--c-primary)); color: rgb(var(--c-on-primary));
+    opacity: 0; transform: scale(0.5);
+    transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .ob-card[aria-pressed="true"] .ob-card-check { opacity: 1; transform: scale(1); }
+
+  /* — Tone waveforms: silent at rest, resonating when chosen — */
+  .ob-wave { display: flex; align-items: flex-end; gap: 2.5px; height: 26px; }
+  .ob-wave span {
+    width: 3px; border-radius: 2px; height: 32%;
+    background: rgb(var(--c-outline) / 0.4);
+    transition: height 0.3s ease, background-color 0.3s ease;
+  }
+  .ob-card[aria-pressed="true"] .ob-wave span {
+    background: rgb(var(--c-primary));
+    animation: ob-wave 1.08s ease-in-out infinite;
+    animation-delay: var(--d, 0s);
+  }
+  @keyframes ob-wave { 0%, 100% { height: 32%; } 50% { height: 96%; } }
+
+  /* — CTA shared with auth: gradient + sheen; disabled until a choice is made — */
+  .ob-cta[disabled] { opacity: 0.38; pointer-events: none; box-shadow: none; filter: saturate(0.6); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ob-shell .ob-rise,
+    .ob-shell .ob-strike-live .fork-strike,
+    .ob-shell .ob-strike-live .strike-ring,
+    .ob-shell .ob-strike-live .lockup-halo,
+    .ob-leave.ob-fwd, .ob-leave.ob-bwd, .ob-enter.ob-fwd, .ob-enter.ob-bwd { animation: none !important; }
+    .ob-seg i { transition: none; }
+    .ob-card, .ob-card-check, .ob-wave span { transition: none; }
+    .ob-card[aria-pressed="true"] .ob-wave span { animation: none; height: 64%; }
+  }
+
   /* ==================== AUTH ACCESS — world-class pass ====================
      Motion language: the struck fork — strike, resonate, settle.
      Every surface is token-driven (rgb(var(--c-*)/a)) so light + dark themes
@@ -1041,6 +1136,273 @@
       </div>
 
     </aside>
+  </div>
+</div>
+
+<!-- ==================== FIRST-RUN ONBOARDING (new operators tune their room) ==================== -->
+<div id="ob-shell" class="ob-shell fixed inset-0 z-[70] overflow-y-auto" aria-hidden="true">
+  <div role="dialog" aria-modal="true" aria-labelledby="ob-title"
+       class="relative min-h-full w-full max-w-[390px] mx-auto flex flex-col bg-surface-container-lowest px-margin pt-safe pb-safe overflow-hidden">
+
+    <!-- ambient art — the same air the auth screen breathes -->
+    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div class="aurora"></div>
+      <div class="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-primary/15 blur-3xl"></div>
+      <div class="absolute top-1/3 -left-28 w-72 h-72 rounded-full bg-tertiary/10 blur-3xl"></div>
+      <svg class="absolute -bottom-14 -right-12 w-64 h-64 opacity-[0.07] text-primary" viewBox="0 0 200 200" fill="none" stroke="currentColor">
+        <circle cx="100" cy="100" r="30"/>
+        <circle cx="100" cy="100" r="58"/>
+        <circle cx="100" cy="100" r="86"/>
+        <line x1="100" y1="14" x2="100" y2="186"/>
+        <line x1="14" y1="100" x2="186" y2="100"/>
+      </svg>
+      <div class="a-vignette absolute inset-0"></div>
+      <div class="a-grain absolute inset-0"></div>
+    </div>
+
+    <!-- top bar: mini brand + skip -->
+    <div class="ob-rise relative h-16 flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-surface-container-high/60 shadow-[0_0_12px_rgba(217,119,54,0.12)]">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M9 3.5 V10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+            <path d="M15 3.5 V10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+            <path d="M9 10 C9 13.4 15 13.4 15 10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+            <path d="M12 12.4 V16.9" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+            <circle cx="12" cy="6.6" r="1.2" class="logo-dot animate-radar-dot"/>
+          </svg>
+        </div>
+        <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-widest">ATTUNE</span>
+      </div>
+      <button type="button" id="ob-skip" class="font-label-caps text-label-caps tracking-widest text-outline hover:text-on-surface transition-colors px-3 py-2 -mr-2 rounded-full">SKIP</button>
+    </div>
+
+    <!-- progress rail (hidden on the welcome cover) -->
+    <div id="ob-progress" class="relative hidden items-center gap-2 pb-space-sm" aria-hidden="true">
+      <span class="ob-seg"><i></i></span>
+      <span class="ob-seg"><i></i></span>
+      <span class="ob-seg"><i></i></span>
+      <span id="ob-progress-label" class="font-label-caps text-[9px] text-outline tracking-[0.22em] pl-1">1 / 3</span>
+    </div>
+
+    <!-- stage -->
+    <div id="ob-stage" class="relative flex-1 flex flex-col">
+      <p class="sr-only" aria-live="polite" data-ob-announcer></p>
+
+      <!-- STEP 0 · WELCOME — the cover -->
+      <section data-ob-step="welcome" class="relative flex-1 flex flex-col">
+        <div class="ob-rise relative flex flex-col items-center text-center pt-space-lg pb-space-md" aria-hidden="true">
+          <div class="relative w-16 h-16" data-ob-strike>
+            <span class="lockup-halo absolute -inset-2.5 rounded-[20px] bg-primary/20 blur-xl pointer-events-none"></span>
+            <span class="strike-ring absolute inset-0 rounded-2xl border border-primary/50 pointer-events-none"></span>
+            <span class="strike-ring sr2 absolute inset-0 rounded-2xl border border-primary/30 pointer-events-none"></span>
+            <div class="relative w-16 h-16 flex items-center justify-center rounded-2xl bg-surface-container-high/70 backdrop-blur-sm border border-outline-variant/40 ring-1 ring-primary/15 shadow-[0_0_32px_rgba(217,119,54,0.16),inset_0_1px_0_rgba(255,201,163,0.10)]">
+              <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none">
+                <g class="fork-strike">
+                  <path d="M9 3.5 V10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+                  <path d="M15 3.5 V10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+                  <path d="M9 10 C9 13.4 15 13.4 15 10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+                  <path d="M12 12.4 V16.9" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+                  <circle cx="12" cy="6.6" r="1.2" class="logo-dot animate-radar-dot"/>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="ob-rise relative flex-1 flex flex-col" style="animation-delay:.08s">
+          <h1 id="ob-title" tabindex="-1" class="font-body-lg text-[27px] leading-[1.16] font-bold text-on-surface text-center tracking-[-0.01em]">Every room has a tone.</h1>
+          <p class="pt-space-sm text-center font-body-md text-body-md text-on-surface-variant leading-relaxed px-2" data-ob-welcome-sub>
+            Three quick moves and your room is in tune.
+          </p>
+          <div class="flex-1"></div>
+          <button type="button" data-ob-cta="begin"
+                  class="group relative w-full overflow-hidden flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-on-primary font-label-caps text-label-caps tracking-widest font-semibold shadow-[0_10px_30px_rgba(217,119,54,0.30)] hover:shadow-[0_14px_38px_rgba(217,119,54,0.42)] hover:brightness-110 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-container-low outline-none transition-all">
+            <span class="a-sheen absolute inset-y-0 -left-1/2 w-1/2 -translate-x-full skew-x-[-18deg] bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[450%]" aria-hidden="true"></span>
+            <span class="relative">BEGIN TUNING</span>
+            <span class="material-symbols-outlined text-base relative transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+          </button>
+          <p class="pt-space-sm pb-space-xs text-center font-label-caps text-[9px] text-outline tracking-[0.22em]">ABOUT A MINUTE &#8226; STAYS ON THIS DEVICE</p>
+        </div>
+      </section>
+
+      <!-- STEP 1 · THE ROOM -->
+      <section data-ob-step="room" class="relative flex-1 flex flex-col" hidden>
+        <p class="font-label-caps text-label-caps text-primary tracking-[0.26em] pt-space-sm">STEP 1 OF 3 &#8226; THE ROOM</p>
+        <h2 tabindex="-1" class="pt-1.5 font-body-lg text-[24px] leading-tight font-bold text-on-surface tracking-[-0.01em]">What kind of room is it?</h2>
+        <p class="pt-1.5 font-body-md text-body-md text-on-surface-variant leading-relaxed">The sound is shaped to fit the house.</p>
+        <div class="pt-space-md pb-2">
+          <label for="ob-venue" class="font-label-caps text-label-caps text-outline tracking-widest block pb-1">VENUE NAME</label>
+          <div class="relative">
+            <span class="material-symbols-outlined text-lg pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-outline" aria-hidden="true">storefront</span>
+            <input id="ob-venue" type="text" autocomplete="organization" enterkeyhint="done" placeholder="Your venue"
+                   class="w-full pl-10 pr-3 bg-surface-container border border-outline-variant/50 rounded-lg px-space-sm py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline/70 transition-colors focus:outline-none focus:border-primary/70 focus:shadow-[0_0_0_4px_rgb(var(--c-primary)/0.10)]"/>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-space-xs" role="group" aria-label="Room type">
+          <button type="button" class="ob-card rounded-xl border border-outline-variant/50 bg-surface-container-low/70 px-3 py-3" data-ob-room="listening-bar" aria-pressed="false">
+            <span class="ob-card-check material-symbols-outlined text-[13px]" aria-hidden="true">check</span>
+            <span class="material-symbols-outlined text-xl text-secondary" aria-hidden="true">graphic_eq</span>
+            <span class="block pt-1.5 font-body-md text-body-md font-medium text-on-surface">Listening Bar</span>
+            <span class="block font-body-sm text-body-sm text-on-surface-variant">Vinyl-forward, close and warm</span>
+          </button>
+          <button type="button" class="ob-card rounded-xl border border-outline-variant/50 bg-surface-container-low/70 px-3 py-3" data-ob-room="cocktail-lounge" aria-pressed="false">
+            <span class="ob-card-check material-symbols-outlined text-[13px]" aria-hidden="true">check</span>
+            <span class="material-symbols-outlined text-xl text-secondary" aria-hidden="true">nightlife</span>
+            <span class="block pt-1.5 font-body-md text-body-md font-medium text-on-surface">Cocktail Lounge</span>
+            <span class="block font-body-sm text-body-sm text-on-surface-variant">Low-slow and candlelit</span>
+          </button>
+          <button type="button" class="ob-card rounded-xl border border-outline-variant/50 bg-surface-container-low/70 px-3 py-3" data-ob-room="wine-bar" aria-pressed="false">
+            <span class="ob-card-check material-symbols-outlined text-[13px]" aria-hidden="true">check</span>
+            <span class="material-symbols-outlined text-xl text-secondary" aria-hidden="true">wine_bar</span>
+            <span class="block pt-1.5 font-body-md text-body-md font-medium text-on-surface">Wine Bar</span>
+            <span class="block font-body-sm text-body-sm text-on-surface-variant">Unhurried, table-side warmth</span>
+          </button>
+          <button type="button" class="ob-card rounded-xl border border-outline-variant/50 bg-surface-container-low/70 px-3 py-3" data-ob-room="restaurant" aria-pressed="false">
+            <span class="ob-card-check material-symbols-outlined text-[13px]" aria-hidden="true">check</span>
+            <span class="material-symbols-outlined text-xl text-secondary" aria-hidden="true">restaurant</span>
+            <span class="block pt-1.5 font-body-md text-body-md font-medium text-on-surface">Restaurant</span>
+            <span class="block font-body-sm text-body-sm text-on-surface-variant">Steady energy between courses</span>
+          </button>
+          <button type="button" class="ob-card rounded-xl border border-outline-variant/50 bg-surface-container-low/70 px-3 py-3" data-ob-room="cafe" aria-pressed="false">
+            <span class="ob-card-check material-symbols-outlined text-[13px]" aria-hidden="true">check</span>
+            <span class="material-symbols-outlined text-xl text-secondary" aria-hidden="true">local_cafe</span>
+            <span class="block pt-1.5 font-body-md text-body-md font-medium text-on-surface">Caf&#233;</span>
+            <span class="block font-body-sm text-body-sm text-on-surface-variant">Bright mornings, soft refills</span>
+          </button>
+          <button type="button" class="ob-card rounded-xl border border-outline-variant/50 bg-surface-container-low/70 px-3 py-3" data-ob-room="live-venue" aria-pressed="false">
+            <span class="ob-card-check material-symbols-outlined text-[13px]" aria-hidden="true">check</span>
+            <span class="material-symbols-outlined text-xl text-secondary" aria-hidden="true">mic_external_on</span>
+            <span class="block pt-1.5 font-body-md text-body-md font-medium text-on-surface">Live Venue</span>
+            <span class="block font-body-sm text-body-sm text-on-surface-variant">Stage-first, room second</span>
+          </button>
+        </div>
+        <div class="flex-1"></div>
+        <div class="flex items-center gap-2.5 py-space-sm">
+          <button type="button" data-ob-back class="h-11 px-4 flex items-center justify-center rounded-xl border border-outline-variant/40 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" aria-label="Back to welcome">
+            <span class="material-symbols-outlined text-base" aria-hidden="true">arrow_back</span>
+          </button>
+          <button type="button" data-ob-cta="room" disabled class="ob-cta group relative flex-1 overflow-hidden flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-on-primary font-label-caps text-label-caps tracking-widest font-semibold shadow-[0_10px_30px_rgba(217,119,54,0.30)] transition-all">
+            <span class="a-sheen absolute inset-y-0 -left-1/2 w-1/2 -translate-x-full skew-x-[-18deg] bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[450%]" aria-hidden="true"></span>
+            <span class="relative">CONTINUE</span>
+            <span class="material-symbols-outlined text-base relative transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 2 · THE TONE -->
+      <section data-ob-step="tone" class="relative flex-1 flex flex-col" hidden>
+        <p class="font-label-caps text-label-caps text-primary tracking-[0.26em] pt-space-sm">STEP 2 OF 3 &#8226; THE TONE</p>
+        <h2 tabindex="-1" class="pt-1.5 font-body-lg text-[24px] leading-tight font-bold text-on-surface tracking-[-0.01em]">Pick the room&#8217;s home tone.</h2>
+        <p class="pt-1.5 font-body-md text-body-md text-on-surface-variant leading-relaxed">The playbook shifts with the night &#8212; this is home base.</p>
+        <div class="flex flex-col gap-2 pt-space-md" role="group" aria-label="Default tone">
+          <button type="button" class="ob-card flex items-center gap-3 rounded-xl border border-outline-variant/50 bg-surface-container-low/70 px-3.5 py-3" data-ob-tone="morning-calm" aria-pressed="false">
+            <span class="ob-card-check material-symbols-outlined text-[13px]" aria-hidden="true">check</span>
+            <span class="material-symbols-outlined text-xl text-secondary flex-shrink-0" aria-hidden="true">wb_sunny</span>
+            <span class="flex-1 min-w-0">
+              <span class="block font-body-md text-body-md font-medium text-on-surface">Morning Calm</span>
+              <span class="block font-body-sm text-body-sm text-on-surface-variant">Soft open, doors at seven</span>
+            </span>
+            <span class="ob-wave flex-shrink-0" aria-hidden="true"><span style="--d:0s"></span><span style="--d:.12s"></span><span style="--d:.24s"></span><span style="--d:.36s"></span><span style="--d:.48s"></span></span>
+            <span class="font-label-caps text-[9px] text-outline tracking-widest flex-shrink-0 w-12 text-right">68 BPM</span>
+          </button>
+          <button type="button" class="ob-card flex items-center gap-3 rounded-xl border border-outline-variant/50 bg-surface-container-low/70 px-3.5 py-3" data-ob-tone="daylight-groove" aria-pressed="false">
+            <span class="ob-card-check material-symbols-outlined text-[13px]" aria-hidden="true">check</span>
+            <span class="material-symbols-outlined text-xl text-secondary flex-shrink-0" aria-hidden="true">wb_twilight</span>
+            <span class="flex-1 min-w-0">
+              <span class="block font-body-md text-body-md font-medium text-on-surface">Daylight Groove</span>
+              <span class="block font-body-sm text-body-sm text-on-surface-variant">Steady mid-tempo through the rush</span>
+            </span>
+            <span class="ob-wave flex-shrink-0" aria-hidden="true"><span style="--d:.05s"></span><span style="--d:.17s"></span><span style="--d:.29s"></span><span style="--d:.41s"></span><span style="--d:.53s"></span></span>
+            <span class="font-label-caps text-[9px] text-outline tracking-widest flex-shrink-0 w-12 text-right">88 BPM</span>
+          </button>
+          <button type="button" class="ob-card flex items-center gap-3 rounded-xl border border-outline-variant/50 bg-surface-container-low/70 px-3.5 py-3" data-ob-tone="golden-hour" aria-pressed="false">
+            <span class="ob-card-check material-symbols-outlined text-[13px]" aria-hidden="true">check</span>
+            <span class="material-symbols-outlined text-xl text-secondary flex-shrink-0" aria-hidden="true">light_mode</span>
+            <span class="flex-1 min-w-0">
+              <span class="block font-body-md text-body-md font-medium text-on-surface">Golden Hour Glow</span>
+              <span class="block font-body-sm text-body-sm text-on-surface-variant">Warm and social as the light drops</span>
+            </span>
+            <span class="ob-wave flex-shrink-0" aria-hidden="true"><span style="--d:.1s"></span><span style="--d:.22s"></span><span style="--d:.34s"></span><span style="--d:.46s"></span><span style="--d:.58s"></span></span>
+            <span class="font-label-caps text-[9px] text-outline tracking-widest flex-shrink-0 w-12 text-right">102 BPM</span>
+          </button>
+          <button type="button" class="ob-card flex items-center gap-3 rounded-xl border border-outline-variant/50 bg-surface-container-low/70 px-3.5 py-3" data-ob-tone="late-night-deep" aria-pressed="false">
+            <span class="ob-card-check material-symbols-outlined text-[13px]" aria-hidden="true">check</span>
+            <span class="material-symbols-outlined text-xl text-secondary flex-shrink-0" aria-hidden="true">dark_mode</span>
+            <span class="flex-1 min-w-0">
+              <span class="block font-body-md text-body-md font-medium text-on-surface">Late-Night Deep</span>
+              <span class="block font-body-sm text-body-sm text-on-surface-variant">Low-slow after dark</span>
+            </span>
+            <span class="ob-wave flex-shrink-0" aria-hidden="true"><span style="--d:.15s"></span><span style="--d:.27s"></span><span style="--d:.39s"></span><span style="--d:.51s"></span><span style="--d:.63s"></span></span>
+            <span class="font-label-caps text-[9px] text-outline tracking-widest flex-shrink-0 w-12 text-right">114 BPM</span>
+          </button>
+        </div>
+        <div class="flex-1"></div>
+        <div class="flex items-center gap-2.5 py-space-sm">
+          <button type="button" data-ob-back class="h-11 px-4 flex items-center justify-center rounded-xl border border-outline-variant/40 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" aria-label="Back to room type">
+            <span class="material-symbols-outlined text-base" aria-hidden="true">arrow_back</span>
+          </button>
+          <button type="button" data-ob-cta="tone" disabled class="ob-cta group relative flex-1 overflow-hidden flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-on-primary font-label-caps text-label-caps tracking-widest font-semibold shadow-[0_10px_30px_rgba(217,119,54,0.30)] transition-all">
+            <span class="a-sheen absolute inset-y-0 -left-1/2 w-1/2 -translate-x-full skew-x-[-18deg] bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[450%]" aria-hidden="true"></span>
+            <span class="relative">CONTINUE</span>
+            <span class="material-symbols-outlined text-base relative transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 3 · IN TUNE (the reveal) -->
+      <section data-ob-step="ready" class="relative flex-1 flex flex-col" hidden>
+        <div class="ob-rise relative flex flex-col items-center text-center pt-space-lg pb-2" aria-hidden="true">
+          <div class="relative w-16 h-16" data-ob-strike>
+            <span class="lockup-halo absolute -inset-2.5 rounded-[20px] bg-primary/20 blur-xl pointer-events-none"></span>
+            <span class="strike-ring absolute inset-0 rounded-2xl border border-primary/50 pointer-events-none"></span>
+            <span class="strike-ring sr2 absolute inset-0 rounded-2xl border border-primary/30 pointer-events-none"></span>
+            <div class="relative w-16 h-16 flex items-center justify-center rounded-2xl bg-surface-container-high/70 backdrop-blur-sm border border-outline-variant/40 ring-1 ring-primary/15 shadow-[0_0_32px_rgba(217,119,54,0.16),inset_0_1px_0_rgba(255,201,163,0.10)]">
+              <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none">
+                <g class="fork-strike">
+                  <path d="M9 3.5 V10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+                  <path d="M15 3.5 V10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+                  <path d="M9 10 C9 13.4 15 13.4 15 10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+                  <path d="M12 12.4 V16.9" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+                  <circle cx="12" cy="6.6" r="1.2" class="logo-dot animate-radar-dot"/>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="ob-rise relative flex-1 flex flex-col" style="animation-delay:.08s">
+          <p class="font-label-caps text-label-caps text-primary tracking-[0.26em] text-center">STEP 3 OF 3 &#8226; TUNED</p>
+          <h2 tabindex="-1" class="pt-1.5 font-body-lg text-[27px] leading-tight font-bold text-on-surface text-center tracking-[-0.01em]">In tune.</h2>
+          <p class="pt-1.5 text-center font-body-md text-body-md text-on-surface-variant leading-relaxed px-2" data-ob-ready-sub>
+            Sound, sight and service on one dial.
+          </p>
+          <div class="pt-space-md flex flex-col gap-2">
+            <div class="flex items-center gap-3 rounded-xl border border-outline-variant/40 bg-surface-container-low/70 px-3.5 py-3">
+              <span class="material-symbols-outlined text-lg text-secondary flex-shrink-0" aria-hidden="true">storefront</span>
+              <span class="flex-1 min-w-0">
+                <span class="block font-label-caps text-[9px] text-outline tracking-[0.22em]">THE ROOM</span>
+                <span class="block font-body-md text-body-md font-medium text-on-surface truncate" data-ob-sum-venue>&#8212;</span>
+              </span>
+              <span class="font-label-caps text-[9px] text-outline tracking-widest flex-shrink-0" data-ob-sum-room>&#8212;</span>
+            </div>
+            <div class="flex items-center gap-3 rounded-xl border border-outline-variant/40 bg-surface-container-low/70 px-3.5 py-3">
+              <span class="material-symbols-outlined text-lg text-secondary flex-shrink-0" aria-hidden="true">music_note</span>
+              <span class="flex-1 min-w-0">
+                <span class="block font-label-caps text-[9px] text-outline tracking-[0.22em]">THE TONE</span>
+                <span class="block font-body-md text-body-md font-medium text-on-surface truncate" data-ob-sum-tone>&#8212;</span>
+              </span>
+            </div>
+          </div>
+          <div class="flex-1"></div>
+          <button type="button" data-ob-cta="enter"
+                  class="group relative w-full overflow-hidden flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-on-primary font-label-caps text-label-caps tracking-widest font-semibold shadow-[0_10px_30px_rgba(217,119,54,0.30)] hover:shadow-[0_14px_38px_rgba(217,119,54,0.42)] hover:brightness-110 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-container-low outline-none transition-all">
+            <span class="a-sheen absolute inset-y-0 -left-1/2 w-1/2 -translate-x-full skew-x-[-18deg] bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[450%]" aria-hidden="true"></span>
+            <span class="relative" data-ob-enter-label>ENTER THE ROOM</span>
+            <span class="material-symbols-outlined text-base relative transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+          </button>
+          <p class="pt-space-sm pb-space-xs text-center font-body-sm text-body-sm text-on-surface-variant">You can retune anytime from Sound Settings.</p>
+        </div>
+      </section>
+    </div>
   </div>
 </div>
 
@@ -3094,6 +3456,223 @@
     toggle.addEventListener('click', () => apply(!root.classList.contains('light'), true));
   })();
 
+  /* ---------------- First-run onboarding: tune the room ---------------- */
+  (function initOnboarding() {
+    const shell = document.getElementById('ob-shell');
+    if (!shell) return;
+
+    const OB_KEY = 'attune.onboarding';
+    const PROFILE_KEY = 'attune.roomProfile';
+    const SESSION_KEY = 'roomtone.session';
+    const STEPS = ['welcome', 'room', 'tone', 'ready'];
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let index = 0;
+    let animating = false;
+    const picks = { room: null, tone: null };
+    const ROOM_LABELS = {
+      'listening-bar': 'Listening Bar', 'cocktail-lounge': 'Cocktail Lounge', 'wine-bar': 'Wine Bar',
+      'restaurant': 'Restaurant', 'cafe': 'Caf\u00E9', 'live-venue': 'Live Venue'
+    };
+    const TONE_LABELS = {
+      'morning-calm': 'Morning Calm', 'daylight-groove': 'Daylight Groove',
+      'golden-hour': 'Golden Hour Glow', 'late-night-deep': 'Late-Night Deep'
+    };
+    const STEP_TITLES = {
+      welcome: 'Welcome', room: 'Step 1 of 3: the room', tone: 'Step 2 of 3: the tone', ready: 'Step 3 of 3: tuned'
+    };
+
+    function readSession() {
+      try { return JSON.parse(localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY) || 'null'); }
+      catch (e) { return null; }
+    }
+    function isPending() {
+      try { return localStorage.getItem(OB_KEY) === 'pending'; } catch (e) { return false; }
+    }
+    const panelFor = name => shell.querySelector('[data-ob-step="' + name + '"]');
+
+    /* Re-arm the struck fork each time a lockup panel enters. */
+    function restartStrike(name) {
+      const el = panelFor(name) && panelFor(name).querySelector('[data-ob-strike]');
+      if (!el) return;
+      el.classList.remove('ob-strike-live');
+      void el.offsetWidth;
+      el.classList.add('ob-strike-live');
+    }
+
+    function paintProgress() {
+      const rail = document.getElementById('ob-progress');
+      const label = document.getElementById('ob-progress-label');
+      if (!rail) return;
+      const segs = rail.querySelectorAll('.ob-seg');
+      if (index === 0) { rail.classList.add('hidden'); rail.classList.remove('flex'); return; }
+      rail.classList.remove('hidden'); rail.classList.add('flex');
+      segs.forEach((seg, i) => seg.classList.toggle('on', i < index));
+      if (label) label.textContent = index + ' / 3';
+    }
+
+    function announce(name) {
+      const ann = shell.querySelector('[data-ob-announcer]');
+      if (ann) ann.textContent = STEP_TITLES[name] || '';
+    }
+
+    function focusHeading(panel) {
+      const heading = panel.querySelector('h1, h2');
+      if (heading) heading.focus({ preventScroll: true });
+    }
+
+    function goTo(next, dir) {
+      if (animating || next === index || next < 0 || next >= STEPS.length) return;
+      const from = panelFor(STEPS[index]);
+      const to = panelFor(STEPS[next]);
+      index = next;
+      animating = true;
+      paintProgress();
+      announce(STEPS[next]);
+      if (reduceMotion) {
+        from.hidden = true;
+        to.hidden = false;
+        restartStrike(STEPS[next]);
+        animating = false;
+        focusHeading(to);
+        return;
+      }
+      to.hidden = false;
+      to.classList.add('ob-enter', dir);
+      from.classList.add('ob-leave', dir);
+      setTimeout(() => {
+        from.hidden = true;
+        from.classList.remove('ob-leave', 'ob-fwd', 'ob-bwd');
+        to.classList.remove('ob-enter', 'ob-fwd', 'ob-bwd');
+        restartStrike(STEPS[next]);
+        animating = false;
+        focusHeading(to);
+      }, 400);
+    }
+
+    function venueName() {
+      const input = document.getElementById('ob-venue');
+      const typed = input && input.value.trim();
+      if (typed) return typed;
+      const session = readSession();
+      return (session && session.venue) || 'Your Room';
+    }
+
+    function paintReady() {
+      const sumVenue = shell.querySelector('[data-ob-sum-venue]');
+      const sumRoom = shell.querySelector('[data-ob-sum-room]');
+      const sumTone = shell.querySelector('[data-ob-sum-tone]');
+      const enterLabel = shell.querySelector('[data-ob-enter-label]');
+      if (sumVenue) sumVenue.textContent = venueName();
+      if (sumRoom) sumRoom.textContent = (ROOM_LABELS[picks.room] || '').toUpperCase();
+      if (sumTone) sumTone.textContent = TONE_LABELS[picks.tone] || '\u2014';
+      if (enterLabel) enterLabel.textContent = 'ENTER ' + venueName().toUpperCase();
+    }
+
+    function toast(message) {
+      const t = document.getElementById('toast');
+      if (!t) return;
+      const txt = t.querySelector('[data-toast-text]');
+      const ico = t.querySelector('[data-toast-icon]');
+      if (txt) txt.textContent = message;
+      if (ico) ico.textContent = 'tune';
+      t.classList.remove('opacity-0', 'translate-y-2');
+      setTimeout(() => t.classList.add('opacity-0', 'translate-y-2'), 2800);
+    }
+
+    function complete(skipped) {
+      try {
+        localStorage.setItem(OB_KEY, 'done');
+        localStorage.setItem(PROFILE_KEY, JSON.stringify({
+          venue: venueName(), room: picks.room, tone: picks.tone, tunedAt: Date.now()
+        }));
+      } catch (e) { /* onboarding state is best-effort */ }
+      shell.classList.remove('ob-visible');
+      shell.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      toast(skipped ? 'Setup skipped \u2014 tune up anytime in Sound Settings'
+        : 'Welcome aboard \u2014 ' + venueName() + ' is in tune');
+    }
+
+    function personalize() {
+      const session = readSession();
+      const first = session && session.name ? session.name.split(' ')[0] : '';
+      const sub = shell.querySelector('[data-ob-welcome-sub]');
+      if (sub) sub.textContent = first
+        ? 'Welcome, ' + first + ' \u2014 three quick moves and your room is in tune.'
+        : 'Three quick moves and your room is in tune.';
+      const input = document.getElementById('ob-venue');
+      if (input && !input.value && session && session.venue) input.value = session.venue;
+    }
+
+    function show() {
+      personalize();
+      index = 0;
+      animating = false;
+      shell.querySelectorAll('[data-ob-step]').forEach((panel, i) => {
+        panel.hidden = i !== 0;
+        panel.classList.remove('ob-enter', 'ob-leave', 'ob-fwd', 'ob-bwd');
+      });
+      paintProgress();
+      document.body.style.overflow = 'hidden';
+      shell.classList.add('ob-visible');
+      shell.setAttribute('aria-hidden', 'false');
+      restartStrike('welcome');
+      /* Replay the cover rise on every reveal. */
+      shell.querySelectorAll('.ob-rise').forEach(el => {
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+      });
+      setTimeout(() => focusHeading(panelFor('welcome')), 320);
+    }
+
+    /* — Wire: CTAs, back, skip, choice cards, enter key — */
+    shell.querySelectorAll('[data-ob-cta]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.getAttribute('data-ob-cta');
+        if (action === 'begin') goTo(1, 'fwd');
+        else if (action === 'room') goTo(2, 'fwd');
+        else if (action === 'tone') { paintReady(); goTo(3, 'fwd'); }
+        else if (action === 'enter') complete(false);
+      });
+    });
+    shell.querySelectorAll('[data-ob-back]').forEach(btn => {
+      btn.addEventListener('click', () => goTo(index - 1, 'bwd'));
+    });
+    const skipBtn = document.getElementById('ob-skip');
+    if (skipBtn) skipBtn.addEventListener('click', () => complete(true));
+
+    shell.querySelectorAll('[data-ob-room]').forEach(card => {
+      card.addEventListener('click', () => {
+        picks.room = card.getAttribute('data-ob-room');
+        shell.querySelectorAll('[data-ob-room]').forEach(c => c.setAttribute('aria-pressed', String(c === card)));
+        const cta = shell.querySelector('[data-ob-cta="room"]');
+        if (cta) cta.disabled = false;
+      });
+    });
+    shell.querySelectorAll('[data-ob-tone]').forEach(card => {
+      card.addEventListener('click', () => {
+        picks.tone = card.getAttribute('data-ob-tone');
+        shell.querySelectorAll('[data-ob-tone]').forEach(c => c.setAttribute('aria-pressed', String(c === card)));
+        const cta = shell.querySelector('[data-ob-cta="tone"]');
+        if (cta) cta.disabled = false;
+      });
+    });
+
+    const venueInput = document.getElementById('ob-venue');
+    if (venueInput) venueInput.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      const cta = shell.querySelector('[data-ob-cta="room"]');
+      if (cta && !cta.disabled) cta.click();
+      else goTo(1, 'fwd');
+    });
+
+    window.AttuneOnboarding = { start: show, isPending: isPending };
+    if (isPending()) setTimeout(show, 300);
+  })();
+
   /* ---------------- Auth: drawer Sign Out -> operator authentication ---------------- */
   (function initAuth() {
     const shell = document.getElementById('auth-shell');
@@ -3399,13 +3978,18 @@
           forgotEmailLine.textContent = 'Check ' + inputs.email.value.trim() + ' \u2014 the code expires in 10 minutes.';
           setMode('forgot-success');
         } else {
-          const message = mode === 'register'
+          const isNewOperator = mode === 'register';
+          if (isNewOperator) {
+            try { localStorage.setItem('attune.onboarding', 'pending'); } catch (e) { /* best-effort */ }
+          }
+          const message = isNewOperator
             ? 'Operator pass created \u2014 welcome aboard'
             : 'Signed in \u2014 Amber Room shift synced';
           hideAuth();
           form.reset();
           setMode('signin');
           showToast(message);
+          if (isNewOperator && window.AttuneOnboarding) setTimeout(() => window.AttuneOnboarding.start(), 650);
         }
       }, 900);
     });

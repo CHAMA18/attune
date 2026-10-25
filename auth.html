@@ -793,6 +793,8 @@
       var user = { name: name, email: email, venue: venue, pass: await hashPass(email, pass) };
       users.push(user);
       saveUsers(users);
+      /* First account creation: mark the room-tuning onboarding for the app. */
+      try { localStorage.setItem('attune.onboarding', 'pending'); } catch (e) {}
       startSession(user, true, 'Account created. Opening the door\u2026', 'door_open');
     });
 
