@@ -507,7 +507,7 @@
       <span class="text-outline-variant text-[8px]">&#8226;</span>
       <span class="font-label-caps text-label-caps text-outline-variant">EVERY ROOM HAS A TONE</span>
     </div>
-    <p class="font-label-caps text-label-caps text-outline-variant/70 text-center max-w-[280px] leading-relaxed">DEMO AUTH &#8226; CREDENTIALS NEVER LEAVE THIS DEVICE</p>
+    <p class="font-label-caps text-label-caps text-outline-variant/70 text-center leading-relaxed">DEMO AUTH &#8226; CREDENTIALS NEVER LEAVE THIS DEVICE</p>
   </footer>
 
 </main>
@@ -716,9 +716,53 @@
 
   /* ---------------- Shared sign-in / session start ---------------- */
   function startSession(user, remember, welcomeMsg, toastIcon) {
-    setSession({ name: user.name, email: user.email, venue: user.venue, issuedAt: Date.now() }, remember);
+    setSession({
+      name: user.name,
+      email: user.email,
+      venue: user.venue,
+      provider: user.provider || 'email',
+      issuedAt: Date.now()
+    }, remember);
     toast(welcomeMsg, toastIcon);
     setTimeout(function () { location.replace(redirectTarget()); }, 950);
+  }
+
+  /* ---------------- Google / Apple sign-in ---------------- */
+  /* The Firebase module is deferred, so it finishes loading after this script
+     runs. Wait for its ready event instead of reading the global too early. */
+  function whenAuthReady() {
+    if (window.RoomtoneAuthReady) return window.RoomtoneAuthReady;
+    return new Promise(function (resolve) {
+      var settled = false;
+      function settle() {
+        if (settled) return;
+        settled = true;
+        resolve(window.RoomtoneAuthReady || Promise.resolve());
+      }
+      window.addEventListener('roomtone-auth-ready', settle, { once: true });
+      setTimeout(settle, 8000);
+    });
+  }
+
+  /* Provider failure copy lives in auth-firebase.js, shared with the in-app
+     auth shell; this shim keeps a sane fallback if the module never loads. */
+  function ssoErrorMessage(label, err) {
+    if (window.RoomtoneSsoError) return window.RoomtoneSsoError(label, err);
+    return (label ? label + ' sign-in' : 'Sign-in') + ' failed. Try again.';
+  }
+  function setSsoBusy(btn, busy) {
+    var text = btn.querySelector('span');
+    if (!text) return;
+    if (busy) {
+      btn.setAttribute('data-label', text.textContent);
+      text.textContent = 'Connecting\u2026';
+      btn.disabled = true;
+      btn.classList.add('opacity-60');
+    } else {
+      if (btn.getAttribute('data-label')) text.textContent = btn.getAttribute('data-label');
+      btn.disabled = false;
+      btn.classList.remove('opacity-60');
+    }
   }
 
   /* ---------------- Form bindings ---------------- */
@@ -815,14 +859,44 @@
       await seedDemo();
       var user = loadUsers().find(function (u) { return u.email === 'demo@roomtone.os'; });
       if (!user) { toast('Demo unavailable \u2014 create an account instead.', 'error'); return; }
-      startSession(user, true, 'Demo room unlocked. Tuning\u2026', 'theater_comedy');
+      startSession({ name: user.name, email: user.email, venue: user.venue, provider: 'demo' },
+        true, 'Demo room unlocked. Tuning\u2026', 'theater_comedy');
     });
 
-    /* SSO placeholders. */
+    /* Google / Apple sign-in via Firebase Auth. Popup on desktop; redirect
+       hand-off on iOS and installed PWAs, where popups are unreliable. */
     document.querySelectorAll('[data-sso]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var provider = btn.getAttribute('data-sso') === 'google' ? 'Google' : 'Apple';
-        toast(provider + ' sign-in is not wired in this demo.', 'info');
+      btn.addEventListener('click', async function () {
+        var kind = btn.getAttribute('data-sso');
+        var label = kind === 'google' ? 'Google' : 'Apple';
+        hideBanner($('signInError'));
+        setSsoBusy(btn, true);
+        try {
+          await whenAuthReady();
+          if (!window.RoomtoneSSO) {
+            showBanner($('signInError'), $('signInErrorText'),
+              label + ' sign-in is unavailable right now. Use your email and passkey.');
+            return;
+          }
+          var who = await window.RoomtoneSSO(kind);
+          if (who && who.redirect) {
+            /* The page is handing off to the identity provider. */
+            toast('Opening ' + label + '\u2026', 'open_in_new');
+            return;
+          }
+          var linkedName = who.linked === 'apple' ? 'Apple' : who.linked === 'google' ? 'Google' : '';
+          startSession({ name: who.name, email: who.email, venue: null, provider: kind },
+            true,
+            linkedName
+              ? 'Linked ' + linkedName + ' to your operator profile. Tuning\u2026'
+              : 'Signed in with ' + label + '. Tuning\u2026',
+            linkedName ? 'link' : 'verified_user');
+        } catch (err) {
+          if (err && (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request')) return;
+          showBanner($('signInError'), $('signInErrorText'), ssoErrorMessage(label, err));
+        } finally {
+          setSsoBusy(btn, false);
+        }
       });
     });
 
@@ -845,9 +919,47 @@
     bindMisc();
     bindClearOnInput();
     await seedDemo();
-    /* Already signed in? Go straight to the app — unless #force is used
-       to inspect these pages (handy during development). */
-    if (currentHash() !== 'force' && getSession()) {
+
+    /* #force keeps these screens open for inspection (handy in development). */
+    var inspect = currentHash() === 'force';
+    var handoffPending = false;
+    try { handoffPending = !!sessionStorage.getItem('roomtone.sso.pending'); } catch (e) {}
+
+    /* Fast path: a stored session with no Google/Apple hand-off in flight. */
+    if (!inspect && !handoffPending && getSession()) {
+      location.replace(redirectTarget());
+      return;
+    }
+
+    /* Finish a redirect hand-off (a no-op when there is none). */
+    await whenAuthReady();
+    var back = window.RoomtoneRedirectUser
+      ? await window.RoomtoneRedirectUser()
+      : { user: null, error: null, provider: null };
+
+    if (back && back.user) {
+      var ssoUser = {
+        name: back.user.name, email: back.user.email, venue: null,
+        provider: back.user.provider
+      };
+      var providerName = back.user.provider === 'apple' ? 'Apple' : 'Google';
+      if (inspect) {
+        setSession(ssoUser, true);
+        toast('Signed in with ' + providerName + '. Session saved.', 'verified_user');
+      } else {
+        var linkedProvider = back.user.linked === 'apple' ? 'Apple' : back.user.linked === 'google' ? 'Google' : '';
+        startSession(ssoUser, true,
+          linkedProvider
+            ? 'Linked ' + linkedProvider + ' to your operator profile. Tuning\u2026'
+            : 'Signed in with ' + providerName + '. Tuning\u2026',
+          linkedProvider ? 'link' : 'verified_user');
+        return;
+      }
+    } else if (back && back.error) {
+      var failedName = back.provider === 'apple' ? 'Apple' : back.provider === 'google' ? 'Google' : '';
+      showScreen('sign-in');
+      showBanner($('signInError'), $('signInErrorText'), ssoErrorMessage(failedName, back.error));
+    } else if (!inspect && getSession()) {
       location.replace(redirectTarget());
       return;
     }
@@ -857,32 +969,22 @@
 </script>
 
 <script type="module">
-  /* Firebase (qloo-api-1) — lazy, guarded init. Analytics only for now;
-     window.RoomtoneFirebase is exposed for the upcoming Auth swap. */
-  (function () {
-    var firebaseConfig = {
-      apiKey: "AIzaSyA_5jutEQbIfmc8S3BFKZKeLRNw6Y5AsYc",
-      authDomain: "qloo-api-1.firebaseapp.com",
-      projectId: "qloo-api-1",
-      storageBucket: "qloo-api-1.firebasestorage.app",
-      messagingSenderId: "128364649920",
-      appId: "1:128364649920:web:3e131dc7493dc2de89bc25",
-      measurementId: "G-2W56KTZ42L"
-    };
-    var V = 'https://www.gstatic.com/firebasejs/10.14.1/';
-    Promise.all([
-      import(V + 'firebase-app.js'),
-      import(V + 'firebase-analytics.js')
-    ]).then(function (mods) {
-      var app = mods[0].initializeApp(firebaseConfig);
-      return mods[1].isSupported().then(function (ok) {
-        if (ok) mods[1].getAnalytics(app);
-        window.RoomtoneFirebase = app;
-      });
-    }).catch(function (e) {
-      console.warn('[firebase] init skipped:', e && e.message);
-    });
-  })();
+  /* Google/Apple sign-in lives in auth-firebase.js, shared with the in-app
+     auth shell. This page only exposes it to the classic script above. */
+  import { ready, errorMessage } from './auth-firebase.js';
+
+  window.RoomtoneSsoError = errorMessage;
+  window.RoomtoneAuthReady = ready.then(function (api) {
+    window.RoomtoneSSO = api ? api.signIn : null;
+    window.RoomtoneRedirectUser = api ? api.resolveRedirect : null;
+    window.RoomtoneAuth = api ? api.auth : null;
+    window.RoomtoneFirebase = api ? api.app : null;
+    return !!api;
+  });
+
+  window.RoomtoneAuthReady.then(function () {
+    window.dispatchEvent(new Event('roomtone-auth-ready'));
+  });
 </script>
 </body>
 </html>

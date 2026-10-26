@@ -16,7 +16,7 @@ Every venue sits inside a taste signature — the places, artists, and audiences
 
 3. **COMPOSE.** An LLM (z-ai / OpenAI / Gemini / Anthropic — provider-switchable, one env var) writes the playbook under a hard contract: *cite only grounded entities; one concrete, physical action per daypart (07–11, 11–16, 16–20, 20–02); a playlist anchor with BPM band; a real menu callout; under 120 words.* If every LLM path fails, a deterministic composer writes from the same grounded data — **the route always answers 200; the app never dead-ends.**
 
-4. **AUDIT.** The UI renders the agent's work as a first-class surface: an **agent-trace strip** ("18 entities received · anchor Five Leaves → Qloo artist hop off Five Leaves · Ersen 91%, Omar Souleyman 91% · anchor pull 100% → z-ai LLM cited the grounded block"), **cited driver chips** (El Born · 94% MATCH), the persona quote, and a one-tap **grounding JSON export**. Judges can verify every claim in one tap — nothing is invented.
+4. **AUDIT.** The UI renders the agent's work as a first-class surface: an **agent-trace strip** ("N entities received · anchor <venue> → Qloo artist hop off <venue> · <artist> NN%, <artist> NN% · anchor pull NN% → LLM cited the grounded block"), **cited driver chips** (<place> · NN% MATCH), the persona quote, and a one-tap **grounding JSON export**. Judges can verify every claim in one tap — nothing is invented.
 
 ### Your venue, not a demo venue
 

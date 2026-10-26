@@ -1,0 +1,15 @@
+{"level":"info","ts":1792995996.29531,"msg":"maxprocs: Leaving GOMAXPROCS=10: CPU quota undefined"}
+{"level":"info","ts":1792995996.2953541,"msg":"GOMEMLIMIT is updated","GOMEMLIMIT":15461882265,"previous":9223372036854775807}
+{"level":"info","ts":1792995996.295361,"msg":"using config from file","file":"Caddyfile"}
+{"level":"info","ts":1792995996.2953658,"msg":"adapted config to JSON","adapter":"caddyfile"}
+{"level":"warn","ts":1792995996.29537,"msg":"Caddyfile input is not formatted; run 'caddy fmt --overwrite' to fix inconsistencies","adapter":"caddyfile","file":"Caddyfile","line":15}
+{"level":"warn","ts":1792995996.2953758,"logger":"admin","msg":"admin endpoint disabled"}
+{"level":"info","ts":1792995996.295459,"logger":"http.auto_https","msg":"automatic HTTPS is completely disabled for server","server_name":"srv0"}
+{"level":"info","ts":1792995996.295465,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0x526626f05100"}
+{"level":"warn","ts":1792995996.29591,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":":3000"}
+{"level":"warn","ts":1792995996.295917,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":":3000"}
+{"level":"info","ts":1792995996.2959218,"logger":"http.log","msg":"server running","name":"srv0","protocols":["h1","h2","h3"]}
+{"level":"info","ts":1792995996.296175,"msg":"autosaved config (load with --resume flag)","file":"/Users/chunguchama/Library/Application Support/Caddy/autosave.json"}
+{"level":"info","ts":1792995996.296181,"msg":"serving initial configuration"}
+{"level":"info","ts":1792995996.3049212,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:/Users/chunguchama/Library/Application Support/Caddy","instance":"cc690c5d-6c69-4e15-a4f6-c38b55178be5","try_again":1793082396.30492,"try_again_in":86399.999999708}
+{"level":"info","ts":1792995996.305079,"logger":"tls","msg":"finished cleaning storage units"}

@@ -43,7 +43,7 @@ clearly-badged demo — an operator never stares at a spinner").
 
 **Action:** open the grounding-export button first (`{}` icon) — flash the JSON —
 then point at the "Grounded by Qloo" strip: persona line + entity chips
-("Ryuichi Sakamoto · 0.96").
+("<artist name> · 0.96", from the live response).
 
 ## SHOT 4 — Daypart cadence (1:25 – 1:55)
 **Screen:** THE PLAN, daypart selector.

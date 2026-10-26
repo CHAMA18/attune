@@ -6,7 +6,7 @@ export const QLOO_BASE = "https://hackathon.api.qloo.com";
 export const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
 /* Transparent GET proxy: /api/qloo/... -> hackathon.api.qloo.com/... */

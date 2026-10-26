@@ -16,6 +16,31 @@
     })();
   } catch (e) { /* storage unavailable: stay dark */ }
 </script>
+<script>
+  /* Bearer-token bridge for /api/**. The Firebase module at the end of this
+     page fills this in when the operator signed in with Google or Apple;
+     every other session (email/passkey, demo room) stays anonymous. */
+  window.AttuneAuth = (function () {
+    var readyResolve;
+    var ready = new Promise(function (resolve) { readyResolve = resolve; });
+    var getHeaders = null;
+    /* Do not make the feed wait forever if the SDK never arrives. */
+    setTimeout(function () { readyResolve(); }, 3000);
+    return {
+      markReady: function (fn) { getHeaders = fn || null; readyResolve(); },
+      headers: function () {
+        return Promise.race([
+          ready,
+          new Promise(function (resolve) { setTimeout(resolve, 3000); })
+        ]).then(function () {
+          if (!getHeaders) return {};
+          try { return Promise.resolve(getHeaders()).catch(function () { return {}; }); }
+          catch (e) { return {}; }
+        });
+      }
+    };
+  })();
+</script>
 <title>Attune</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23111319'/%3E%3Cg fill='none' stroke='%23ffb68c' stroke-width='1.9' stroke-linecap='round'%3E%3Cpath d='M9 4.6 V10.4'/%3E%3Cpath d='M15 4.6 V10.4'/%3E%3Cpath d='M9 10.4 C9 13.5 15 13.5 15 10.4'/%3E%3Cpath d='M12 12.7 V17.4'/%3E%3C/g%3E%3Ccircle cx='12' cy='7.4' r='1.25' fill='%23ffb68c'/%3E%3C/svg%3E"/>
 
@@ -1066,7 +1091,8 @@
     </div>
 
     <div class="flex items-center gap-space-xs flex-shrink-0">
-      <button type="button" aria-label="Operator profile — tap to sign out"
+      <button type="button" id="profile-open" aria-label="Operator profile — edit profile and venue"
+              aria-haspopup="dialog" aria-controls="profile-sheet"
               class="relative w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container-high/60 transition-colors">
         <span class="relative block w-9 h-9 rounded-full p-[1.5px] bg-gradient-to-br from-primary/70 via-primary-container/50 to-secondary/70 shadow-[0_4px_14px_-4px_rgba(217,119,54,0.55)]">
           <img alt="Operator profile" class="w-full h-full rounded-full object-cover"
@@ -1107,28 +1133,21 @@
 
       <!-- Drawer body -->
       <div class="px-space-md flex-1 overflow-y-auto pt-space-sm">
-        <section class="mt-space-lg mb-space-md rounded-xl bg-surface-container p-space-sm" aria-label="Your venue" data-venue-panel>
-          <div class="flex items-center gap-1.5 px-1 pb-1.5">
-            <span class="material-symbols-outlined text-secondary text-base">storefront</span>
-            <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Your Venue</span>
+        <section class="mt-space-md mb-space-sm rounded-xl bg-surface-container p-space-sm" aria-label="Operator profile" data-operator-panel>
+          <div class="flex items-center gap-2.5 px-1">
+            <span class="relative block w-9 h-9 rounded-full p-[1.5px] bg-gradient-to-br from-primary/70 via-primary-container/50 to-secondary/70 flex-shrink-0" aria-hidden="true">
+              <span class="w-full h-full rounded-full bg-surface-container-high flex items-center justify-center font-label-caps text-label-caps text-primary tracking-wider" data-operator-initials>OP</span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="font-body-md text-body-md text-on-surface font-medium truncate" data-operator-name>Operator</p>
+              <p class="font-body-sm text-body-sm text-on-surface-variant truncate" data-operator-email>Not signed in</p>
+            </div>
           </div>
-          <p class="px-1 font-body-sm text-body-sm text-on-surface font-medium" data-venue-name>The Amber Room</p>
-          <p class="px-1 pb-2 font-body-sm text-body-sm text-on-surface-variant" data-venue-address>142 Franklin St, Greenpoint</p>
-          <div class="flex flex-col gap-1.5 px-1 pb-1">
-            <input data-venue-input type="text" autocomplete="organization" placeholder="Venue name"
-                   class="w-full bg-surface-container-high border border-outline-variant/50 rounded-lg px-2.5 py-2 font-body-sm text-body-sm text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary/70"/>
-            <input data-venue-area type="text" autocomplete="address-level2" placeholder="Neighborhood or city"
-                   class="w-full bg-surface-container-high border border-outline-variant/50 rounded-lg px-2.5 py-2 font-body-sm text-body-sm text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary/70"/>
-            <button type="button" data-venue-apply
-                    class="w-full flex items-center justify-center gap-1.5 rounded-lg bg-tertiary/10 px-2 py-2 text-tertiary hover:bg-tertiary/20 transition-colors">
-              <span class="material-symbols-outlined text-base">tune</span>
-              <span class="font-label-caps text-label-caps tracking-wider">Retune the room</span>
-            </button>
-            <p data-venue-note class="hidden px-1 font-body-sm text-body-sm text-on-surface-variant"></p>
+          <div class="flex items-center gap-1.5 px-1 pt-2">
+            <span class="material-symbols-outlined text-[14px] text-secondary" data-operator-provider-icon aria-hidden="true">verified_user</span>
+            <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider" data-operator-provider>SIGNED IN WITH EMAIL</span>
           </div>
         </section>
-
-        
 
         <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">SUPPORT &amp; LEGAL</p>
         <div class="flex flex-col gap-1 pb-space-md">
@@ -1285,6 +1304,77 @@
         </section>
     </div>
     <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-md py-3 flex-shrink-0 border-t border-surface-container-high/70">ATTUNE &#183; V1.0.0 &#183; IN-APP PREVIEW</p>
+  </div>
+</div>
+
+<!-- ==================== PROFILE & VENUE SHEET (opened from the appbar avatar) ==================== -->
+<div id="profile-sheet" class="legal-root fixed inset-0 z-[65]" aria-hidden="true">
+  <div class="legal-backdrop absolute inset-0 bg-black/60 backdrop-blur-[2px]" data-profile-dismiss></div>
+  <div class="legal-panel absolute inset-0 mx-auto w-full max-w-[390px] flex flex-col bg-surface-container-low shadow-[0_-12px_48px_rgba(0,0,0,0.55)] overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="profile-title">
+    <div class="flex items-center justify-between gap-2 px-space-md h-16 flex-shrink-0 border-b border-surface-container-high/70">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="material-symbols-outlined text-secondary text-xl flex-shrink-0">person</span>
+        <h2 id="profile-title" class="font-title-editorial text-title-editorial text-on-surface truncate">Profile &amp; venue</h2>
+      </div>
+      <button type="button" data-profile-close aria-label="Close profile settings"
+              class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container-high/60 transition-colors flex-shrink-0">
+        <span class="material-symbols-outlined text-on-surface-variant text-2xl">close</span>
+      </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto px-space-md py-space-md">
+      <section class="rounded-xl bg-surface-container p-space-sm" aria-label="Operator profile">
+        <div class="flex items-center gap-1.5 px-1 pb-2">
+          <span class="material-symbols-outlined text-secondary text-base">badge</span>
+          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Operator</span>
+        </div>
+        <label class="block px-1 pb-2">
+          <span class="font-label-caps text-label-caps text-outline tracking-widest block pb-1">NAME</span>
+          <input id="profile-name" type="text" autocomplete="name" placeholder="Your name"
+                 class="w-full bg-surface-container-high border border-outline-variant/50 rounded-lg px-2.5 py-2 font-body-sm text-body-sm text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary/70"/>
+        </label>
+        <label class="block px-1 pb-2">
+          <span class="font-label-caps text-label-caps text-outline tracking-widest block pb-1">SIGN-IN EMAIL</span>
+          <input id="profile-email" type="email" readonly aria-readonly="true"
+                 class="w-full bg-surface-container-high/60 border border-outline-variant/40 rounded-lg px-2.5 py-2 font-body-sm text-body-sm text-on-surface-variant"/>
+        </label>
+        <button type="button" data-profile-save
+                class="w-full flex items-center justify-center gap-1.5 rounded-lg bg-tertiary/10 px-2 py-2 text-tertiary hover:bg-tertiary/20 transition-colors">
+          <span class="material-symbols-outlined text-base">save</span>
+          <span class="font-label-caps text-label-caps tracking-wider">Save profile</span>
+        </button>
+        <p data-profile-note class="hidden px-1 pt-2 font-body-sm text-body-sm text-on-surface-variant"></p>
+      </section>
+
+      <section class="mt-space-sm rounded-xl bg-surface-container p-space-sm" aria-label="Your venue" data-venue-panel>
+        <div class="flex items-center gap-1.5 px-1 pb-1.5">
+          <span class="material-symbols-outlined text-secondary text-base">storefront</span>
+          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Your Venue</span>
+        </div>
+        <p class="px-1 font-body-sm text-body-sm text-on-surface font-medium" data-venue-name>The Amber Room</p>
+        <p class="px-1 pb-2 font-body-sm text-body-sm text-on-surface-variant" data-venue-address>142 Franklin St, Greenpoint</p>
+        <div class="flex flex-col gap-1.5 px-1 pb-1">
+          <input data-venue-input type="text" autocomplete="organization" placeholder="Venue name"
+                 class="w-full bg-surface-container-high border border-outline-variant/50 rounded-lg px-2.5 py-2 font-body-sm text-body-sm text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary/70"/>
+          <input data-venue-area type="text" autocomplete="address-level2" placeholder="Neighborhood or city"
+                 class="w-full bg-surface-container-high border border-outline-variant/50 rounded-lg px-2.5 py-2 font-body-sm text-body-sm text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary/70"/>
+          <button type="button" data-venue-apply
+                  class="w-full flex items-center justify-center gap-1.5 rounded-lg bg-tertiary/10 px-2 py-2 text-tertiary hover:bg-tertiary/20 transition-colors">
+            <span class="material-symbols-outlined text-base">tune</span>
+            <span class="font-label-caps text-label-caps tracking-wider">Retune the room</span>
+          </button>
+          <p data-venue-note class="hidden px-1 font-body-sm text-body-sm text-on-surface-variant"></p>
+        </div>
+      </section>
+
+      <button type="button" data-profile-signout
+              class="mt-space-sm w-full flex items-center justify-center gap-1.5 rounded-lg bg-surface-container px-2 py-2.5 text-on-surface-variant hover:text-error hover:bg-surface-bright transition-colors">
+        <span class="material-symbols-outlined text-base">logout</span>
+        <span class="font-label-caps text-label-caps tracking-wider">Sign out</span>
+      </button>
+    </div>
+
+    <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-md py-3 flex-shrink-0 border-t border-surface-container-high/70">ATTUNE &#183; V1.0.0</p>
   </div>
 </div>
 
@@ -1682,8 +1772,19 @@
 
         <div class="flex items-center gap-2 pt-space-md pb-space-xs" data-mode-field="signin register">
           <span class="h-px flex-1 bg-outline-variant/50"></span>
-          <span class="font-label-caps text-label-caps text-outline">OR</span>
+          <span class="font-label-caps text-label-caps text-outline">OR CONTINUE WITH</span>
           <span class="h-px flex-1 bg-outline-variant/50"></span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-space-xs pt-space-xs" data-mode-field="signin register">
+          <button type="button" data-sso="google" class="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-colors disabled:opacity-70">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>
+            <span class="font-label-caps text-label-caps tracking-wider">GOOGLE</span>
+          </button>
+          <button type="button" data-sso="apple" class="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-colors disabled:opacity-70">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.36 12.76c.03 3.24 2.84 4.32 2.87 4.33-.02.08-.45 1.53-1.48 3.03-.89 1.3-1.81 2.6-3.27 2.62-1.43.03-1.89-.85-3.53-.85-1.64 0-2.15.83-3.5.88-1.41.05-2.48-1.4-3.38-2.7-1.84-2.66-3.24-7.51-1.36-10.79.94-1.63 2.61-2.66 4.43-2.69 1.38-.03 2.68.93 3.53.93.84 0 2.42-1.15 4.08-.98.7.03 2.65.28 3.91 2.12-.1.06-2.33 1.36-2.3 4.1zM13.68 3.94c.74-.9 1.24-2.15 1.11-3.39-1.07.04-2.36.71-3.13 1.61-.68.79-1.28 2.06-1.12 3.28 1.19.09 2.41-.61 3.14-1.5z"/></svg>
+            <span class="font-label-caps text-label-caps tracking-wider">APPLE</span>
+          </button>
         </div>
 
         <div class="grid grid-cols-2 gap-space-xs pt-space-xs" data-mode-field="signin register">
@@ -1711,15 +1812,6 @@
     </div>
 
     <div class="relative flex-1"></div>
-
-    <!-- waveform + telemetry footer -->
-    <div class="relative auth-rise auth-d3">
-      <div data-waveform class="flex items-end gap-0.5 h-10 w-full opacity-80"></div>
-      <div class="flex items-center justify-between pt-space-sm">
-        <span class="font-label-caps text-label-caps text-outline tracking-widest flex items-center gap-1"><span class="a-tls-lock material-symbols-outlined text-[11px] text-primary/70" aria-hidden="true">lock</span>SECURE SESSION &#183; TLS 1.3</span>
-      </div>
-      <p class="font-label-caps text-label-caps text-outline tracking-widest pt-space-xs pb-space-sm text-center">ATTUNE &#183; AMBIENCE INTELLIGENCE</p>
-    </div>
   </div>
 </div>
 
@@ -3560,7 +3652,7 @@
       },
       register: {
         kicker: 'NEW OPERATOR \u00B7 VENUE 142-FRANKLIN',
-        cta: 'CREATE PASS'
+        cta: 'CREATE ACCOUNT'
       },
       forgot: {
         kicker: 'ACCOUNT RECOVERY',
@@ -3818,7 +3910,7 @@
       submitBtn.setAttribute('aria-busy', 'true');
       submitIcon.textContent = 'progress_activity';
       submitIcon.classList.add('animate-spin');
-      submitLabel.textContent = mode === 'register' ? 'CREATING PASS\u2026'
+      submitLabel.textContent = mode === 'register' ? 'CREATING ACCOUNT\u2026'
         : (mode === 'forgot' ? 'SENDING\u2026' : 'AUTHENTICATING\u2026');
 
       setTimeout(() => {
@@ -3846,6 +3938,35 @@
         }
       }, 900);
     });
+
+    /* Google/Apple sign-in from this shell. The provider module in
+       auth-firebase.js runs the flow and calls back here to finish. */
+    window.AttuneAuthShell = {
+      complete: function (profile, label, linkedProvider) {
+        var entry = {
+          name: profile.name, email: profile.email, venue: null,
+          provider: profile.provider, issuedAt: Date.now()
+        };
+        var remember = false;
+        try { remember = localStorage.getItem('roomtone-remember') === 'true'; } catch (e) { /* ignore */ }
+        try {
+          var raw = JSON.stringify(entry);
+          if (remember) localStorage.setItem('roomtone.session', raw);
+          else sessionStorage.setItem('roomtone.session', raw);
+        } catch (e) { /* storage blocked */ }
+        hideAuth();
+        form.reset();
+        setMode('signin');
+        var linkedName = linkedProvider === 'apple' ? 'Apple' : linkedProvider === 'google' ? 'Google' : '';
+        showToast((linkedName ? 'Linked ' + linkedName + '. ' : 'Signed in with ' + label + '. ') + 'Tuning\u2026',
+          linkedName ? 'link' : 'verified_user');
+        /* Reload so the drawer profile, feed identity and API token all pick
+           up the operator that just signed in. */
+        setTimeout(function () { location.reload(); }, 1000);
+      },
+      redirecting: function (label) { showToast('Opening ' + label + '\u2026', 'open_in_new'); },
+      fail: function (message) { showToast(message, 'error'); }
+    };
 
     setMode('signin');
   })();
@@ -3979,6 +4100,15 @@
   }
 
   /* ----------------------- transport ----------------------- */
+  /* A Google/Apple operator carries a Firebase ID token; the Worker verifies
+     it and runs /api/** as that operator. Other sessions send no auth header. */
+  function apiHeaders(extra) {
+    var headers = extra || {};
+    if (!window.AttuneAuth) return Promise.resolve(headers);
+    return window.AttuneAuth.headers().then(function (auth) {
+      return Object.assign(headers, auth || {});
+    });
+  }
   function qlooFetch(path, params) {
     var url = API_BASE + '/qloo' + path + '?' + new URLSearchParams(params || {}).toString();
     var cached = null;
@@ -3989,9 +4119,11 @@
     /* Longer than the Worker's 15s upstream timeout, so a slow Qloo answer
        arrives as a real response instead of a client-side abort. */
     var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 20000) : null;
-    return fetch(url, {
-      headers: { 'accept': 'application/json' },
-      signal: ctrl ? ctrl.signal : undefined
+    return apiHeaders({ 'accept': 'application/json' }).then(function (headers) {
+      return fetch(url, {
+        headers: headers,
+        signal: ctrl ? ctrl.signal : undefined
+      });
     }).then(function (res) {
       if (!res.ok) throw new Error('QLOO_HTTP_' + res.status);
       var ct = res.headers.get('content-type') || '';
@@ -4500,11 +4632,13 @@
     var t0 = Date.now();
     var ctrl = ('AbortController' in window) ? new AbortController() : null;
     var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 25000) : null;
-    return fetch(API_BASE + '/llm/playbook', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(groundingContext()),
-      signal: ctrl ? ctrl.signal : undefined
+    return apiHeaders({ 'Content-Type': 'application/json' }).then(function (headers) {
+      return fetch(API_BASE + '/llm/playbook', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(groundingContext()),
+        signal: ctrl ? ctrl.signal : undefined
+      });
     }).then(function (res) {
       if (timer) clearTimeout(timer);
       if (!res.ok) throw new Error('LLM_HTTP_' + res.status);
@@ -4613,12 +4747,144 @@
     });
   }
 
-  /* ----------------------- avatar sign-out ----------------------- */
-  (function initSignOut() {
-    var avatarImg = document.querySelector('header img[alt="Operator profile"]');
-    var btn = avatarImg ? avatarImg.closest('button') : null;
-    if (!btn) return;
-    btn.addEventListener('click', function () {
+  /* ----------------------- drawer operator profile ----------------------- */
+  (function initOperatorProfile() {
+    var session = null;
+    try {
+      session = JSON.parse(localStorage.getItem('roomtone.session') || sessionStorage.getItem('roomtone.session') || 'null');
+    } catch (e) { session = null; }
+    if (!session) return;
+
+    var LABELS = { google: 'Google', apple: 'Apple', email: 'Email', demo: 'Demo room' };
+    var ICONS = { google: 'verified_user', apple: 'verified_user', email: 'key', demo: 'theater_comedy' };
+    var provider = session.provider || 'email';
+    var name = session.name || 'Operator';
+
+    function set(sel, text) {
+      var el = document.querySelector(sel);
+      if (el) el.textContent = text;
+    }
+    set('[data-operator-name]', name);
+    set('[data-operator-email]', session.email || 'Local operator');
+    set('[data-operator-provider]', 'SIGNED IN WITH ' + (LABELS[provider] || LABELS.email).toUpperCase());
+
+    var icon = document.querySelector('[data-operator-provider-icon]');
+    if (icon) icon.textContent = ICONS[provider] || ICONS.email;
+
+    var initials = name.trim().split(/\s+/).slice(0, 2).map(function (word) {
+      return word.charAt(0);
+    }).join('').toUpperCase();
+    set('[data-operator-initials]', initials || 'OP');
+  })();
+
+  /* ----------------------- profile & venue sheet -----------------------
+     Opened from the appbar avatar. Editing lives here now, not in the
+     drawer; sign-out moved here with it. */
+  (function initProfileSheet() {
+    var root = document.getElementById('profile-sheet');
+    var openBtn = document.getElementById('profile-open');
+    if (!root || !openBtn) return;
+
+    var closeBtn = root.querySelector('[data-profile-close]');
+    var backdrop = root.querySelector('[data-profile-dismiss]');
+    var nameInput = document.getElementById('profile-name');
+    var emailInput = document.getElementById('profile-email');
+    var saveBtn = root.querySelector('[data-profile-save]');
+    var note = root.querySelector('[data-profile-note]');
+    var signOutBtn = root.querySelector('[data-profile-signout]');
+    var venueInput = root.querySelector('[data-venue-input]');
+    var areaInput = root.querySelector('[data-venue-area]');
+    var venueNameEl = root.querySelector('[data-venue-name]');
+    var toast = document.getElementById('toast');
+    var lastTrigger = null;
+
+    function readSession() {
+      try {
+        var raw = localStorage.getItem('roomtone.session');
+        if (raw) return { data: JSON.parse(raw), store: localStorage };
+        raw = sessionStorage.getItem('roomtone.session');
+        if (raw) return { data: JSON.parse(raw), store: sessionStorage };
+      } catch (e) { /* storage blocked */ }
+      return null;
+    }
+    function readProfile() {
+      try { return JSON.parse(localStorage.getItem('attune.roomProfile') || 'null') || {}; }
+      catch (e) { return {}; }
+    }
+    function showNote(message) {
+      if (!note) return;
+      note.textContent = message;
+      note.classList.remove('hidden');
+    }
+    function toastMsg(message, icon) {
+      if (!toast) return;
+      var txt = toast.querySelector('[data-toast-text]');
+      var ico = toast.querySelector('[data-toast-icon]');
+      if (txt) txt.textContent = message;
+      if (ico) ico.textContent = icon || 'check_circle';
+      toast.classList.remove('opacity-0', 'translate-y-2');
+      setTimeout(function () { toast.classList.add('opacity-0', 'translate-y-2'); }, 2600);
+    }
+
+    function prefill() {
+      var session = readSession();
+      if (session && session.data) {
+        if (nameInput) nameInput.value = session.data.name || '';
+        if (emailInput) emailInput.value = session.data.email || '';
+      }
+      var profile = readProfile();
+      if (venueInput) venueInput.value = profile.venue || (venueNameEl ? venueNameEl.textContent.trim() : '');
+      if (areaInput) areaInput.value = profile.area || '';
+      if (note) note.classList.add('hidden');
+    }
+
+    function setOpen(open) {
+      root.classList.toggle('legal-open', open);
+      root.setAttribute('aria-hidden', open ? 'false' : 'true');
+      document.body.style.overflow = open ? 'hidden' : '';
+      if (open) prefill();
+    }
+    function dismiss() {
+      setOpen(false);
+      if (lastTrigger) lastTrigger.focus();
+    }
+
+    openBtn.addEventListener('click', function () {
+      lastTrigger = openBtn;
+      setOpen(true);
+      if (closeBtn) closeBtn.focus();
+    });
+    if (closeBtn) closeBtn.addEventListener('click', dismiss);
+    if (backdrop) backdrop.addEventListener('click', dismiss);
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && root.classList.contains('legal-open')) dismiss();
+    });
+
+    if (saveBtn) saveBtn.addEventListener('click', function () {
+      var name = (nameInput && nameInput.value || '').trim();
+      if (name.length < 2) {
+        showNote('Add your name first.');
+        if (nameInput) nameInput.focus();
+        return;
+      }
+      var session = readSession();
+      if (session && session.data) {
+        session.data.name = name;
+        try { session.store.setItem('roomtone.session', JSON.stringify(session.data)); } catch (e) { /* blocked */ }
+      }
+      var nameEl = document.querySelector('[data-operator-name]');
+      if (nameEl) nameEl.textContent = name;
+      var initialsEl = document.querySelector('[data-operator-initials]');
+      if (initialsEl) {
+        initialsEl.textContent = name.split(/\s+/).slice(0, 2).map(function (word) {
+          return word.charAt(0);
+        }).join('').toUpperCase() || 'OP';
+      }
+      showNote('Profile saved.');
+      toastMsg('Profile saved', 'check_circle');
+    });
+
+    if (signOutBtn) signOutBtn.addEventListener('click', function () {
       if (!window.confirm('Sign out of Attune?')) return;
       try {
         localStorage.removeItem('roomtone.session');
@@ -4748,6 +5014,123 @@
   window.addEventListener('attune:venue-changed', function () { setTimeout(paint, 3800); });
   paint();
 })();
+</script>
+
+<script type="module">
+  /* Google / Apple buttons in the in-app auth shell (drawer -> Sign Out).
+     auth-firebase.js owns the flow; this only wires the two buttons. */
+  (function () {
+    var shell = document.getElementById('auth-shell');
+    if (!shell) return;
+    var buttons = shell.querySelectorAll('[data-sso]');
+    if (!buttons.length) return;
+
+    buttons.forEach(function (btn) {
+      var text = btn.querySelector('span');
+      var original = text ? text.textContent : '';
+      btn.addEventListener('click', function () {
+        var kind = btn.getAttribute('data-sso');
+        var label = kind === 'google' ? 'Google' : 'Apple';
+        var bridge = window.AttuneAuthShell;
+        if (!bridge) return;
+        if (text) text.textContent = 'CONNECTING\u2026';
+        btn.disabled = true;
+        btn.classList.add('opacity-70');
+
+        import('./auth-firebase.js')
+          .then(function (mod) {
+            return mod.ready.then(function (api) { return { mod: mod, api: api }; });
+          })
+          .then(function (loaded) {
+            if (!loaded.api) {
+              bridge.fail(label + ' sign-in is unavailable right now. Use your password.');
+              return;
+            }
+            return loaded.api.signIn(kind).then(function (who) {
+              if (who && who.redirect) {
+                bridge.redirecting(label);
+                return;
+              }
+              bridge.complete({ name: who.name, email: who.email, provider: kind }, label, who.linked);
+            }, function (err) {
+              if (err && (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request')) return;
+              bridge.fail(loaded.mod.errorMessage(label, err));
+            });
+          })
+          .catch(function (e) {
+            console.warn('[firebase] provider sign-in unavailable:', e && e.message);
+            bridge.fail(label + ' sign-in is unavailable right now. Use your password.');
+          })
+          .then(function () {
+            if (text) text.textContent = original;
+            btn.disabled = false;
+            btn.classList.remove('opacity-70');
+          });
+      });
+    });
+  })();
+</script>
+
+<script type="module">
+  /* Google/Apple sessions: finish a redirect hand-off, then keep a fresh
+     Firebase ID token on /api/** requests. Shared with auth.html. */
+  (function () {
+    var session = null;
+    try {
+      session = JSON.parse(localStorage.getItem('roomtone.session') || sessionStorage.getItem('roomtone.session') || 'null');
+    } catch (e) { session = null; }
+
+    var provider = session && session.provider;
+    var handoff = false;
+    try { handoff = !!sessionStorage.getItem('roomtone.sso.pending'); } catch (e) { /* storage blocked */ }
+
+    if (provider !== 'google' && provider !== 'apple' && !handoff) {
+      window.AttuneAuth.markReady(null);
+      return;
+    }
+
+    function toast(text, icon) {
+      var t = document.getElementById('toast');
+      if (!t) return;
+      var txt = t.querySelector('[data-toast-text]');
+      var ico = t.querySelector('[data-toast-icon]');
+      if (txt) txt.textContent = text;
+      if (ico) ico.textContent = icon || 'check_circle';
+      t.classList.remove('opacity-0', 'translate-y-2');
+    }
+
+    import('./auth-firebase.js').then(function (mod) {
+      return mod.ready.then(function (api) { return { mod: mod, api: api }; });
+    }).then(function (loaded) {
+      var api = loaded.api;
+      if (!api) { window.AttuneAuth.markReady(null); return; }
+      return api.resolveRedirect().then(function (result) {
+        if (result && result.user) {
+          var profile = result.user;
+          var label = profile.provider === 'apple' ? 'Apple' : 'Google';
+          var entry = {
+            name: profile.name, email: profile.email, venue: null,
+            provider: profile.provider, issuedAt: Date.now()
+          };
+          try {
+            var remembered = !!localStorage.getItem('roomtone.session');
+            var store = remembered ? localStorage : sessionStorage;
+            store.setItem('roomtone.session', JSON.stringify(entry));
+          } catch (e) { /* storage blocked */ }
+          toast('Signed in with ' + label + '. Tuning\u2026', 'verified_user');
+          setTimeout(function () { location.reload(); }, 900);
+          return;
+        }
+        if (result && result.error) {
+          console.warn('[auth] redirect sign-in failed:', result.error.code || result.error.message);
+        }
+        window.AttuneAuth.markReady(api.headers);
+      });
+    }).catch(function (e) {
+      console.warn('[firebase] token refresh unavailable:', e && e.message);
+      window.AttuneAuth.markReady(null);
+    });
+  })();
 </script>
 
 </body>

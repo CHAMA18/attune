@@ -32,7 +32,7 @@ The agent is not a chat box bolted onto a dashboard — it is the composition en
             the route always answers 200. The app never dead-ends.
 ```
 
-Response contract: `{ playbook, engine: llm|local, provider, model, generatedAt, latencyMs, agentTrace[], drivers[] }`. `drivers` re-renders as the cited MATCH chips; `agentTrace` renders verbatim as the trace strip.
+Response contract: `{ playbook, engine: llm|local, provider, model, generatedAt, latencyMs, agentTrace[], drivers[], operator }` (`operator` is the verified Google/Apple identity, or `null` for an anonymous demo session). `drivers` re-renders as the cited MATCH chips; `agentTrace` renders verbatim as the trace strip.
 
 ## The grounding pipeline (app side)
 
@@ -125,6 +125,13 @@ firebase deploy --only functions,hosting
 # → https://qloo-api-1.web.app  (same-origin /api/** rewrite keeps keys server-side)
 ```
 
+### Turning on Google & Apple sign-in
+
+`auth.html` ships the client half (popup on desktop, redirect hand-off on iOS
+and installed PWAs). Each provider still needs a one-time switch in the Firebase
+console — plus an Apple Services ID and `.p8` signing key for Apple. Follow
+[`docs/auth-setup.md`](docs/auth-setup.md).
+
 CI-style deploy from a headless box: run `firebase login:ci` where you have a
 browser, then export the printed token as `FIREBASE_TOKEN` in the deploy
 environment — `firebase deploy` picks it up automatically.
@@ -144,6 +151,7 @@ localStorage.setItem('roomtone.apiBase', 'http://localhost:8787/api');
 ```
 index.html          single-file app (UI + Tailwind CDN + live-feed + venue resolution)
 auth.html           hash-routed auth (sign in / create / reset) + one-tap demo login
+auth-firebase.js    shared Google/Apple sign-in (auth.html + the in-app auth shell)
 worker/             Cloudflare Worker: Qloo proxy + playbook agent (enrich + compose + fallback)
 firebase.json       Static hosting config; cache headers
 Caddyfile           single-origin local stack: file_server + Qloo proxy + agent proxy

@@ -1,0 +1,4 @@
+Attune playbook agent -> http://127.0.0.1:3789
+  engines   : z-ai CLI -> local composer
+  grounding : Qloo enrichment ON (key loaded)
+[playbook] z-ai CLI failed: spawn z-ai ENOENT
