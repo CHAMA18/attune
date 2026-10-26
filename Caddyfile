@@ -44,7 +44,7 @@
 
         # --- Static app ----------------------------------------------------
         handle {
-                root * /home/z/my-project/roomtone-os
+                root * .
                 try_files {path} {path}/ /index.html
                 header /audio/* Cache-Control "public, max-age=86400"
                 header /logo/*  Cache-Control "public, max-age=86400"

@@ -3884,6 +3884,8 @@
     var override = (localStorage.getItem('roomtone.apiBase') || '').trim().replace(/\/+$/, '');
     /* The old Firebase host is retired (404 on every Qloo path). Drop a stale override so it can't break the feed. */
     if (/cloudfunctions\.net/.test(override)) { localStorage.removeItem('roomtone.apiBase'); override = ''; }
+    /* An override must point at the Worker's /api prefix. A bare host (e.g. the Worker root) answers 404 'Unknown route' for every Qloo call. */
+    if (override && !/\/api$/.test(override)) { localStorage.removeItem('roomtone.apiBase'); override = ''; }
     if (override) API_BASE = override;
   } catch (e) { /* storage blocked */ }
 
@@ -3984,7 +3986,9 @@
     if (cached && Date.now() - cached.t < CACHE_TTL) return Promise.resolve(cached.data);
 
     var ctrl = ('AbortController' in window) ? new AbortController() : null;
-    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 8000) : null;
+    /* Longer than the Worker's 15s upstream timeout, so a slow Qloo answer
+       arrives as a real response instead of a client-side abort. */
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 20000) : null;
     return fetch(url, {
       headers: { 'accept': 'application/json' },
       signal: ctrl ? ctrl.signal : undefined
@@ -4650,6 +4654,11 @@
           if (!box || state.live) return;
           box.textContent = 'Qloo did not return data for this block. Check the connection, then reload.';
         });
+        /* Home cards: say so instead of leaving the placeholder copy on screen. */
+        if (!state.live) {
+          setText('daypart-audio-title', 'Qloo unavailable');
+          setText('daypart-action', 'Qloo did not return data for this block. Check the connection, then reload.');
+        }
         var persona = document.getElementById('llm-persona');
         if (persona && !state.llmLive) {
           persona.textContent = '\u201CAnalog-leaning night owls who treat listening as the main event.\u201D';
