@@ -1787,11 +1787,7 @@
           </button>
         </div>
 
-        <div class="grid grid-cols-2 gap-space-xs pt-space-xs" data-mode-field="signin register">
-          <button type="button" data-alt="badge" class="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-colors">
-            <span class="material-symbols-outlined text-base">nfc</span>
-            <span class="font-label-caps text-label-caps tracking-wider">VENUE BADGE</span>
-          </button>
+        <div class="grid grid-cols-1 gap-space-xs pt-space-xs" data-mode-field="signin register">
           <button type="button" data-alt="otp" class="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-colors">
             <span class="material-symbols-outlined text-base">pin</span>
             <span class="font-label-caps text-label-caps tracking-wider">ONE-TIME CODE</span>
@@ -3895,10 +3891,7 @@
 
     shell.querySelectorAll('[data-alt]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const message = btn.getAttribute('data-alt') === 'badge'
-          ? 'Venue badge SSO pairs from the back-of-house reader.'
-          : 'One-time codes are issued at the door terminal.';
-        showToast(message, 'info');
+        showToast('One-time codes are issued at the door terminal.', 'info');
       });
     });
 
