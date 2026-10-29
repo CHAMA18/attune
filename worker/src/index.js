@@ -11,7 +11,7 @@
  *   without it the demo room stays anonymous.
  */
 import { CORS_HEADERS, enrichWithQloo, json, proxyQloo } from "./qloo.js";
-import { SYSTEM_PROMPT, compactGrounding, computeDrivers, composeLocal, mergedArtists, validPlaybook } from "./compose.js";
+import { SYSTEM_PROMPT, compactGrounding, computeDrivers, composeLocal, mergedArtists, validPlaybook, auditGrounding } from "./compose.js";
 import { callLLM } from "./llm.js";
 import { operatorFromRequest } from "./auth.js";
 
@@ -98,6 +98,38 @@ async function playbook(request, env, operator) {
     trace.push({ step: "compose", detail: "deterministic composer — every line cites grounded entities" });
   }
 
+  /* Verify-and-correct loop: the agent audits its own draft against the
+     grounding JSON. Below the bar it re-asks the composer ONCE, quoting the
+     failed sections — a bounded self-correction, not a single shot. */
+  let audit = auditGrounding(composed.text, g);
+  trace.push({
+    step: "audit",
+    detail: audit.verified + "/" + audit.lines + " lines cite grounded entities" + (audit.ok ? " · pass" : " · below bar"),
+  });
+  if (!audit.ok && engine === "llm") {
+    const failed = audit.bad.join(", ");
+    try {
+      const retryPrompt = userPrompt +
+        "\n\nYour previous draft failed the grounding audit on: " + failed +
+        ". Rewrite those sections naming ONLY entities present in the grounding JSON. Return the full playbook again, same format.";
+      const out2 = await callLLM(env, SYSTEM_PROMPT, retryPrompt);
+      if (validPlaybook(out2.text)) {
+        const audit2 = auditGrounding(out2.text, g);
+        if (audit2.verified > audit.verified) {
+          composed = out2;
+          audit = audit2;
+          audit.retried = true;
+          trace.push({ step: "retry", detail: "re-grounded " + failed + " · " + audit2.verified + "/" + audit2.lines + " lines now cite entities" });
+        } else {
+          trace.push({ step: "retry", detail: "retry did not improve grounding — keeping the first draft" });
+        }
+      }
+    } catch (err) {
+      console.error("playbook audit retry failed", err);
+      trace.push({ step: "retry", detail: "retry unreachable — keeping the first draft" });
+    }
+  }
+
   return json({
     operator: operator
       ? { uid: operator.uid, email: operator.email, provider: operator.provider }
@@ -109,6 +141,7 @@ async function playbook(request, env, operator) {
     generatedAt: new Date().toISOString(),
     latencyMs: Date.now() - t0,
     agentTrace: trace,
+    audit: { lines: audit.lines, verified: audit.verified, ok: audit.ok, retried: Boolean(audit.retried), failed_sections: audit.bad },
     drivers: computeDrivers(ctx, artists),
   });
 }

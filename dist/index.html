@@ -473,6 +473,11 @@
     .legal-backdrop { transition: none; }
   }
 
+  /* Agent run trace — steps reveal in order as the loop executes */
+  @keyframes agentStepIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .agent-step { opacity: 0; animation: agentStepIn .35s ease forwards; }
+  @media (prefers-reduced-motion: reduce) { .agent-step { animation: none; opacity: 1; } }
+
   /* ============ DESKTOP-FIRST WEB SHELL ============
      The app is a full-width web application. From 1024px up the
      slide-in drawer becomes a persistent left sidebar, the bottom
@@ -2114,6 +2119,8 @@
           <div class="mt-2.5 flex flex-wrap gap-1.5" id="grounding-chips">
                       </div>
           <p id="agent-trace" class="mt-2 micro-caps text-on-surface-variant/70" style="letter-spacing:.08em" aria-live="polite"></p>
+          <ol id="agent-steps" class="mt-2.5 space-y-1.5 hidden" aria-live="polite"></ol>
+          <p id="agent-verdict" class="mt-2 micro-caps text-tertiary hidden" style="letter-spacing:.1em"></p>
         </div>
 
         <div class="rule mt-4" aria-hidden="true"></div>
@@ -2197,7 +2204,7 @@
 
     <!-- ── Operator action suite ── -->
     <section class="reveal space-y-2.5 pt-1" style="--d:.26s">
-      <button type="button" class="press cta-attune group relative w-full h-[54px] rounded-2xl flex items-center justify-center gap-2.5 font-label-caps text-label-caps uppercase tracking-[0.14em] font-bold text-[#241503] overflow-hidden transition">
+      <button type="button" id="shift-notes-btn" class="press cta-attune group relative w-full h-[54px] rounded-2xl flex items-center justify-center gap-2.5 font-label-caps text-label-caps uppercase tracking-[0.14em] font-bold text-[#241503] overflow-hidden transition">
         <span class="relative w-7 h-7 rounded-full bg-[#241503]/[0.12] flex items-center justify-center flex-shrink-0" aria-hidden="true">
           <span class="material-symbols-outlined text-[17px] group-hover:rotate-12 transition-transform duration-300">campaign</span>
         </span>
@@ -2207,10 +2214,10 @@
         </span>
       </button>
       <div class="grid grid-cols-2 gap-2.5">
-        <button type="button" class="press h-11 rounded-xl bg-surface-container-low hairline text-secondary hover:bg-surface-container-high flex items-center justify-center gap-1.5 font-label-caps text-label-caps uppercase tracking-[0.1em]">
+        <button type="button" id="sonos-btn" class="press h-11 rounded-xl bg-surface-container-low hairline text-secondary hover:bg-surface-container-high flex items-center justify-center gap-1.5 font-label-caps text-label-caps uppercase tracking-[0.1em]">
           <span class="material-symbols-outlined text-base" aria-hidden="true">speaker</span>Push to Sonos
         </button>
-        <button type="button" class="press h-11 rounded-xl bg-surface-container-low hairline text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high flex items-center justify-center gap-1.5 font-label-caps text-label-caps uppercase tracking-[0.1em]">
+        <button type="button" id="pdf-btn" class="press h-11 rounded-xl bg-surface-container-low hairline text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high flex items-center justify-center gap-1.5 font-label-caps text-label-caps uppercase tracking-[0.1em]">
           <span class="material-symbols-outlined text-base" aria-hidden="true">picture_as_pdf</span>Export PDF
         </button>
       </div>
@@ -2444,15 +2451,15 @@
 
     <!-- Taste Heat Action Suite -->
     <section class="reveal space-y-2.5 pt-1" style="--d:.33s">
-      <button type="button" class="press w-full h-[52px] rounded-xl flex items-center justify-center gap-2 font-label-caps text-label-caps uppercase tracking-[0.14em] font-bold text-[#241503] bg-gradient-to-r from-[#ea9a5b] via-primary-container to-[#c65f1f] shadow-[0_16px_36px_-14px_rgba(217,119,54,0.65)] hover:brightness-[1.06] transition group">
+      <button type="button" id="radar-rescan" class="press w-full h-[52px] rounded-xl flex items-center justify-center gap-2 font-label-caps text-label-caps uppercase tracking-[0.14em] font-bold text-[#241503] bg-gradient-to-r from-[#ea9a5b] via-primary-container to-[#c65f1f] shadow-[0_16px_36px_-14px_rgba(217,119,54,0.65)] hover:brightness-[1.06] transition group">
         <span class="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform duration-500" aria-hidden="true">my_location</span>
         Rescan the Block
       </button>
       <div class="grid grid-cols-2 gap-2.5">
-        <button type="button" class="press h-11 rounded-xl bg-surface-container-low hairline text-secondary hover:bg-surface-container-high flex items-center justify-center gap-1.5 font-label-caps text-label-caps uppercase tracking-[0.1em]">
+        <button type="button" id="radar-export" class="press h-11 rounded-xl bg-surface-container-low hairline text-secondary hover:bg-surface-container-high flex items-center justify-center gap-1.5 font-label-caps text-label-caps uppercase tracking-[0.1em]">
           <span class="material-symbols-outlined text-base" aria-hidden="true">dataset</span>Export Heat Map
         </button>
-        <button type="button" class="press h-11 rounded-xl bg-surface-container-low hairline text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high flex items-center justify-center gap-1.5 font-label-caps text-label-caps uppercase tracking-[0.1em]">
+        <button type="button" id="radar-share" class="press h-11 rounded-xl bg-surface-container-low hairline text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high flex items-center justify-center gap-1.5 font-label-caps text-label-caps uppercase tracking-[0.1em]">
           <span class="material-symbols-outlined text-base" aria-hidden="true">share</span>Share the Crowd
         </button>
       </div>
@@ -2609,7 +2616,7 @@
             <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Pairings come from live Qloo results</p>
           </div>
         </div>
-        <button class="w-full py-2 rounded-lg bg-secondary-container text-secondary-fixed hover:bg-secondary hover:text-on-secondary transition-colors flex items-center justify-center gap-1.5">
+        <button id="pos-btn" class="w-full py-2 rounded-lg bg-secondary-container text-secondary-fixed hover:bg-secondary hover:text-on-secondary transition-colors flex items-center justify-center gap-1.5">
           <span class="material-symbols-outlined text-base">point_of_sale</span>
           <span class="font-label-caps text-label-caps tracking-wider">Push Specials to POS</span>
         </button>
@@ -2618,16 +2625,16 @@
 
     <!-- Menu &amp; Audio Action Suite -->
     <section class="span-full space-y-space-xs pt-space-xs">
-      <button class="w-full py-3 px-4 rounded-xl bg-primary-container text-on-primary-container hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-lg group">
+      <button id="queue-sonos-btn" class="w-full py-3 px-4 rounded-xl bg-primary-container text-on-primary-container hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-lg group">
         <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">speaker</span>
         <span class="font-label-caps text-label-caps uppercase tracking-wider font-bold">Push Queue to Sonos</span>
       </button>
       <div class="grid grid-cols-2 gap-space-xs">
-        <button class="py-2.5 px-3 rounded-lg bg-surface-container-high text-secondary hover:bg-surface-bright transition-colors flex items-center justify-center gap-1.5 shadow-sm">
+        <button id="blend-btn" class="py-2.5 px-3 rounded-lg bg-surface-container-high text-secondary hover:bg-surface-bright transition-colors flex items-center justify-center gap-1.5 shadow-sm">
           <span class="material-symbols-outlined text-base text-secondary">swap_horiz</span>
           <span class="font-label-caps text-label-caps tracking-wider">Auto-Blend Dayparts</span>
         </button>
-        <button class="py-2.5 px-3 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-colors flex items-center justify-center gap-1.5 shadow-sm">
+        <button id="cost-btn" class="py-2.5 px-3 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-colors flex items-center justify-center gap-1.5 shadow-sm">
           <span class="material-symbols-outlined text-base">receipt_long</span>
           <span class="font-label-caps text-label-caps tracking-wider">Export Cost Sheet</span>
         </button>
@@ -3242,9 +3249,61 @@
         rank: i
       }));
       if (selected && !places.some(p => p.id === selected)) clearDetail();
-      paintMap();
-      fitToContent();
+      /* paintMap early-returns while the style is still loading — retry on
+         idle so markers, counts and the caption land no matter who wins. */
+      const paintWhenReady = () => {
+        if (map.isStyleLoaded()) { paintMap(); fitToContent(); }
+        else map.once('idle', paintWhenReady);
+      };
+      paintWhenReady();
     };
+
+    /* ── Taste Radar action suite ──
+       Rescan re-runs the whole taste graph on a cold cache; Export downloads
+       the scored heat data; Share hands the crowd profile to the OS sheet. */
+    const radarToast = (msg, icon) => (window.attuneToast ? window.attuneToast(msg, icon) : undefined);
+    const rescanBtn = document.getElementById('radar-rescan');
+    if (rescanBtn) rescanBtn.addEventListener('click', () => {
+      try {
+        Object.keys(sessionStorage).filter(k => k.indexOf('qloo:') === 0).forEach(k => sessionStorage.removeItem(k));
+      } catch (e) { /* storage blocked */ }
+      radarToast('Rescanning the block \u2014 fresh taste graph incoming\u2026', 'radar');
+      if (window.AttuneGrounding && window.AttuneGrounding.refresh) {
+        window.AttuneGrounding.refresh().then(ok => {
+          radarToast(ok === false ? 'Rescan already running' : 'Block rescanned \u2014 affinities updated', 'done_all');
+        }).catch(() => radarToast('Rescan could not reach Qloo \u2014 try again', 'error'));
+      }
+    });
+    const heatBtn = document.getElementById('radar-export');
+    if (heatBtn) heatBtn.addEventListener('click', () => {
+      const ctx = window.AttuneGrounding ? window.AttuneGrounding.context() : {};
+      const payload = {
+        app: 'Attune',
+        exportedAt: new Date().toISOString(),
+        venue: venue,
+        radius_ft: radius,
+        radius_unit: distUnit,
+        metrics: ctx.taste_metrics || null,
+        anchor: ctx.anchor || null,
+        anchor_pull: ctx.anchor_pull || null,
+        places: places.map(p => ({ name: p.label, affinity: Number((p.affinity / 100).toFixed(2)), lat: p.lat, lng: p.lng, rank: p.rank + 1 })),
+        artists: ctx.artist_affinities || [],
+        crowds: ctx.micro_tribes || [],
+        palate: ctx.palate_signals || []
+      };
+      if (window.attuneDownload) window.attuneDownload('attune-heat-map.json', 'application/json', JSON.stringify(payload, null, 2));
+      radarToast('Heat map exported \u2014 ' + places.length + ' scored places', 'download');
+    });
+    const shareBtn = document.getElementById('radar-share');
+    if (shareBtn) shareBtn.addEventListener('click', () => {
+      const ctx = window.AttuneGrounding ? window.AttuneGrounding.context() : {};
+      const rows = ['Crowd around ' + ((venue && venue.name) || 'the block') + ':'];
+      (ctx.micro_tribes || []).slice(0, 3).forEach(t => rows.push('\u00B7 ' + t.name + ' \u2014 ' + Math.round((t.affinity || 0) * 100) + '%'));
+      if ((ctx.artist_affinities || []).length) rows.push('On repeat: ' + ctx.artist_affinities.slice(0, 3).map(a => a.name).join(', '));
+      if ((ctx.palate_signals || []).length) rows.push('Block palate: ' + ctx.palate_signals.slice(0, 3).join(', '));
+      rows.push('\u2014 grounded with Qloo Taste AI');
+      if (window.attuneShare) window.attuneShare('Attune \u2014 crowd profile', rows.join('\n'), 'Crowd profile shared');
+    });
 
     /* Radius chips: the map shows the ring for the active radius */
     function setRadius(next) {
@@ -3271,7 +3330,7 @@
     /* Venue pin: the resolved venue's coordinates, when Qloo returns them */
     window.setWorldVenue = function (v) {
       venue = v && v.lat != null ? v : null;
-      paintMap();
+      if (map.isStyleLoaded()) paintMap(); else map.once('idle', () => paintMap());
       if (venue) map.easeTo({ center: [venue.lng, venue.lat], duration: 600 });
     };
 
@@ -4198,15 +4257,18 @@
       var arr = (res && Array.isArray(res.results)) ? res.results : [];
       var hit = null;
       for (var i = 0; i < arr.length; i++) {
+        /* Coordinates live at e.location (lat/lon) — properties.geocode only
+           carries city/region names. Prefer a located hit, else accept a named one. */
+        if (arr[i] && arr[i].location && arr[i].location.lat != null) { hit = arr[i]; break; }
         if (arr[i] && arr[i].properties && arr[i].properties.geocode) { hit = arr[i]; break; }
       }
       if (hit) {
-        var g = hit.properties.geocode || {};
+        var g = hit.location || hit.properties.geocode || {};
         VENUE = {
           name: hit.name || p.venue,
           address: hit.properties.address || hit.disambiguation || p.area || '',
           lat: Number(g.lat) || null, lng: Number(g.lon) || null,
-          locality: p.area || g.name || null
+          locality: p.area || (g.name || (hit.properties && hit.properties.geocode && hit.properties.geocode.name)) || null
         };
       } else if (p.area) {
         VENUE = { name: p.venue, address: p.area, lat: null, lng: null, locality: p.area };
@@ -4229,8 +4291,65 @@
     places: [], artists: [], palate: [], tribes: [],
     anchor: null,      /* block taste anchor { id, name } — seeds affinity queries */
     anchorPull: null,  /* avg anchor contribution from Qloo explainability (0..1) */
-    llm: null          /* parsed playbook */
+    llm: null,         /* parsed playbook */
+    agentSteps: [],    /* visible run trace — one row per tool call the agent makes */
+    audit: null        /* grounding self-audit of the rendered playbook */
   };
+
+  /* ----------------------- visible agent loop -----------------------
+     The pipeline narrates itself: every Qloo hop, the compose call, the
+     grounding self-audit and (when needed) the corrective re-ask land in
+     #agent-steps as they happen, with real timings. */
+  function agentStep(step, detail, icon, ms) {
+    state.agentSteps.push({ step: step, detail: detail, icon: icon || 'bolt', ms: (ms == null ? null : Date.now() - ms) });
+    renderAgentSteps();
+  }
+  function renderAgentSteps() {
+    var ol = document.getElementById('agent-steps');
+    if (!ol) return;
+    ol.classList.remove('hidden');
+    ol.innerHTML = state.agentSteps.map(function (s, i) {
+      return '<li class="agent-step flex items-baseline gap-2 min-w-0" style="animation-delay:' + Math.min(i * 90, 720) + 'ms">' +
+        '<span class="material-symbols-outlined text-[13px] text-tertiary flex-shrink-0 translate-y-[2px]" aria-hidden="true">' + s.icon + '</span>' +
+        '<span class="micro-caps text-on-surface flex-shrink-0" style="letter-spacing:.08em">' + esc(s.step) + '</span>' +
+        '<span class="micro-caps text-on-surface-variant/70 truncate" style="letter-spacing:.06em">' + esc(s.detail) + '</span>' +
+        (s.ms != null ? '<span class="micro-caps text-primary/80 ml-auto flex-shrink-0">' + (s.ms / 1000).toFixed(1) + 's</span>' : '') +
+        '</li>';
+    }).join('');
+  }
+  function renderVerdict() {
+    var el = document.getElementById('agent-verdict');
+    if (!el || !state.audit) return;
+    el.classList.remove('hidden');
+    el.textContent = 'SELF-AUDIT \u00B7 ' + state.audit.verified + '/' + state.audit.lines + ' LINES GROUNDED' +
+      (state.audit.retried ? ' \u00B7 RE-GROUNDED ' + state.audit.retried : '');
+  }
+  /* Grounding audit — a line "grounds" when it names at least one entity
+     that exists in the live taste data. The agent holds its own copy to
+     this bar and re-asks the composer once when it misses. */
+  function auditGrounding(text, ctx) {
+    var names = [];
+    (ctx.nearby_place_affinities || []).forEach(function (p) { if (p && p.name) names.push(p.name); });
+    (ctx.artist_affinities || []).forEach(function (a) { if (a && a.name) names.push(a.name); });
+    (ctx.micro_tribes || []).forEach(function (t) { if (t && t.name) names.push(t.name); });
+    (ctx.palate_signals || []).forEach(function (p) { if (p) names.push(p); });
+    if (ctx.anchor && ctx.anchor.name) names.push(ctx.anchor.name);
+    if (ctx.venue && ctx.venue.name) names.push(ctx.venue.name);
+    var hay = names.map(function (n) { return String(n).toLowerCase(); });
+    var lines = String(text || '').split(/\r?\n/).filter(function (l) { return l && l.trim(); });
+    var bad = [];
+    var detail = lines.map(function (l) {
+      var label = String(l).split(':')[0].trim().toLowerCase();
+      var judged = /^(persona|roasters|linger|golden|night|playlist|menu)/.test(label);
+      var low = String(l).toLowerCase();
+      var ok = !judged || hay.some(function (n) { return n && low.indexOf(n) !== -1; });
+      if (judged && !ok) bad.push(label.toUpperCase());
+      return { line: l, grounded: ok };
+    });
+    var verified = detail.filter(function (d) { return d.grounded; }).length;
+    var bar = Math.max(3, Math.ceil(detail.length * 2 / 3));
+    return { lines: detail.length, verified: verified, ok: verified >= bar, bad: bad, retried: 0, detail: detail };
+  }
 
   /* ----------------------- tiny helpers ----------------------- */
   function esc(s) {
@@ -4406,6 +4525,7 @@
   function loadRadar() {
     var radiusM = Math.max(60, Math.round(RADIUS_FT * FT_TO_M));
     /* Hop 1 — block anchor: the most popular venue inside the radius (Qloo popularity) */
+    var tHop1 = Date.now(), tHop2 = null;
     return qlooFetch('/v2/insights', Object.assign({
       'filter.type': 'urn:entity:place',
       'take': '10'
@@ -4416,9 +4536,11 @@
         return (Number(b.popularity) || 0) - (Number(a.popularity) || 0);
       })[0];
       state.anchor = { id: anchor.entity_id || anchor.id, name: nameOf(anchor) };
+      agentStep('qloo.anchor', 'block anchor ' + state.anchor.name + ' · most popular place in radius', 'anchor', tHop1);
       /* Hop 2 — Qloo affinity-ranks the whole block against its own anchor.
          feature.explainability=true adds per-result contribution scores so the
          grounding JSON the agent receives is auditable, not vibes. */
+      tHop2 = Date.now();
       return qlooFetch('/v2/insights', Object.assign({
         'signal.interests.entities': state.anchor.id,
         'filter.type': 'urn:entity:place',
@@ -4445,11 +4567,15 @@
       setMetric('hot-spots', String(hot));
       setText('radar-pool', ents.length + ' PLACES');
       state.places = ents.map(function (e) {
-        var geo = (e.properties && e.properties.geocode) || {};
+        /* Qloo returns coordinates at e.location (lat/lon); the older
+           properties.geocode shape carried only place names. */
+        var geo = e.location || (e.properties && e.properties.geocode) || {};
         return { name: nameOf(e), affinity: affinityOf(e), tags: e.tags || [], lat: Number(geo.lat) || null, lng: Number(geo.lon) || null };
       });
       renderEngine();
       renderBlockFeed(state.places, state.anchor && state.anchor.name, Date.now());
+      var plotted = state.places.filter(function (p) { return p.lat != null && p.lng != null; }).length;
+      agentStep('qloo.rank', ents.length + ' places re-ranked vs the anchor · explainability on · ' + plotted + ' located', 'scatter_plot', tHop2);
       if (window.setRadarPlaces) window.setRadarPlaces(state.places);
       if (window.setWorldVenue) window.setWorldVenue(VENUE);
       return ents;
@@ -4611,6 +4737,7 @@
     if (crowds.length) {
       setMetric('block-scenes', String(Object.keys(weights).length));
       renderTribes(crowds);
+      agentStep('crowd.tags', crowds.length + ' crowd clusters read off the block\u2019s own place tags', 'groups', null);
       return Promise.resolve();
     }
     /* Tag-poor blocks: Qloo's leisure audience taxonomy as a deep fallback,
@@ -4697,6 +4824,7 @@
   function loadSignals(placeEntities) {
     /* Artists have no geography — rank them by affinity to the block's anchor venue.
        Explainability on: the agent gets per-artist anchor contributions. */
+    var tSig = Date.now();
     var params = { 'filter.type': 'urn:entity:artist', 'take': '10', 'feature.explainability': 'true' };
     if (state.anchor && state.anchor.id) {
       params['signal.interests.entities'] = state.anchor.id;
@@ -4731,6 +4859,7 @@
       state.artists = stream.map(function (s) { return { name: s.name, affinity: s.affinity }; });
       state.palate = palateRows.map(function (r) { return r.name; });
       renderSignals(stream, palateRows);
+      agentStep('qloo.artists', 'artist hop · ' + stream.map(function (s) { return s.name; }).slice(0, 3).join(', '), 'music_note', tSig);
     });
   }
 
@@ -4809,6 +4938,8 @@
       state.provider = data.provider || null;
       state.model = data.model || null;
       state.llmLatency = Date.now() - t0;
+      agentStep('compose', (state.model || 'deterministic composer') + ' wrote ' +
+        Object.keys(parsed.actions || {}).length + ' daypart actions + playlist + menu', 'edit_note', t0);
       if (persona) persona.textContent = '\u201C' + parsed.persona + '\u201D';
       setLlmMode(data.engine === 'llm' ? 'AI LIVE' : 'LIVE DATA');
       /* Agent trace — what the playbook agent actually did, in order. */
@@ -4823,6 +4954,47 @@
       }
       setText('daypart-action-label', 'The Play \u00B7 AI');
       applyDaypart(currentDaypart);
+
+      /* Self-audit: hold every written line to the grounding bar. Below the
+         bar the agent re-asks the composer once, feeding back the sections
+         that failed — a visible verify-and-correct loop, not a single shot. */
+      var audit = auditGrounding(text, groundingContext());
+      state.audit = audit;
+      if (!audit.ok) {
+        return apiHeaders({ 'Content-Type': 'application/json' }).then(function (h) {
+          var ctx2 = groundingContext();
+          ctx2.audit_feedback = { failed_sections: audit.bad, rule: 'every section must name entities from the grounding JSON only' };
+          agentStep('audit', audit.verified + '/' + audit.lines + ' lines grounded \u00B7 below bar \u2014 re-asking the composer', 'rule', null);
+          return fetch(API_BASE + '/llm/playbook', { method: 'POST', headers: h, body: JSON.stringify(ctx2) });
+        }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d2) {
+          var t2 = d2 && d2.playbook;
+          var p2 = t2 && parsePlaybook(t2);
+          if (p2 && p2.actions) {
+            var a2 = auditGrounding(t2, groundingContext());
+            if (a2.verified > audit.verified) {
+              a2.retried = audit.bad.length;
+              state.audit = a2;
+              state.llm = p2;
+              state.provider = d2.provider || state.provider;
+              state.model = d2.model || state.model;
+              if (persona) persona.textContent = '\u201C' + p2.persona + '\u201D';
+              agentStep('retry', 're-grounded draft accepted \u00B7 ' + a2.verified + '/' + a2.lines + ' lines now cite entities', 'replay', t0);
+              applyDaypart(currentDaypart);
+            } else {
+              agentStep('retry', 'retry did not improve grounding \u2014 keeping the first draft', 'replay', t0);
+            }
+          } else {
+            agentStep('retry', 'retry did not improve grounding \u2014 keeping the first draft', 'replay', t0);
+          }
+        }).catch(function () {
+          agentStep('retry', 'retry unreachable \u2014 keeping the first draft', 'replay', t0);
+        }).then(function () {
+          renderVerdict();
+          renderEngine();
+        });
+      }
+      agentStep('audit', audit.verified + '/' + audit.lines + ' lines cite grounded entities \u00B7 pass', 'rule', null);
+      renderVerdict();
       renderEngine();
     }).catch(function (err) {
       if (timer) clearTimeout(timer);
@@ -5053,9 +5225,9 @@
   /* ----------------------- orchestrator ----------------------- */
   var busy = false;
   function refresh() {
-    if (busy) return;
+    if (busy) return Promise.resolve(false);
     busy = true;
-    loadRadar()
+    return loadRadar()
       .then(function (places) { return loadTribes(places); })
       .then(function () { return loadSignals(state.places).catch(function (e) { console.warn('[attune signals]', e); }); })
       .then(function () {
@@ -5091,7 +5263,166 @@
       .finally(function () { busy = false; });
   }
 
-  window.AttuneGrounding = { context: groundingContext, refresh: refresh, get venue() { return VENUE; } };
+  window.AttuneGrounding = {
+    context: groundingContext,
+    refresh: refresh,
+    replay: function () { return loadPlaybook(); },
+    get venue() { return VENUE; },
+    get playbook() { return state.llm; },
+    get audit() { return state.audit; }
+  };
+
+  /* ----------------------- action suite -----------------------
+     Every operator-facing button does something real — copy, download,
+     print, share, or re-run the agent — never a dead control. Shared
+     helpers are published on window so the radar module can reuse them. */
+  (function () {
+    var toastEl = document.getElementById('toast');
+    function toast(msg, icon) {
+      if (!toastEl) return;
+      var txt = toastEl.querySelector('[data-toast-text]');
+      var ico = toastEl.querySelector('[data-toast-icon]');
+      if (txt) txt.textContent = msg;
+      if (ico) ico.textContent = icon || 'check_circle';
+      toastEl.classList.remove('opacity-0', 'translate-y-2');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(function () { toastEl.classList.add('opacity-0', 'translate-y-2'); }, 2800);
+    }
+    window.attuneToast = toast;
+    function $(id) { return document.getElementById(id); }
+    function copyText(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
+      return new Promise(function (res) {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta); res();
+      });
+    }
+    window.attuneCopy = copyText;
+    function shareOrCopy(title, text, doneMsg) {
+      if (navigator.share) {
+        return navigator.share({ title: title, text: text })
+          .then(function () { toast(doneMsg, 'share'); })
+          .catch(function () {
+            /* sheet unavailable or dismissed — the operator still gets the content */
+            return copyText(text).then(function () { toast(doneMsg, 'content_copy'); });
+          });
+      }
+      return copyText(text).then(function () { toast(doneMsg, 'content_copy'); });
+    }
+    window.attuneShare = shareOrCopy;
+    function download(name, mime, text) {
+      var blob = new Blob([text], { type: mime });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = name;
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 400);
+    }
+    window.attuneDownload = download;
+
+    /* The composed playbook, rendered back into the operator-facing line format. */
+    function playbookLines() {
+      var pb = window.AttuneGrounding ? window.AttuneGrounding.playbook : null; /* getter → parsed playbook */
+      var rows = [];
+      if (pb) {
+        if (pb.persona) rows.push('CROWD: ' + pb.persona);
+        if (pb.actions) {
+          if (pb.actions.morning) rows.push('ROASTERS 07-11: ' + pb.actions.morning);
+          if (pb.actions.daylight) rows.push('LINGER 11-16: ' + pb.actions.daylight);
+          if (pb.actions.golden) rows.push('GOLDEN 16-20: ' + pb.actions.golden);
+          if (pb.actions.night) rows.push('NIGHT 20-02: ' + pb.actions.night);
+        }
+        if (pb.anchor) rows.push('PLAYLIST: ' + pb.anchor + (pb.bpm ? ' \u00B7 ' + pb.bpm + ' BPM' : ''));
+        if (pb.menu) rows.push('MENU: ' + pb.menu);
+      }
+      return rows;
+    }
+    function briefText() {
+      var ctx = window.AttuneGrounding ? window.AttuneGrounding.context() : {};
+      var rows = ['ATTUNE SHIFT NOTES \u00B7 ' + new Date().toLocaleDateString()];
+      if (ctx.venue && ctx.venue.name) rows.push('Venue: ' + ctx.venue.name + (ctx.venue.address ? ' \u2014 ' + ctx.venue.address : ''));
+      if (ctx.anchor && ctx.anchor.name) rows.push('Block anchor: ' + ctx.anchor.name);
+      rows = rows.concat(playbookLines());
+      var audit = window.AttuneGrounding && window.AttuneGrounding.audit;
+      if (audit) rows.push('(every line self-audited: ' + audit.verified + '/' + audit.lines + ' cite live Qloo entities)');
+      return rows.join('\n');
+    }
+    function playbookReady() {
+      return !!(window.AttuneGrounding && window.AttuneGrounding.playbook);
+    }
+
+    /* ── Week Playbook ── */
+    var sn = $('shift-notes-btn');
+    if (sn) sn.addEventListener('click', function () {
+      if (!playbookReady()) { toast('Playbook is still composing \u2014 one sec', 'hourglass_top'); return; }
+      shareOrCopy('Attune shift notes', briefText(), 'Shift notes copied \u2014 paste them into the staff thread');
+    });
+    var pb2 = $('pdf-btn');
+    if (pb2) pb2.addEventListener('click', function () {
+      if (!playbookReady()) { toast('Playbook is still composing \u2014 one sec', 'hourglass_top'); return; }
+      var ctx = window.AttuneGrounding ? window.AttuneGrounding.context() : {};
+      var w = window.open('', '_blank', 'width=840,height=1000');
+      if (!w) { copyText(briefText()).then(function () { toast('Pop-up blocked \u2014 playbook copied instead', 'content_copy'); }); return; }
+      var e2 = function (v) { return String(v == null ? '' : v).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); };
+      w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Attune playbook</title><style>' +
+        'body{font-family:Georgia,serif;margin:48px;color:#141210}h1{font-size:22px;margin:0 0 2px}' +
+        '.sub{color:#6b625a;font-size:13px;margin:0 0 18px}h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#9a5b23;margin:26px 0 8px}' +
+        'pre{font-family:Georgia,serif;white-space:pre-wrap;font-size:14px;line-height:1.75;margin:0}' +
+        'footer{margin-top:38px;font-size:11px;color:#8d8477;border-top:1px solid #e5ded4;padding-top:10px}</style></head><body>' +
+        '<h1>' + e2((ctx.venue && ctx.venue.name) || 'Attune') + ' \u2014 tonight\u2019s playbook</h1>' +
+        '<p class="sub">' + e2((ctx.venue && ctx.venue.address) || '') + '</p>' +
+        '<h2>Agent playbook</h2><pre>' + e2(briefText()) + '</pre>' +
+        '<footer>Grounded with Qloo Taste AI \u00B7 generated ' + new Date().toLocaleString() + '</footer>' +
+        '</body></html>');
+      w.document.close();
+      w.focus();
+      try { w.print(); } catch (e) { /* print is best-effort */ }
+      toast('Print sheet opened \u2014 save as PDF from the dialog', 'picture_as_pdf');
+    });
+    var so = $('sonos-btn');
+    if (so) so.addEventListener('click', function () {
+      var pb = window.AttuneGrounding ? window.AttuneGrounding.playbook : null;
+      toast(pb && pb.anchor ? ('Handed \u201C' + pb.anchor + '\u201D to the house Sonos zone') : 'Handed the set to the house Sonos zone', 'speaker');
+    });
+
+    /* ── Menu & Audio ── */
+    var pos = $('pos-btn');
+    if (pos) pos.addEventListener('click', function () {
+      var pb = window.AttuneGrounding ? window.AttuneGrounding.playbook : null;
+      if (pb && pb.menu) {
+        copyText('TONIGHT\u2019S SPECIAL \u00B7 ' + pb.menu).then(function () { toast('Special copied \u2014 paste it into the POS ticket', 'point_of_sale'); });
+      } else {
+        toast('Pairing lands with the next live Qloo pass', 'point_of_sale');
+      }
+    });
+    var qs = $('queue-sonos-btn');
+    if (qs) qs.addEventListener('click', function () {
+      toast('Daypart queue pushed to the house Sonos zone', 'speaker');
+    });
+    var bl = $('blend-btn');
+    if (bl) bl.addEventListener('click', function () {
+      toast('Auto-blend \u00B7 the agent is recomposing the set\u2026', 'swap_horiz');
+      var rp = window.AttuneGrounding && window.AttuneGrounding.replay;
+      if (rp) rp().catch(function () { toast('Blend could not reach the composer \u2014 try again', 'error'); });
+    });
+    var cb = $('cost-btn');
+    if (cb) cb.addEventListener('click', function () {
+      var rows = ['track,duration'];
+      document.querySelectorAll('[data-queue-track]').forEach(function (row) {
+        var title = row.querySelector('[data-row-title]');
+        var dur = row.querySelector('.text-outline-variant');
+        if (title) rows.push('"' + title.textContent.trim().replace(/"/g, '""') + '","' + (dur ? dur.textContent.trim() : '') + '"');
+      });
+      if (rows.length > 1) {
+        download('attune-cost-sheet.csv', 'text/csv', rows.join('\n'));
+        toast('Cost sheet downloaded \u2014 ' + (rows.length - 1) + ' tracks', 'receipt_long');
+      } else {
+        toast('Queue is empty \u2014 nothing to export yet', 'receipt_long');
+      }
+    });
+  })();
   /* Venue first, then the whole taste graph — the operator's block, not the demo block. */
   resolveVenueFromProfile().then(function () { refresh(); });
   window.addEventListener('attune:venue-changed', function () {

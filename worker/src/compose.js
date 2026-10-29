@@ -65,6 +65,34 @@ export function validPlaybook(text) {
     /GOLDEN/i.test(t) && /NIGHT/i.test(t) && t.length < 2000;
 }
 
+/* Grounding audit — the agent checks its own copy before shipping it.
+   A line "grounds" when it names at least one entity that exists in the
+   compact grounding JSON. The section label (PERSONA / ROASTERS / …) is
+   what the retry loop quotes back when a line fails the bar. */
+export function auditGrounding(text, g) {
+  const names = [];
+  (g.top_places || []).forEach((p) => p && p.name && names.push(p.name));
+  (g.top_artists || []).forEach((a) => a && a.name && names.push(a.name));
+  (g.audiences || []).forEach((a) => a && a.name && names.push(a.name));
+  (g.palate_tags || []).forEach((p) => p && names.push(p));
+  if (g.block_anchor && g.block_anchor.name) names.push(g.block_anchor.name);
+  if (g.venue && g.venue.name) names.push(g.venue.name);
+  const hay = names.map((n) => String(n).toLowerCase());
+  const lines = String(text || "").split(/\r?\n/).filter((l) => l && l.trim());
+  const bad = [];
+  const detail = lines.map((line) => {
+    const label = String(line).split(":")[0].trim().toLowerCase();
+    const judged = /^(persona|roasters|linger|golden|night|playlist|menu)/.test(label);
+    const low = String(line).toLowerCase();
+    const ok = !judged || hay.some((n) => n && low.includes(n));
+    if (judged && !ok) bad.push(label.toUpperCase());
+    return { line, grounded: ok };
+  });
+  const verified = detail.filter((d) => d.grounded).length;
+  const bar = Math.max(3, Math.ceil(detail.length * 2 / 3));
+  return { lines: detail.length, verified: verified, ok: verified >= bar, bad, detail };
+}
+
 /* Deterministic composer — data in, copy out; cites real entities only. */
 export function composeLocal(g) {
   const place = (g.top_places && g.top_places[0] && g.top_places[0].name) || "the anchor venue down the block";
