@@ -103,6 +103,9 @@
     .lockup-rise, .fork-strike, .strike-ring, .lockup-halo { animation: none !important; }
   }
 
+  /* Ambient cinema canvas: full-bleed behind the shell, never interactive. */
+  #auth-ambient { display: block; }
+
   /* Mobile view enforcement: on screens wider than a phone, present the app
      inside a centered 390px phone column — identical to the main app shell. */
   @media (min-width: 481px) {
@@ -185,11 +188,9 @@
 
 <body class="bg-background font-body-md text-on-surface antialiased flex flex-col min-h-screen relative">
 
-<!-- ==================== AMBIENT LAYER ==================== -->
-<div class="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-  <div class="absolute -top-28 -left-24 w-80 h-80 bg-primary/10 rounded-full blur-3xl"></div>
-  <div class="absolute top-1/3 -right-24 w-72 h-72 bg-secondary/8 rounded-full blur-3xl"></div>
-  <div class="absolute -bottom-24 -left-16 w-72 h-72 bg-tertiary/8 rounded-full blur-3xl"></div>
+<!-- ==================== AMBIENT LAYER — &#8220;ROOM TONE&#8221; cinematic engine ==================== -->
+<div class="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
+  <canvas id="auth-ambient" class="absolute inset-0 w-full h-full"></canvas>
 </div>
 
 <!-- ==================== AUTH SHELL ==================== -->
@@ -985,6 +986,241 @@
   window.RoomtoneAuthReady.then(function () {
     window.dispatchEvent(new Event('roomtone-auth-ready'));
   });
+</script>
+<script>
+/* ================= ATTUNE "ROOM TONE" — cinematic ambient background =================
+   A bar at golden hour, out of focus: tungsten bokeh drifting in warm air, a slow
+   shaft of light leaning through the blinds, dust twinkling in the beam, the room's
+   own sound running as faint waveform ribbons, shot on 35mm (grain + vignette).
+   Theme-aware, reduced-motion safe, paused when hidden, DPR-capped, no deps. */
+(function initAmbientCinema() {
+  'use strict';
+  try {
+  const canvas = document.getElementById('auth-ambient');
+  if (!canvas || typeof canvas.getContext !== 'function') return;
+  const ctx = canvas.getContext('2d', { alpha: false });
+  if (!ctx) return;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const rand = (function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; })(20261031);
+
+  const palettes = {
+    dark: {
+      baseTop: '#12161d', baseMid: '#1a1f27', baseBot: '#2b2114',
+      hearthRGB: '217,119,54', hearthA: 0.24,
+      shaftRGB: '255,196,150', shaftA: 0.15,
+      bokeh: [['255,182,140', 0.20], ['255,201,163', 0.16], ['232,168,124', 0.14], ['255,221,180', 0.12]],
+      ribbons: ['255,182,140', '255,221,180', '110,222,190'],
+      ribbonA: [0.17, 0.13, 0.10],
+      moteRGB: '255,214,170', grain: 0.06, vigRGB: '0,0,0', vigA: 0.42, additive: true
+    },
+    light: {
+      baseTop: '#f7efe2', baseMid: '#f3e7d4', baseBot: '#ecdcbf',
+      hearthRGB: '217,119,54', hearthA: 0.10,
+      shaftRGB: '255,236,210', shaftA: 0.22,
+      bokeh: [['224,148,84', 0.13], ['233,171,116', 0.11], ['206,128,74', 0.10], ['240,190,138', 0.09]],
+      ribbons: ['200,116,50', '222,150,92', '38,150,120'],
+      ribbonA: [0.13, 0.10, 0.08],
+      moteRGB: '160,104,52', grain: 0.035, vigRGB: '87,66,27', vigA: 0.17, additive: false
+    }
+  };
+  let P = palettes.dark;
+
+  let W = 0, H = 0, DPR = 1;
+  let baseGrad = null, vignette = null, shaft = null, hearth = null;
+  const bokehSprites = [];
+  const grainTiles = [];
+  let bokeh = [], motes = [], ribbons = [];
+
+  function makeCanvas(w, h) { const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w)); c.height = Math.max(1, Math.round(h)); return c; }
+
+  function buildSprites() {
+    bokehSprites.length = 0;
+    P.bokeh.forEach(function (pair) {
+      const c = makeCanvas(128, 128), g = c.getContext('2d');
+      const grd = g.createRadialGradient(64, 64, 2, 64, 64, 64);
+      grd.addColorStop(0, 'rgba(255,255,255,0.85)');
+      grd.addColorStop(0.25, 'rgba(' + pair[0] + ',0.55)');
+      grd.addColorStop(0.62, 'rgba(' + pair[0] + ',0.16)');
+      grd.addColorStop(1, 'rgba(' + pair[0] + ',0)');
+      g.fillStyle = grd; g.fillRect(0, 0, 128, 128);
+      bokehSprites.push(c);
+    });
+    hearth = makeCanvas(720, 720);
+    const hg = hearth.getContext('2d');
+    const hgrd = hg.createRadialGradient(360, 360, 10, 360, 360, 360);
+    hgrd.addColorStop(0, 'rgba(' + P.hearthRGB + ',' + P.hearthA + ')');
+    hgrd.addColorStop(0.55, 'rgba(' + P.hearthRGB + ',' + (P.hearthA * 0.38) + ')');
+    hgrd.addColorStop(1, 'rgba(' + P.hearthRGB + ',0)');
+    hg.fillStyle = hgrd; hg.fillRect(0, 0, 720, 720);
+
+    shaft = makeCanvas(430, 940);
+    const sg = shaft.getContext('2d');
+    const sgrd = sg.createLinearGradient(0, 0, 430, 0);
+    sgrd.addColorStop(0, 'rgba(' + P.shaftRGB + ',0)');
+    sgrd.addColorStop(0.42, 'rgba(' + P.shaftRGB + ',' + P.shaftA + ')');
+    sgrd.addColorStop(0.58, 'rgba(' + P.shaftRGB + ',' + (P.shaftA * 0.8) + ')');
+    sgrd.addColorStop(1, 'rgba(' + P.shaftRGB + ',0)');
+    sg.fillStyle = sgrd;
+    sg.fillRect(0, 0, 430, 940);
+    const fade = sg.createLinearGradient(0, 0, 0, 940);
+    fade.addColorStop(0, 'rgba(0,0,0,0.9)'); fade.addColorStop(0.35, 'rgba(0,0,0,0)');
+    fade.addColorStop(0.75, 'rgba(0,0,0,0)'); fade.addColorStop(1, 'rgba(0,0,0,0.95)');
+    sg.globalCompositeOperation = 'destination-out';
+    sg.fillStyle = fade; sg.fillRect(0, 0, 430, 940);
+    sg.globalCompositeOperation = 'source-over';
+
+    grainTiles.length = 0;
+    for (let t = 0; t < 4; t++) {
+      const c = makeCanvas(192, 192), g = c.getContext('2d');
+      const img = g.createImageData(192, 192);
+      for (let i = 0; i < img.data.length; i += 4) {
+        const v = 120 + Math.floor(rand() * 135);
+        img.data[i] = v; img.data[i + 1] = v; img.data[i + 2] = v;
+        img.data[i + 3] = Math.floor(rand() * 46);
+      }
+      g.putImageData(img, 0, 0);
+      grainTiles.push(ctx.createPattern(c, 'repeat'));
+    }
+  }
+
+  function buildScene() {
+    bokeh = []; motes = []; ribbons = [];
+    for (let i = 0; i < 60; i++) {
+      const depth = 0.3 + rand() * 0.7;
+      bokeh.push({
+        s: Math.floor(rand() * bokehSprites.length),
+        x: rand(), y: rand(),
+        r: (20 + rand() * 95) * (0.5 + depth * 0.8),
+        vy: (3.5 + rand() * 6) / (0.35 + depth),
+        swayA: 5 + rand() * 14, swayT: 9 + rand() * 13, ph: rand() * TAU,
+        pulseT: 8 + rand() * 15, ph2: rand() * TAU, depth: depth
+      });
+    }
+    for (let i = 0; i < 70; i++) {
+      motes.push({ x: rand(), y: rand(), vx: (1.5 + rand() * 3) / 60, vy: (3 + rand() * 7) / 60, r: 0.5 + rand() * 1.2, tw: 2 + rand() * 4.5, ph: rand() * TAU });
+    }
+    const defs = [[0.30, 15, 17, [1.25, 2.6, 4.2], 0.26], [0.55, 24, 29, [1.05, 2.2, 3.6], 0.42], [0.76, 13, 41, [1.45, 2.9, 4.6], 0.19]];
+    defs.forEach(function (d, i) {
+      ribbons.push({ yFrac: d[0], amp: d[1], T: d[2], k: d[3], speed: d[4], hue: P.ribbons[i], alpha: P.ribbonA[i] });
+    });
+  }
+
+  function rebuild() {
+    DPR = Math.min(window.devicePixelRatio || 1, 1.75);
+    W = canvas.clientWidth || window.innerWidth; H = canvas.clientHeight || window.innerHeight;
+    canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    baseGrad = ctx.createLinearGradient(0, 0, 0, H);
+    baseGrad.addColorStop(0, P.baseTop); baseGrad.addColorStop(0.55, P.baseMid); baseGrad.addColorStop(1, P.baseBot);
+    vignette = makeCanvas(W, H);
+    const vg = vignette.getContext('2d');
+    const vr = vg.createRadialGradient(W / 2, H * 0.46, Math.min(W, H) * 0.36, W / 2, H * 0.5, Math.max(W, H) * 0.78);
+    vr.addColorStop(0, 'rgba(' + P.vigRGB + ',0)');
+    vr.addColorStop(1, 'rgba(' + P.vigRGB + ',' + P.vigA + ')');
+    vg.fillStyle = vr; vg.fillRect(0, 0, W, H);
+    buildSprites(); buildScene();
+  }
+
+  const ptr = { tx: 0, ty: 0, x: 0, y: 0, seen: false };
+  function onMove(e) { ptr.seen = true; ptr.tx = (e.clientX / window.innerWidth - 0.5); ptr.ty = (e.clientY / window.innerHeight - 0.5); }
+  window.addEventListener('pointermove', onMove, { passive: true });
+
+  function frame(now) {
+    const t = now / 1000;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = baseGrad; ctx.fillRect(0, 0, W, H);
+
+    if (!ptr.seen) { ptr.tx = Math.sin(t / 37) * 0.22; ptr.ty = Math.cos(t / 53) * 0.16; }
+    ptr.x += (ptr.tx - ptr.x) * 0.035; ptr.y += (ptr.ty - ptr.y) * 0.035;
+
+    ctx.globalCompositeOperation = P.additive ? 'lighter' : 'source-over';
+    const hx = W * (0.16 + 0.10 * Math.sin(t / 47)), hy = H * (0.80 + 0.07 * Math.cos(t / 61));
+    const hs = (0.85 + 0.15 * Math.sin(t / 23)) * Math.max(1.1, Math.min(W, H) / 620);
+    ctx.globalAlpha = 0.85 + 0.15 * Math.sin(t / 31);
+    ctx.drawImage(hearth, hx - 360 * hs, hy - 360 * hs, 720 * hs, 720 * hs);
+
+    const ang = -0.42 + Math.sin(t / 61) * 0.045;
+    const sa = 0.75 + 0.25 * Math.sin(t / 23 + 1.7);
+    ctx.save();
+    ctx.translate(W * 0.88, -H * 0.06); ctx.rotate(ang);
+    ctx.globalAlpha = sa;
+    const shw = Math.max(W, H) * 0.55;
+    ctx.drawImage(shaft, -shw / 2, -40, shw, H * 1.5);
+    ctx.restore();
+
+    ribbons.forEach(function (rb, ri) {
+      ctx.beginPath();
+      const segs = 96, w2 = 1 / segs;
+      for (let i = 0; i <= segs; i++) {
+        const u = i * w2, x = u * W;
+        const y = rb.yFrac * H + rb.amp * (Math.sin(u * rb.k[0] * TAU + t * rb.speed) + 0.5 * Math.sin(u * rb.k[1] * TAU - t * rb.speed * 0.62) + 0.25 * Math.sin(u * rb.k[2] * TAU + t * rb.speed * 0.35));
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      const g = ctx.createLinearGradient(0, 0, W, 0);
+      g.addColorStop(0, 'rgba(' + rb.hue + ',0)');
+      g.addColorStop(0.28, 'rgba(' + rb.hue + ',' + rb.alpha + ')');
+      g.addColorStop(0.62, 'rgba(' + rb.hue + ',' + (rb.alpha * 0.85) + ')');
+      g.addColorStop(1, 'rgba(' + rb.hue + ',0)');
+      ctx.strokeStyle = g; ctx.lineWidth = 2.2; ctx.stroke();
+    });
+
+    bokeh.forEach(function (b) {
+      const yNorm = ((b.y - t * b.vy / H) % 1 + 1) % 1;
+      const x = (b.x + Math.sin(t / b.swayT + b.ph) * b.swayA / W) * W + ptr.x * 26 * b.depth;
+      const y = yNorm * H + ptr.y * 18 * b.depth;
+      const a = (0.55 + 0.45 * Math.sin(t / b.pulseT + b.ph2));
+      ctx.globalAlpha = Math.max(0.08, a);
+      const r = b.r * (1 + 0.05 * Math.sin(t / 9 + b.ph));
+      ctx.drawImage(bokehSprites[b.s], x - r, y - r, r * 2, r * 2);
+    });
+
+    ctx.fillStyle = 'rgba(' + P.moteRGB + ',0.75)';
+    motes.forEach(function (m) {
+      const x = ((m.x + t * m.vx) % 1 + 1) % 1 * W + ptr.x * 34;
+      const y = ((m.y - t * m.vy) % 1 + 1) % 1 * H + ptr.y * 22;
+      const a = 0.28 + 0.5 * Math.max(0, Math.sin(t / m.tw + m.ph));
+      ctx.globalAlpha = a;
+      ctx.beginPath(); ctx.arc(x, y, m.r, 0, TAU); ctx.fill();
+    });
+
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = P.grain;
+    if (grainTiles.length) {
+      ctx.save();
+      ctx.translate(Math.floor(rand() * 192), Math.floor(rand() * 192));
+      ctx.fillStyle = grainTiles[Math.floor(rand() * grainTiles.length)];
+      ctx.fillRect(-192, -192, W + 384, H + 384);
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+    ctx.drawImage(vignette, 0, 0, W, H);
+  }
+
+  let rafId = 0, running = false;
+  function loop(now) { try { window.__ambientFrames = (window.__ambientFrames || 0) + 1; frame(now); } catch (e) { window.__ambientErr = String((e && e.stack) || e); running = false; } rafId = running ? requestAnimationFrame(loop) : 0; }
+  function start() { if (!running && !reduceMotion) { running = true; rafId = requestAnimationFrame(loop); } }
+  function stop() { running = false; if (rafId) cancelAnimationFrame(rafId); rafId = 0; }
+
+  function applyTheme() {
+    P = document.documentElement.classList.contains('light') ? palettes.light : palettes.dark;
+    try { rebuild(); } catch (e) { window.__ambientErr = String((e && e.stack) || e); return; }
+    if (reduceMotion) try { frame(13700); } catch (e2) { window.__ambientErr = String((e2 && e2.stack) || e2); }
+  }
+  new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+  let resizePending = 0;
+  window.addEventListener('resize', function () {
+    if (resizePending) return;
+    resizePending = requestAnimationFrame(function () { resizePending = 0; applyTheme(); });
+  });
+  document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
+
+  applyTheme();
+  start();
+  } catch (e) { window.__ambientErr = 'init: ' + String((e && e.stack) || e); }
+})();
 </script>
 </body>
 </html>
