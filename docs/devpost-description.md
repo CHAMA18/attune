@@ -42,4 +42,4 @@ qloo-taste-ai-api (insights · audiences · search · explainability) · vanilla
 ## Links
 
 - Demo: https://qloo-api-1.web.app (one-tap demo login; or retune to your own venue from the drawer)
-- Repo: https://github.com/CHAMA18/roomtone-os (MIT — see README for architecture + judging-criteria mapping)
+- Repo: https://github.com/CHAMA18/attune (MIT — see README for architecture + judging-criteria mapping)
