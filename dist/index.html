@@ -3249,6 +3249,7 @@
     /* Radius chips: the map shows the ring for the active radius */
     function setRadius(next) {
       radius = next;
+      paintChips();  /* keep the "WITHIN …" label + pill states in sync */
       paintMap();
     }
     document.querySelectorAll('[data-radius]').forEach(chip => {
