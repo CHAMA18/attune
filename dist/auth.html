@@ -3,8 +3,8 @@
 <html class="dark" lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-<meta name="shell-type" content="mobile_tab"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="shell-type" content="responsive_web"/>
 <meta name="description" content="Attune operator access — sign in, create an account, or recover your key."/>
 <title>Sign in · Attune</title>
 
@@ -106,16 +106,56 @@
   /* Ambient cinema canvas: full-bleed behind the shell, never interactive. */
   #auth-ambient { display: block; }
 
-  /* Mobile view enforcement: on screens wider than a phone, present the app
-     inside a centered 390px phone column — identical to the main app shell. */
-  @media (min-width: 481px) {
-    html { background-color: #0b0e13; }
-    html body {
-      width: 390px;
-      max-width: 100%;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 30px 90px rgba(0, 0, 0, 0.55);
+  /* Desktop-first: the auth page is a full-width web page. From 1024px it
+     splits into a brand column (left) and the access card (right). Below
+     that, the original stacked mobile layout is preserved untouched. */
+  @media (min-width: 1024px) {
+    html body > main[class] {
+      max-width: 1160px;
+      margin-inline: auto;
+      padding-left: 3rem;
+      padding-right: 3rem;
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      column-gap: 4rem;
+      row-gap: 0.5rem;
+      align-items: center;
+      align-content: center;
+    }
+    body > main > header.lockup-rise {
+      grid-column: 1;
+      grid-row: 1;
+      align-self: center;
+      justify-self: start;
+      max-width: 460px;
+      align-items: flex-start;
+      text-align: left;
+    }
+    body > main > header.lockup-rise .eq-strip,
+    body > main > header.lockup-rise [id="eqStrip"] {
+      justify-content: flex-start;
+      margin-inline: 0;
+    }
+    body > main > aside.auth-features {
+      grid-column: 1;
+      grid-row: 2;
+      justify-self: start;
+      max-width: 460px;
+    }
+    body > main > section.auth-screen {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      width: 100%;
+      max-width: 540px;
+      justify-self: center;
+      margin-top: 0;
+    }
+    body > main > p.note,
+    body > main > footer {
+      grid-column: 2;
+      grid-row: 3;
+      justify-self: center;
+      text-align: center;
     }
   }
 </style>
@@ -226,6 +266,37 @@
     <!-- Room tone equalizer -->
     <div class="mt-5 flex items-end justify-center gap-[3px] h-9 w-56 opacity-80" aria-hidden="true" id="eqStrip"></div>
   </header>
+
+  <!-- Desktop brand column — why Attune (hidden on mobile) -->
+  <aside class="auth-features hidden lg:flex flex-col gap-5 mt-10" aria-label="Why Attune">
+    <div class="flex items-start gap-3.5">
+      <span class="w-10 h-10 rounded-xl bg-surface-container-high/60 ring-1 ring-outline-variant/30 flex items-center justify-center flex-shrink-0" aria-hidden="true">
+        <span class="material-symbols-outlined text-primary text-xl">radar</span>
+      </span>
+      <div>
+        <p class="font-body-md text-body-md font-medium text-on-surface">Live taste graph of your block</p>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Qloo affinity intelligence for the streets around your venue, plotted place by place.</p>
+      </div>
+    </div>
+    <div class="flex items-start gap-3.5">
+      <span class="w-10 h-10 rounded-xl bg-surface-container-high/60 ring-1 ring-outline-variant/30 flex items-center justify-center flex-shrink-0" aria-hidden="true">
+        <span class="material-symbols-outlined text-secondary text-xl">calendar_month</span>
+      </span>
+      <div>
+        <p class="font-body-md text-body-md font-medium text-on-surface">Tonight&#8217;s operating playbook</p>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">An agent turns the block&#8217;s taste signals into a run-of-show your floor can execute.</p>
+      </div>
+    </div>
+    <div class="flex items-start gap-3.5">
+      <span class="w-10 h-10 rounded-xl bg-surface-container-high/60 ring-1 ring-outline-variant/30 flex items-center justify-center flex-shrink-0" aria-hidden="true">
+        <span class="material-symbols-outlined text-tertiary text-xl">graphic_eq</span>
+      </span>
+      <div>
+        <p class="font-body-md text-body-md font-medium text-on-surface">Licensed, dayparted room tone</p>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">A queue that follows your service — open soil mornings, creek afternoons, vinyl after dark.</p>
+      </div>
+    </div>
+  </aside>
 
   <!-- ==================== SCREEN · SIGN IN ==================== -->
   <section class="auth-screen w-full mt-7 rounded-xl bg-surface-container-low p-space-md shadow-xl relative overflow-hidden" data-auth-screen="sign-in" aria-label="Sign in">

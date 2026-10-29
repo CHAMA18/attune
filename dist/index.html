@@ -3,8 +3,8 @@
 <html class="dark" lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-<meta name="shell-type" content="mobile_tab"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="shell-type" content="responsive_web"/>
 <script>
   try {
     if (localStorage.getItem('roomtone-theme') === 'light') document.documentElement.classList.add('light');
@@ -473,22 +473,138 @@
     .legal-backdrop { transition: none; }
   }
 
-  @media (min-width: 481px) {
-    html {
-      background-color: #0b0e13;
+  /* ============ DESKTOP-FIRST WEB SHELL ============
+     The app is a full-width web application. From 1024px up the
+     slide-in drawer becomes a persistent left sidebar, the bottom
+     dock retires, and each screen reflows into a two-column
+     editorial grid. Below 1024px the original mobile experience
+     (bottom dock + slide-in drawer) is preserved untouched. */
+  :root { --sidebar-w: 300px; }
+
+  /* Screen stacks: flex column on mobile, 2-col grid on desktop.
+     space-y-* margins were replaced by gap so grid rows stay clean. */
+  .screen-stack { display: flex; flex-direction: column; gap: 1.25rem; }
+  section.screen.hidden { display: none !important; }
+  .span-full { grid-column: 1 / -1; }
+
+  @media (min-width: 1024px) {
+    /* Drawer becomes the persistent sidebar */
+    #app-drawer {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: var(--sidebar-w);
+      z-index: 40;
+      visibility: visible !important;
+      transition: none;
     }
-    html body {
-      width: 390px;
-      max-width: 100%;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 30px 90px rgba(0, 0, 0, 0.55);
+    #app-drawer .drawer-backdrop { display: none; }
+    #app-drawer .drawer-rail {
+      position: static;
+      width: auto;
+      max-width: none;
+      height: 100%;
+      transform: none;
     }
-    html body > header[class],
-    html body > nav[class] {
-      width: 390px;
-      left: 50%;
-      transform: translateX(-50%);
+    #app-drawer .drawer-panel {
+      position: relative;
+      inset: auto;
+      width: 100%;
+      max-width: none;
+      height: 100%;
+      transform: none !important;
+      transition: none;
+      border-right: 1px solid rgb(var(--c-surface-container-high) / 0.55);
+      box-shadow: none !important;
+    }
+    #app-drawer [data-drawer-close] { display: none; }
+
+    /* App bar spans the content pane */
+    html body > header[class] {
+      left: var(--sidebar-w);
+      right: 0;
+      width: auto;
+    }
+    html body > header[class] > div[class]:first-child {
+      max-width: 1480px;
+      margin-inline: auto;
+      padding-left: 2.5rem;
+      padding-right: 2.5rem;
+    }
+    #drawer-trigger { display: none; }
+
+    /* Content pane + two-column screen grid */
+    html body > main[class] {
+      width: auto;
+      margin-left: var(--sidebar-w);
+      padding-bottom: 2.5rem;
+    }
+    main section.screen {
+      max-width: 1480px;
+      margin-inline: auto;
+      padding-left: 2.5rem;
+      padding-right: 2.5rem;
+      padding-bottom: 2rem;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
+      align-items: start;
+    }
+    #world-map { height: 30rem; }
+
+    /* Bottom dock retires on desktop */
+    html body > nav[class] { display: none; }
+
+    /* Bottom sheets become centered dialogs */
+    #legal-sheet .legal-panel {
+      top: 8vh;
+      bottom: auto;
+      height: min(84vh, 800px);
+      max-width: 660px;
+      border-radius: 1.25rem;
+    }
+    #sound-sheet .legal-panel,
+    #profile-sheet .legal-panel {
+      top: 8vh;
+      bottom: 8vh;
+      max-width: 660px;
+      border-radius: 1.25rem;
+    }
+
+    /* Toast centers over the content pane */
+    #toast {
+      left: calc(var(--sidebar-w) + (100vw - var(--sidebar-w)) / 2);
+      bottom: 2rem;
+      transform: translate(-50%, 0) !important;
+    }
+    #toast.translate-y-2 { transform: translate(-50%, 0.5rem) !important; }
+
+    /* Onboarding / auth overlays become centered modal cards */
+    #ob-shell, #auth-shell {
+      background: rgba(8, 9, 13, 0.62);
+      backdrop-filter: blur(3px);
+    }
+    #ob-shell > div {
+      min-height: 0;
+      margin-block: 6vh;
+      border-radius: 1.5rem;
+      box-shadow: 0 44px 110px rgba(0, 0, 0, 0.55);
+    }
+    #auth-shell > div {
+      min-height: 0;
+      margin-block: 10vh;
+      border-radius: 1.5rem;
+      box-shadow: 0 44px 110px rgba(0, 0, 0, 0.55);
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1023.98px) {
+    main section.screen {
+      max-width: 720px;
+      margin-inline: auto;
+      padding-left: 2rem;
+      padding-right: 2rem;
     }
   }
 
@@ -603,12 +719,7 @@
   html.light .nav-dock { box-shadow: inset 0 0 0 1px rgba(61, 44, 21, 0.10), 0 22px 44px -18px rgba(87, 66, 27, 0.4); }
   html.light .drawer-panel { box-shadow: 8px 0 48px rgba(87, 66, 27, 0.22); }
 
-  @media (min-width: 481px) {
-    html.light { background-color: #e3dac9; }
-    html.light body {
-      box-shadow: 0 0 0 1px rgba(87, 66, 27, 0.14), 0 30px 90px rgba(87, 66, 27, 0.28);
-    }
-  }
+
 
   /* Auth shell (drawer Sign Out -> operator authentication). */
   .auth-shell {
@@ -1149,6 +1260,25 @@
           </div>
         </section>
 
+        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">OPERATE</p>
+        <div class="flex flex-col gap-1 pb-space-md" role="navigation" aria-label="Primary screens">
+          <a href="#" data-path="playbook" aria-label="Week Playbook screen" aria-current="page"
+             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-primary bg-surface-container/80 hover:text-on-surface hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-xl">calendar_month</span>
+            <span class="font-body-md text-body-md">Week Playbook</span>
+          </a>
+          <a href="#" data-path="taste-heat" aria-label="Taste radar screen"
+             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-xl">radar</span>
+            <span class="font-body-md text-body-md">Taste Radar</span>
+          </a>
+          <a href="#" data-path="menu-sound" aria-label="Menu and audio screen"
+             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-xl">nightlife</span>
+            <span class="font-body-md text-body-md">Menu &amp; Audio</span>
+          </a>
+        </div>
+
         <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">SUPPORT &amp; LEGAL</p>
         <div class="flex flex-col gap-1 pb-space-md">
           <button type="button" data-legal-open="terms"
@@ -1381,7 +1511,7 @@
 <!-- ==================== FIRST-RUN ONBOARDING (new operators tune their room) ==================== -->
 <div id="ob-shell" class="ob-shell fixed inset-0 z-[70] overflow-y-auto" aria-hidden="true">
   <div role="dialog" aria-modal="true" aria-labelledby="ob-title"
-       class="relative min-h-full w-full max-w-[390px] mx-auto flex flex-col bg-surface-container-lowest px-margin pt-safe pb-safe overflow-hidden">
+       class="relative min-h-full w-full max-w-[390px] lg:max-w-[680px] mx-auto flex flex-col bg-surface-container-lowest px-margin pt-safe pb-safe overflow-hidden">
 
     <!-- ambient art — the same air the auth screen breathes -->
     <div class="pointer-events-none absolute inset-0" aria-hidden="true">
@@ -1650,7 +1780,7 @@
 
 <!-- ==================== AUTH (drawer Sign Out -> operator authentication) ==================== -->
 <div id="auth-shell" class="auth-shell fixed inset-0 z-[80] overflow-y-auto" aria-hidden="true">
-  <div class="relative min-h-full w-full max-w-[390px] mx-auto flex flex-col bg-surface-container-lowest px-margin pt-safe pb-safe overflow-hidden">
+  <div class="relative min-h-full w-full max-w-[390px] lg:max-w-[460px] mx-auto flex flex-col bg-surface-container-lowest px-margin pt-safe pb-safe overflow-hidden">
 
     <!-- ambient art -->
     <div class="pointer-events-none absolute inset-0" aria-hidden="true">
@@ -1822,10 +1952,10 @@
 <main class="flex-1 flex flex-col relative w-full pt-20 pb-36 bg-surface">
 
   <!-- ==================== SCREEN 1 · PLAYBOOK ==================== -->
-  <section class="screen w-full px-margin pb-12 space-y-5" data-screen="playbook" aria-label="Week Playbook">
+  <section class="screen screen-stack w-full px-margin pb-12" data-screen="playbook" aria-label="Week Playbook">
 
     <!-- ── The Engine · live agent run (every value computed from this session's Qloo data) ── -->
-    <section class="reveal relative overflow-hidden rounded-2xl p-5 shadow-[0_28px_56px_-26px_rgba(0,0,0,0.75)]" style="--d:.05s; background: linear-gradient(150deg, #2e1c07 0%, #402608 46%, #1d1104 100%);">
+    <section class="span-full reveal relative overflow-hidden rounded-2xl p-5 shadow-[0_28px_56px_-26px_rgba(0,0,0,0.75)]" style="--d:.05s; background: linear-gradient(150deg, #2e1c07 0%, #402608 46%, #1d1104 100%);">
       <div class="pointer-events-none absolute top-0 left-8 right-8 h-px" style="background:linear-gradient(90deg,transparent,rgba(255,201,163,0.5),transparent)" aria-hidden="true"></div>
       <div class="pointer-events-none absolute inset-0 rounded-2xl hairline-strong" aria-hidden="true"></div>
       <div class="pointer-events-none absolute -top-24 -right-10 w-60 h-60 rounded-full bg-primary/20 blur-3xl breathe-slow" aria-hidden="true"></div>
@@ -1882,7 +2012,7 @@
     </section>
 
     <!-- ── The Stage · golden hour direction ── -->
-    <section class="reveal relative overflow-hidden rounded-2xl bg-surface-container hairline shadow-[0_30px_64px_-30px_rgba(0,0,0,0.7)]" style="--d:.12s">
+    <section class="span-full reveal relative overflow-hidden rounded-2xl bg-surface-container hairline shadow-[0_30px_64px_-30px_rgba(0,0,0,0.7)]" style="--d:.12s">
       <!-- cinematic header -->
       <div class="relative h-[184px] bg-surface-container-high overflow-hidden">
         <img class="absolute inset-0 w-full h-full object-cover opacity-90"
@@ -2087,7 +2217,7 @@
     </section>
 
     <!-- ── Realtime heartbeat ── -->
-    <footer class="reveal pt-1 pb-1 text-center" style="--d:.33s">
+    <footer class="span-full reveal pt-1 pb-1 text-center" style="--d:.33s">
       <div class="inline-flex items-center gap-2.5 rounded-full bg-surface-container-low/80 hairline px-3.5 py-1.5">
         <span class="eq h-2.5 text-tertiary" aria-hidden="true">
           <span style="animation-delay:0s"></span>
@@ -2101,10 +2231,10 @@
   </section>
 
   <!-- ==================== SCREEN 2 · TASTE HEAT ==================== -->
-  <section class="screen w-full px-margin pb-12 space-y-5 hidden" data-screen="taste-heat" aria-label="Discover">
+  <section class="screen screen-stack w-full px-margin pb-12 hidden" data-screen="taste-heat" aria-label="Discover">
 
     <!-- ── Proximity World · 3D holo radar ── -->
-    <section class="reveal relative overflow-hidden rounded-2xl bg-surface-container-low hairline shadow-[0_24px_50px_-30px_rgba(0,0,0,0.65)]" style="--d:.05s">
+    <section class="span-full reveal relative overflow-hidden rounded-2xl bg-surface-container-low hairline shadow-[0_24px_50px_-30px_rgba(0,0,0,0.65)]" style="--d:.05s">
       <div class="pointer-events-none absolute -top-24 -right-16 w-64 h-64 rounded-full bg-tertiary/[0.09] blur-3xl breathe" aria-hidden="true"></div>
       <div class="grain absolute inset-0" aria-hidden="true"></div>
 
@@ -2331,10 +2461,10 @@
   </section>
 
   <!-- ==================== SCREEN 3 · MENU &amp; AUDIO ==================== -->
-  <section class="screen w-full px-margin pb-12 space-y-space-md hidden" data-screen="menu-sound" aria-label="Menu and Audio">
+  <section class="screen screen-stack w-full px-margin pb-12 hidden" data-screen="menu-sound" aria-label="Menu and Audio">
 
     <!-- Now Playing Console -->
-    <section class="w-full bg-surface-container rounded-xl shadow-xl overflow-hidden relative" data-audio-player>
+    <section class="span-full w-full bg-surface-container rounded-xl shadow-xl overflow-hidden relative" data-audio-player>
       <audio preload="none" data-audio-element aria-label="Attune music player"></audio>
       <div class="w-full h-32 relative bg-surface-container-high overflow-hidden">
         <img class="w-full h-full object-cover opacity-45 mix-blend-screen"
@@ -2487,7 +2617,7 @@
     </section>
 
     <!-- Menu &amp; Audio Action Suite -->
-    <section class="space-y-space-xs pt-space-xs">
+    <section class="span-full space-y-space-xs pt-space-xs">
       <button class="w-full py-3 px-4 rounded-xl bg-primary-container text-on-primary-container hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-lg group">
         <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">speaker</span>
         <span class="font-label-caps text-label-caps uppercase tracking-wider font-bold">Push Queue to Sonos</span>
@@ -2948,6 +3078,9 @@
     });
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
 
+    /* The map canvas is fluid on desktop — keep the raster in sync with resizes */
+    window.addEventListener('resize', function () { map.resize(); });
+
     const detail = document.getElementById('radar-detail');
     const detailIcon = document.getElementById('radar-detail-icon');
     const detailTitle = document.getElementById('radar-detail-title');
@@ -3177,6 +3310,35 @@
       const sheetOpen = (sheet && sheet.classList.contains('legal-open')) || (soundSheet && soundSheet.classList.contains('legal-open'));
       if (event.key === 'Escape' && root.classList.contains('drawer-open') && !sheetOpen) setOpen(false);
     });
+  })();
+
+  /* ---------------- Desktop shell: drawer becomes a persistent sidebar ----------------
+     Keeps ARIA semantics truthful: on >=1024px the drawer is always visible, so it
+     must not be aria-hidden or announce itself as a modal dialog. */
+  (function initDesktopShell() {
+    const mql = window.matchMedia('(min-width: 1024px)');
+    const root = document.getElementById('app-drawer');
+    const panel = root ? root.querySelector('.drawer-panel') : null;
+    function sync() {
+      const desktop = mql.matches;
+      if (root) {
+        const openMobile = root.classList.contains('drawer-open');
+        root.setAttribute('aria-hidden', desktop || openMobile ? 'false' : 'true');
+      }
+      if (panel) {
+        if (desktop) {
+          panel.removeAttribute('role');
+          panel.removeAttribute('aria-modal');
+        } else {
+          panel.setAttribute('role', 'dialog');
+          panel.setAttribute('aria-modal', 'true');
+        }
+      }
+      if (desktop) document.body.style.overflow = '';
+    }
+    if (mql.addEventListener) mql.addEventListener('change', sync);
+    else if (mql.addListener) mql.addListener(sync);
+    sync();
   })();
 
   /* ---------------- Legal sheet: terms / privacy / credits ---------------- */
