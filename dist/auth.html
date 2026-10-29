@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<meta name="shell-type" content="mobile_tab"/>
+<meta name="description" content="Attune operator access — sign in, create an account, or recover your key."/>
+<title>Sign in · Attune</title>
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://api.fontshare.com" rel="preconnect"/>
+<link crossorigin href="https://cdn.fontshare.com" rel="preconnect"/>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,301,400,401,500,501,700,701,900,901&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+<style>
+  @layer base {
+    html, body { width: 100vw; margin: 0; padding: 0; background-color: #111319; color: #e1e2e9; }
+    body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+    .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+    .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+  }
+  ::-webkit-scrollbar { display: none; }
+
+  body { min-height: max(884px, 100dvh); }
+
+  /* Custom checkbox: reveal the check glyph when the sr-only peer is checked. */
+  .peer:checked + .cb-box .cb-check { opacity: 1; }
+  .peer:checked + .cb-box { background-color: #ffb68c; border-color: #ffb68c; }
+  .peer:focus-visible + .cb-box { outline: 1px solid #ffb68c; outline-offset: 2px; }
+
+  /* Dark autofill fix so saved credentials do not flash white. */
+  input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #e1e2e9;
+    -webkit-box-shadow: 0 0 0 1000px #1d2025 inset;
+    caret-color: #e1e2e9;
+    transition: background-color 9999s ease-out 0s;
+  }
+
+  /* Ambient equalizer: deterministic bars breathing like a live room tone. */
+  @keyframes eq-breathe {
+    0%, 100% { transform: scaleY(0.38); }
+    50% { transform: scaleY(1); }
+  }
+  .eq-bar { transform-origin: bottom; animation: eq-breathe 2.8s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+
+  @keyframes pulse-subtle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+  }
+  .animate-radar-dot { animation: pulse-subtle 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+  @keyframes error-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-5px); }
+    40% { transform: translateX(5px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(3px); }
+  }
+  .shake { animation: error-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .auth-screen.rise { animation: rise-in 0.35s cubic-bezier(0.2, 0, 0, 1); }
+
+  /* Attune lockup — the struck fork. On page load the mark vibrates like a freshly
+     struck tuning fork, emits two sound rings, then the halo settles into a slow breathe. */
+  .logo-dot { fill: #d97736; transform-box: fill-box; transform-origin: center; }
+  .lockup-rise { animation: lockup-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  @keyframes lockup-rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fork-strike { transform-box: view-box; transform-origin: 50% 74%; animation: fork-strike 1.7s cubic-bezier(0.36, 0.07, 0.19, 0.97) 0.3s both; }
+  @keyframes fork-strike {
+    0% { transform: rotate(0deg); }
+    8% { transform: rotate(2.1deg); }
+    17% { transform: rotate(-1.7deg); }
+    27% { transform: rotate(1.15deg); }
+    39% { transform: rotate(-0.65deg); }
+    53% { transform: rotate(0.3deg); }
+    72%, 100% { transform: rotate(0deg); }
+  }
+  .strike-ring { animation: ring-strike 1.15s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both; }
+  .strike-ring.sr2 { animation-delay: 0.55s; }
+  @keyframes ring-strike {
+    0% { opacity: 0.65; transform: scale(0.62); }
+    100% { opacity: 0; transform: scale(1.65); }
+  }
+  .lockup-halo { animation: halo-breathe 3.6s ease-in-out 1.8s infinite; }
+  @keyframes halo-breathe {
+    0%, 100% { opacity: 0.45; transform: scale(0.97); }
+    50% { opacity: 0.85; transform: scale(1.05); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .eq-bar, .animate-radar-dot, .animate-pulse, .animate-ping { animation: none !important; }
+    .auth-screen.rise, .shake { animation: none !important; }
+    .lockup-rise, .fork-strike, .strike-ring, .lockup-halo { animation: none !important; }
+  }
+
+  /* Ambient cinema canvas: full-bleed behind the shell, never interactive. */
+  #auth-ambient { display: block; }
+
+  /* Mobile view enforcement: on screens wider than a phone, present the app
+     inside a centered 390px phone column — identical to the main app shell. */
+  @media (min-width: 481px) {
+    html { background-color: #0b0e13; }
+    html body {
+      width: 390px;
+      max-width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 30px 90px rgba(0, 0, 0, 0.55);
+    }
+  }
+</style>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          'primary': '#ffb68c', 'inverse-primary': '#994703', 'error': '#ffb4ab',
+          'surface-container-low': '#191c21', 'on-secondary-fixed-variant': '#624007',
+          'secondary-fixed-dim': '#f0be7b', 'secondary-container': '#624007',
+          'secondary-fixed': '#ffddb4', 'tertiary-fixed': '#6ffbbe',
+          'on-error-container': '#ffdad6', 'on-tertiary-fixed': '#002113',
+          'surface-bright': '#36393f', 'on-secondary-fixed': '#291800',
+          'surface-container': '#1d2025', 'on-background': '#e1e2e9', 'on-error': '#690005',
+          'tertiary-fixed-dim': '#4edea3', 'tertiary': '#4edea3',
+          'surface-container-highest': '#32353a', 'on-surface-variant': '#dbc1b4',
+          'on-primary-fixed': '#321200', 'secondary': '#f0be7b',
+          'on-primary-fixed-variant': '#753400', 'on-tertiary-container': '#00311f',
+          'on-tertiary-fixed-variant': '#005236', 'error-container': '#93000a',
+          'on-secondary-container': '#ddad6c', 'background': '#111319',
+          'inverse-surface': '#e1e2e9', 'on-surface': '#e1e2e9', 'outline-variant': '#554339',
+          'surface-variant': '#32353a', 'inverse-on-surface': '#2e3036', 'on-primary': '#532200',
+          'on-tertiary': '#003824', 'outline': '#a38c80', 'surface-dim': '#111319',
+          'primary-fixed': '#ffdbc9', 'on-primary-container': '#491d00',
+          'tertiary-container': '#00a572', 'primary-container': '#d97736',
+          'surface-tint': '#ffb68c', 'surface-container-lowest': '#0b0e13',
+          'surface': '#111319', 'on-secondary': '#452b00',
+          'surface-container-high': '#272a30', 'primary-fixed-dim': '#ffb68c'
+        },
+        borderRadius: { 'DEFAULT': '0.125rem', 'lg': '0.25rem', 'xl': '0.5rem', 'full': '0.75rem' },
+        spacing: {
+          'space-md': '1rem', 'gutter': '1.25rem', 'margin-desktop': '3rem',
+          'space-xs': '0.25rem', 'margin-tablet': '2rem', 'space-lg': '1.5rem',
+          'space-sm': '0.5rem', 'gutter-desktop': '1.75rem', 'margin': '1rem', 'space-xl': '2.5rem'
+        },
+        fontFamily: {
+          'sans': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          'label-caps': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'], 'headline-lg': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          'body-sm': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'], 'metric-stat': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          'display-hero-mobile': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'], 'body-lg': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          'headline-sm': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'], 'body-md': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          'display-hero': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'], 'headline-lg-mobile': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          'code-terminal': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'], 'headline-md': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          'title-editorial': ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif']
+        },
+        fontSize: {
+          'label-caps': ['10px', { lineHeight: '14px', letterSpacing: '0.12em', fontWeight: '600' }],
+          'headline-lg': ['40px', { lineHeight: '48px', letterSpacing: '-0.015em', fontWeight: '500' }],
+          'body-sm': ['12px', { lineHeight: '18px', fontWeight: '400' }],
+          'metric-stat': ['24px', { lineHeight: '28px', letterSpacing: '-0.03em', fontWeight: '600' }],
+          'display-hero-mobile': ['36px', { lineHeight: '44px', letterSpacing: '-0.01em', fontWeight: '600' }],
+          'body-lg': ['16px', { lineHeight: '26px', fontWeight: '400' }],
+          'headline-sm': ['22px', { lineHeight: '30px', letterSpacing: '0em', fontWeight: '600' }],
+          'body-md': ['14px', { lineHeight: '22px', fontWeight: '400' }],
+          'display-hero': ['56px', { lineHeight: '64px', letterSpacing: '-0.02em', fontWeight: '600' }],
+          'headline-lg-mobile': ['28px', { lineHeight: '36px', letterSpacing: '-0.01em', fontWeight: '500' }],
+          'code-terminal': ['13px', { lineHeight: '18px', letterSpacing: '-0.01em', fontWeight: '500' }],
+          'headline-md': ['28px', { lineHeight: '36px', letterSpacing: '0em', fontWeight: '500' }],
+          'title-editorial': ['18px', { lineHeight: '26px', fontWeight: '400' }]
+        }
+      }
+    }
+  };
+</script>
+</head>
+
+<body class="bg-background font-body-md text-on-surface antialiased flex flex-col min-h-screen relative">
+
+<!-- ==================== AMBIENT LAYER — &#8220;ROOM TONE&#8221; cinematic engine ==================== -->
+<div class="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
+  <canvas id="auth-ambient" class="absolute inset-0 w-full h-full"></canvas>
+</div>
+
+<!-- ==================== AUTH SHELL ==================== -->
+<main class="flex-1 flex flex-col relative z-10 w-full px-margin pt-14 pb-10 bg-transparent">
+
+  <!-- Brand Lockup — the struck fork -->
+  <header class="lockup-rise flex flex-col items-center text-center" role="img" aria-label="Attune &#8212; Ambience Intelligence">
+    <div class="relative w-16 h-16" aria-hidden="true">
+      <span class="lockup-halo absolute -inset-2.5 rounded-[20px] bg-primary/20 blur-xl pointer-events-none"></span>
+      <span class="strike-ring absolute inset-0 rounded-2xl border border-primary/50 pointer-events-none"></span>
+      <span class="strike-ring sr2 absolute inset-0 rounded-2xl border border-primary/30 pointer-events-none"></span>
+      <div class="relative w-16 h-16 flex items-center justify-center rounded-2xl bg-surface-container-high/70 backdrop-blur-sm border border-outline-variant/40 ring-1 ring-primary/15 shadow-[0_0_32px_rgba(217,119,54,0.16),inset_0_1px_0_rgba(255,201,163,0.10)]">
+        <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none">
+          <defs>
+            <linearGradient id="attune-g" x1="6" y1="3" x2="18" y2="20" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#ffc9a3"/>
+              <stop offset="1" stop-color="#d97736"/>
+            </linearGradient>
+          </defs>
+          <g class="fork-strike">
+            <path d="M9 3.5 V10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+            <path d="M15 3.5 V10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+            <path d="M9 10 C9 13.4 15 13.4 15 10" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+            <path d="M12 12.4 V16.9" stroke="url(#attune-g)" stroke-width="1.9" stroke-linecap="round"/>
+            <circle cx="12" cy="6.6" r="1.2" class="logo-dot animate-radar-dot"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <span class="pt-space-sm font-label-caps text-[15px] font-bold leading-none text-secondary-fixed uppercase tracking-[0.42em] pl-[0.42em]">ATTUNE</span>
+    <span class="pt-1.5 font-label-caps text-label-caps text-outline uppercase tracking-[0.34em] pl-[0.34em]">AMBIENCE INTELLIGENCE</span>
+    <span class="mt-3 h-px w-10 bg-gradient-to-r from-transparent via-primary/60 to-transparent" aria-hidden="true"></span>
+    <!-- Room tone equalizer -->
+    <div class="mt-5 flex items-end justify-center gap-[3px] h-9 w-56 opacity-80" aria-hidden="true" id="eqStrip"></div>
+  </header>
+
+  <!-- ==================== SCREEN · SIGN IN ==================== -->
+  <section class="auth-screen w-full mt-7 rounded-xl bg-surface-container-low p-space-md shadow-xl relative overflow-hidden" data-auth-screen="sign-in" aria-label="Sign in">
+    <div class="absolute -right-10 -top-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl pointer-events-none"></div>
+
+    <header class="relative">
+      <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest bg-surface-container-lowest/80 px-2 py-0.5 rounded-full">OPERATOR ACCESS</span>
+      <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight mt-2">Welcome back to <em class="italic text-primary">the room.</em></h1>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5">Sign in to sync your playbook, sound settings, and what&#8217;s happening on the block.</p>
+    </header>
+
+    <!-- Credential error banner -->
+    <div id="signInError" class="hidden mt-space-sm flex items-start gap-2 rounded-lg bg-error-container/60 border border-error/30 px-3 py-2.5" role="alert">
+      <span class="material-symbols-outlined text-error text-base mt-0.5">lock_reset</span>
+      <p class="font-body-sm text-body-sm text-on-error-container" id="signInErrorText"></p>
+    </div>
+
+    <form id="signInForm" class="relative mt-space-md space-y-space-sm" novalidate>
+      <label class="block" data-field="si-email">
+        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">WORK EMAIL</span>
+        <span class="relative block mt-1.5">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg pointer-events-none">mail</span>
+          <input id="si-email" name="email" type="email" inputmode="email" autocomplete="email"
+                 class="w-full bg-surface-container rounded-lg pl-10 pr-3 py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline-variant/60 border border-surface-container-highest focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40 transition-colors"
+                 placeholder="you@yourvenue.com"/>
+        </span>
+        <span class="hidden mt-1 block font-body-sm text-body-sm text-error" data-error></span>
+      </label>
+
+      <label class="block" data-field="si-password">
+        <span class="flex items-center justify-between">
+          <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">PASSKEY</span>
+          <a href="#forgot" class="font-label-caps text-label-caps text-secondary hover:text-secondary-fixed tracking-wider">FORGOT?</a>
+        </span>
+        <span class="relative block mt-1.5">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg pointer-events-none">key</span>
+          <input id="si-password" name="password" type="password" autocomplete="current-password"
+                 class="w-full bg-surface-container rounded-lg pl-10 pr-11 py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline-variant/60 border border-surface-container-highest focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40 transition-colors"
+                 placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"/>
+          <button type="button" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-toggle-for="si-password" aria-label="Show passkey">
+            <span class="material-symbols-outlined text-base">visibility</span>
+          </button>
+        </span>
+        <span class="hidden mt-1 block font-body-sm text-body-sm text-error" data-error></span>
+      </label>
+
+      <div class="flex items-center justify-between pt-0.5">
+        <label class="flex items-center gap-2 cursor-pointer select-none">
+          <input id="rememberMe" type="checkbox" checked class="sr-only peer"/>
+          <span class="cb-box w-4 h-4 rounded-[4px] border border-outline-variant bg-surface-container flex items-center justify-center transition-colors">
+            <span class="cb-check material-symbols-outlined text-[12px] text-on-primary opacity-0 transition-opacity">check</span>
+          </span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant">Stay signed in</span>
+        </label>
+        <span class="font-label-caps text-label-caps text-outline-variant flex items-center gap-1">
+          <span class="material-symbols-outlined text-[12px]">shield_lock</span> LOCAL ONLY
+        </span>
+      </div>
+
+      <button type="submit" id="signInSubmit"
+              class="w-full py-3 px-4 rounded-xl bg-primary-container text-on-primary-container hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-lg group disabled:opacity-60 disabled:pointer-events-none">
+        <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">graphic_eq</span>
+        <span class="font-label-caps text-label-caps uppercase tracking-wider font-bold">Tune In &#8226; Sign In</span>
+      </button>
+    </form>
+
+    <!-- Demo access -->
+    <button type="button" id="demoAccess"
+            class="mt-space-sm w-full py-2.5 px-3 rounded-lg bg-surface-container-high text-secondary hover:bg-surface-bright transition-colors flex items-center justify-center gap-2 shadow-sm">
+      <span class="material-symbols-outlined text-base">theater_comedy</span>
+      <span class="font-label-caps text-label-caps tracking-wider">EXPLORE THE DEMO ROOM</span>
+      <span class="font-label-caps text-label-caps text-outline-variant">&#8226; NO ACCOUNT</span>
+    </button>
+
+    <div class="flex items-center gap-3 mt-space-md" aria-hidden="true">
+      <div class="h-px flex-1 bg-surface-container-highest"></div>
+      <span class="font-label-caps text-label-caps text-outline-variant tracking-widest">OR CONTINUE WITH</span>
+      <div class="h-px flex-1 bg-surface-container-highest"></div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-space-xs mt-space-sm">
+      <button type="button" class="py-2.5 px-3 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors flex items-center justify-center gap-2" data-sso="google">
+        <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>
+        <span class="font-body-sm text-body-sm font-medium">Google</span>
+      </button>
+      <button type="button" class="py-2.5 px-3 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors flex items-center justify-center gap-2" data-sso="apple">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M16.36 12.76c.03 3.24 2.84 4.32 2.87 4.33-.02.08-.45 1.53-1.48 3.03-.89 1.3-1.81 2.6-3.27 2.62-1.43.03-1.89-.85-3.53-.85-1.64 0-2.15.83-3.5.88-1.41.05-2.48-1.4-3.38-2.7-1.84-2.66-3.24-7.51-1.36-10.79.94-1.63 2.61-2.66 4.43-2.69 1.38-.03 2.68.93 3.53.93.84 0 2.42-1.15 4.08-.98.7.03 2.65.28 3.91 2.12-.1.06-2.33 1.36-2.3 4.1zM13.68 3.94c.74-.9 1.24-2.15 1.11-3.39-1.07.04-2.36.71-3.13 1.61-.68.79-1.28 2.06-1.12 3.28 1.19.09 2.41-.61 3.14-1.5z"/></svg>
+        <span class="font-body-sm text-body-sm font-medium">Apple</span>
+      </button>
+    </div>
+
+    <p class="mt-space-md text-center font-body-sm text-body-sm text-on-surface-variant">
+      New operator on the block?
+      <a href="#sign-up" class="text-secondary hover:text-secondary-fixed font-medium">Create your account</a>
+    </p>
+  </section>
+
+  <!-- ==================== SCREEN · SIGN UP ==================== -->
+  <section class="auth-screen w-full mt-7 rounded-xl bg-surface-container-low p-space-md shadow-xl relative overflow-hidden hidden" data-auth-screen="sign-up" aria-label="Create account">
+    <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-tertiary/10 rounded-full blur-2xl pointer-events-none"></div>
+
+    <header class="relative">
+      <span class="font-label-caps text-label-caps text-tertiary uppercase tracking-widest bg-surface-container-lowest/80 px-2 py-0.5 rounded-full">NEW OPERATOR</span>
+      <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight mt-2">Open the door to <em class="italic text-primary">your sound.</em></h1>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5">One account, every room. Set up your venue and start tuning in minutes.</p>
+    </header>
+
+    <!-- Signup error banner -->
+    <div id="signUpError" class="hidden mt-space-sm flex items-start gap-2 rounded-lg bg-error-container/60 border border-error/30 px-3 py-2.5" role="alert">
+      <span class="material-symbols-outlined text-error text-base mt-0.5">error</span>
+      <p class="font-body-sm text-body-sm text-on-error-container" id="signUpErrorText"></p>
+    </div>
+
+    <form id="signUpForm" class="relative mt-space-md space-y-space-sm" novalidate>
+      <label class="block" data-field="su-name">
+        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">OPERATOR NAME</span>
+        <span class="relative block mt-1.5">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg pointer-events-none">person</span>
+          <input id="su-name" name="name" type="text" autocomplete="name"
+                 class="w-full bg-surface-container rounded-lg pl-10 pr-3 py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline-variant/60 border border-surface-container-highest focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40 transition-colors"
+                 placeholder="Maya Okonkwo"/>
+        </span>
+        <span class="hidden mt-1 block font-body-sm text-body-sm text-error" data-error></span>
+      </label>
+
+      <label class="block" data-field="su-email">
+        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">WORK EMAIL</span>
+        <span class="relative block mt-1.5">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg pointer-events-none">mail</span>
+          <input id="su-email" name="email" type="email" inputmode="email" autocomplete="email"
+                 class="w-full bg-surface-container rounded-lg pl-10 pr-3 py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline-variant/60 border border-surface-container-highest focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40 transition-colors"
+                 placeholder="you@yourvenue.com"/>
+        </span>
+        <span class="hidden mt-1 block font-body-sm text-body-sm text-error" data-error></span>
+      </label>
+
+      <label class="block" data-field="su-venue">
+        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">VENUE NAME</span>
+        <span class="relative block mt-1.5">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg pointer-events-none">storefront</span>
+          <input id="su-venue" name="venue" type="text" autocomplete="organization"
+                 class="w-full bg-surface-container rounded-lg pl-10 pr-3 py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline-variant/60 border border-surface-container-highest focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40 transition-colors"
+                 placeholder="The Amber Room"/>
+        </span>
+        <span class="hidden mt-1 block font-body-sm text-body-sm text-error" data-error></span>
+      </label>
+
+      <label class="block" data-field="su-password">
+        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">PASSKEY</span>
+        <span class="relative block mt-1.5">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg pointer-events-none">key</span>
+          <input id="su-password" name="password" type="password" autocomplete="new-password"
+                 class="w-full bg-surface-container rounded-lg pl-10 pr-11 py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline-variant/60 border border-surface-container-highest focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40 transition-colors"
+                 placeholder="8+ characters"/>
+          <button type="button" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-toggle-for="su-password" aria-label="Show passkey">
+            <span class="material-symbols-outlined text-base">visibility</span>
+          </button>
+        </span>
+        <!-- Strength meter -->
+        <span class="flex items-center gap-1.5 mt-2" data-strength aria-hidden="true">
+          <span class="h-1 flex-1 rounded-full bg-surface-container-highest transition-colors" data-seg="1"></span>
+          <span class="h-1 flex-1 rounded-full bg-surface-container-highest transition-colors" data-seg="2"></span>
+          <span class="h-1 flex-1 rounded-full bg-surface-container-highest transition-colors" data-seg="3"></span>
+          <span class="h-1 flex-1 rounded-full bg-surface-container-highest transition-colors" data-seg="4"></span>
+          <span class="font-label-caps text-label-caps text-outline-variant w-12 text-right tracking-wider" data-strength-label>EMPTY</span>
+        </span>
+        <span class="hidden mt-1 block font-body-sm text-body-sm text-error" data-error></span>
+      </label>
+
+      <label class="block" data-field="su-confirm">
+        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">CONFIRM PASSKEY</span>
+        <span class="relative block mt-1.5">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg pointer-events-none">verified_user</span>
+          <input id="su-confirm" name="confirm" type="password" autocomplete="new-password"
+                 class="w-full bg-surface-container rounded-lg pl-10 pr-11 py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline-variant/60 border border-surface-container-highest focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40 transition-colors"
+                 placeholder="Repeat passkey"/>
+          <button type="button" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-toggle-for="su-confirm" aria-label="Show passkey">
+            <span class="material-symbols-outlined text-base">visibility</span>
+          </button>
+        </span>
+        <span class="hidden mt-1 block font-body-sm text-body-sm text-error" data-error></span>
+      </label>
+
+      <label class="flex items-start gap-2.5 cursor-pointer select-none pt-0.5" data-field="su-terms">
+        <input id="su-terms" type="checkbox" class="sr-only peer"/>
+        <span class="cb-box w-4 h-4 mt-0.5 rounded-[4px] border border-outline-variant bg-surface-container flex items-center justify-center flex-shrink-0 transition-colors">
+          <span class="cb-check material-symbols-outlined text-[12px] text-on-primary opacity-0 transition-opacity">check</span>
+        </span>
+        <span class="font-body-sm text-body-sm text-on-surface-variant">
+          I agree to the <a href="#sign-up" class="text-secondary hover:text-secondary-fixed underline decoration-outline-variant underline-offset-2">Operator Terms</a> and <a href="#sign-up" class="text-secondary hover:text-secondary-fixed underline decoration-outline-variant underline-offset-2">Privacy Notes</a>.
+        </span>
+      </label>
+      <span class="hidden -mt-2 block font-body-sm text-body-sm text-error" data-error data-error-for="su-terms"></span>
+
+      <button type="submit" id="signUpSubmit"
+              class="w-full py-3 px-4 rounded-xl bg-primary-container text-on-primary-container hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-lg group disabled:opacity-60 disabled:pointer-events-none">
+        <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">door_open</span>
+        <span class="font-label-caps text-label-caps uppercase tracking-wider font-bold">Create Account</span>
+      </button>
+    </form>
+
+    <p class="mt-space-md text-center font-body-sm text-body-sm text-on-surface-variant">
+      Already tuning a room?
+      <a href="#sign-in" class="text-secondary hover:text-secondary-fixed font-medium">Sign in</a>
+    </p>
+  </section>
+
+  <!-- ==================== SCREEN · FORGOT PASSKEY ==================== -->
+  <section class="auth-screen w-full mt-7 rounded-xl bg-surface-container-low p-space-md shadow-xl relative overflow-hidden hidden" data-auth-screen="forgot" aria-label="Recover passkey">
+    <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-secondary/10 rounded-full blur-2xl pointer-events-none"></div>
+
+    <header class="relative">
+      <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-widest bg-surface-container-lowest/80 px-2 py-0.5 rounded-full">KEY RECOVERY</span>
+      <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight mt-2">Lost your <em class="italic text-primary">key?</em></h1>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5">Enter your work email and we&#8217;ll send a recovery link to reset your passkey.</p>
+    </header>
+
+    <form id="forgotForm" class="relative mt-space-md space-y-space-sm" novalidate>
+      <label class="block" data-field="fp-email">
+        <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">WORK EMAIL</span>
+        <span class="relative block mt-1.5">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg pointer-events-none">forward_to_inbox</span>
+          <input id="fp-email" name="email" type="email" inputmode="email" autocomplete="email"
+                 class="w-full bg-surface-container rounded-lg pl-10 pr-3 py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline-variant/60 border border-surface-container-highest focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40 transition-colors"
+                 placeholder="you@yourvenue.com"/>
+        </span>
+        <span class="hidden mt-1 block font-body-sm text-body-sm text-error" data-error></span>
+      </label>
+
+      <button type="submit" id="forgotSubmit"
+              class="w-full py-3 px-4 rounded-xl bg-primary-container text-on-primary-container hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-lg group">
+        <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">send</span>
+        <span class="font-label-caps text-label-caps uppercase tracking-wider font-bold">Send Recovery Link</span>
+      </button>
+    </form>
+
+    <p class="mt-space-md text-center font-body-sm text-body-sm text-on-surface-variant">
+      Remembered it?
+      <a href="#sign-in" class="text-secondary hover:text-secondary-fixed font-medium">Back to sign in</a>
+    </p>
+  </section>
+
+  <!-- ==================== SCREEN · RECOVERY SENT ==================== -->
+  <section class="auth-screen w-full mt-7 rounded-xl bg-surface-container-low p-space-md shadow-xl relative overflow-hidden hidden" data-auth-screen="forgot-sent" aria-label="Recovery link sent">
+    <div class="absolute -right-10 -top-10 w-32 h-32 bg-tertiary/10 rounded-full blur-2xl pointer-events-none"></div>
+
+    <div class="relative flex flex-col items-center text-center pt-2 pb-2">
+      <div class="w-16 h-16 rounded-full bg-tertiary/15 flex items-center justify-center shadow-[0_0_20px_rgba(78,222,163,0.2)]">
+        <span class="material-symbols-outlined text-tertiary text-3xl">mark_email_read</span>
+      </div>
+      <h1 class="font-headline-sm text-headline-sm text-on-surface tracking-tight mt-4">Recovery link sent</h1>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 max-w-[280px]">
+        Check <span class="text-on-surface font-medium" id="sentEmail">your inbox</span> for a link to reset your passkey. It expires in 30 minutes.
+      </p>
+
+      <div class="w-full rounded-lg bg-surface-container/70 px-3 py-2.5 mt-space-md flex items-center gap-2 text-left">
+        <span class="material-symbols-outlined text-secondary text-base flex-shrink-0">schedule</span>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">Didn&#8217;t arrive? Check spam, or resend below.</p>
+      </div>
+
+      <div class="w-full space-y-space-xs mt-space-md">
+        <button type="button" id="resendLink" class="w-full py-2.5 px-3 rounded-lg bg-surface-container-high text-secondary hover:bg-surface-bright transition-colors flex items-center justify-center gap-2 shadow-sm">
+          <span class="material-symbols-outlined text-base">refresh</span>
+          <span class="font-label-caps text-label-caps tracking-wider">RESEND LINK</span>
+        </button>
+        <a href="#sign-in" class="w-full py-3 px-4 rounded-xl bg-primary-container text-on-primary-container hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-lg">
+          <span class="material-symbols-outlined text-xl">arrow_back</span>
+          <span class="font-label-caps text-label-caps uppercase tracking-wider font-bold">Back to Sign In</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER MICROCOPY ==================== -->
+  <footer class="mt-auto pt-9 pb-2 flex flex-col items-center gap-1.5">
+    <div class="flex items-center gap-2">
+      <span class="font-label-caps text-label-caps text-outline-variant">ATTUNE</span>
+      <span class="text-outline-variant text-[8px]">&#8226;</span>
+      <span class="font-label-caps text-label-caps text-outline-variant">V1.0</span>
+      <span class="text-outline-variant text-[8px]">&#8226;</span>
+      <span class="font-label-caps text-label-caps text-outline-variant">EVERY ROOM HAS A TONE</span>
+    </div>
+    <p class="font-label-caps text-label-caps text-outline-variant/70 text-center leading-relaxed">DEMO AUTH &#8226; CREDENTIALS NEVER LEAVE THIS DEVICE</p>
+  </footer>
+
+</main>
+
+<!-- ==================== SNACKBAR ==================== -->
+<div id="snackbar" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] hidden" role="status" aria-live="polite">
+  <div class="flex items-center gap-2 rounded-full bg-surface-container-high/95 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.6)] border border-surface-container-highest px-4 py-2.5 whitespace-nowrap">
+    <span class="material-symbols-outlined text-tertiary text-lg" id="snackbarIcon">check_circle</span>
+    <span class="font-label-caps text-label-caps text-on-surface tracking-wider" id="snackbarText">Done</span>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   Attune — demo authentication (client-side only)
+   Credentials and sessions live in localStorage/sessionStorage on this
+   device. Replace this module with a real backend (OAuth / OIDC) before
+   production use. Access pages: #sign-in · #sign-up · #forgot
+   ===================================================================== */
+(function initAuth() {
+  'use strict';
+
+  var USERS_KEY = 'roomtone.users';
+  var SESSION_KEY = 'roomtone.session';
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var SCREENS = ['sign-in', 'sign-up', 'forgot', 'forgot-sent'];
+  var TITLES = {
+    'sign-in': 'Sign in', 'sign-up': 'Create account',
+    'forgot': 'Recover passkey', 'forgot-sent': 'Check your inbox'
+  };
+
+  function $(id) { return document.getElementById(id); }
+  function redirectTarget() {
+    var next = new URLSearchParams(location.search).get('next');
+    return next && /^\/(?!\/)/.test(next) ? next : 'index.html';
+  }
+
+  /* ---------------- Credential store (demo only) ---------------- */
+  function loadUsers() {
+    try { return JSON.parse(localStorage.getItem(USERS_KEY) || '[]') || []; }
+    catch (e) { return []; }
+  }
+  function saveUsers(users) {
+    try { localStorage.setItem(USERS_KEY, JSON.stringify(users)); } catch (e) {}
+  }
+  async function hashPass(email, pass) {
+    var msg = 'roomtone::' + String(email).toLowerCase() + '::' + pass;
+    if (window.crypto && crypto.subtle && window.TextEncoder) {
+      var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+      return 's:' + Array.from(new Uint8Array(buf)).map(function (b) {
+        return b.toString(16).padStart(2, '0');
+      }).join('');
+    }
+    /* Non-secure-context fallback (e.g. file://) — demo only, not crypto. */
+    var h = 5381;
+    for (var i = 0; i < msg.length; i++) h = ((h << 5) + h + msg.charCodeAt(i)) | 0;
+    return 'f:' + (h >>> 0).toString(16);
+  }
+  async function seedDemo() {
+    if (loadUsers().length) return;
+    var users = loadUsers();
+    users.push({
+      name: 'Maya Okonkwo', email: 'demo@roomtone.os', venue: 'The Amber Room',
+      pass: await hashPass('demo@roomtone.os', 'roomtone')
+    });
+    saveUsers(users);
+  }
+
+  /* ---------------- Session (remember-me aware) ---------------- */
+  function getSession() {
+    try {
+      return JSON.parse(localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY) || 'null');
+    } catch (e) { return null; }
+  }
+  function setSession(session, remember) {
+    var raw = JSON.stringify(session);
+    try {
+      if (remember) localStorage.setItem(SESSION_KEY, raw);
+      else sessionStorage.setItem(SESSION_KEY, raw);
+    } catch (e) {}
+  }
+
+  /* ---------------- Field errors ---------------- */
+  function setFieldError(id, msg) {
+    var wrap = document.querySelector('[data-field="' + id + '"]');
+    var err = (wrap && wrap.querySelector('[data-error]')) || document.querySelector('[data-error-for="' + id + '"]');
+    if (err && msg) { err.textContent = msg; err.classList.remove('hidden'); }
+    var input = $(id);
+    if (input) input.classList.add('border-error');
+  }
+  function clearFieldError(id) {
+    var wrap = document.querySelector('[data-field="' + id + '"]');
+    var err = (wrap && wrap.querySelector('[data-error]')) || document.querySelector('[data-error-for="' + id + '"]');
+    if (err) err.classList.add('hidden');
+    var input = $(id);
+    if (input) input.classList.remove('border-error');
+  }
+  function bindClearOnInput() {
+    document.querySelectorAll('input').forEach(function (input) {
+      var evt = input.type === 'checkbox' ? 'change' : 'input';
+      input.addEventListener(evt, function () {
+        var wrap = input.closest('[data-field]');
+        if (wrap) clearFieldError(wrap.getAttribute('data-field'));
+      });
+    });
+  }
+
+  /* ---------------- Banners, shake, busy, toast ---------------- */
+  function showBanner(bannerEl, textEl, msg) {
+    textEl.textContent = msg;
+    bannerEl.classList.remove('hidden');
+    bannerEl.classList.remove('shake'); void bannerEl.offsetWidth;
+    bannerEl.classList.add('shake');
+  }
+  function hideBanner(bannerEl) { bannerEl.classList.add('hidden'); }
+  function setBusy(btn, busy) {
+    var icon = btn.querySelector('.material-symbols-outlined');
+    if (busy) {
+      btn.setAttribute('data-icon', icon.textContent);
+      icon.textContent = 'progress_activity';
+      icon.classList.add('animate-spin');
+      btn.disabled = true;
+    } else {
+      icon.textContent = btn.getAttribute('data-icon') || 'graphic_eq';
+      icon.classList.remove('animate-spin');
+      btn.disabled = false;
+    }
+  }
+  var toastTimer;
+  function toast(msg, icon) {
+    $('snackbarIcon').textContent = icon || 'check_circle';
+    $('snackbarText').textContent = msg;
+    $('snackbar').classList.remove('hidden');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { $('snackbar').classList.add('hidden'); }, 2600);
+  }
+
+  /* ---------------- Hash router ---------------- */
+  function currentHash() { return (location.hash || '#sign-in').replace('#', ''); }
+  function showScreen(name) {
+    if (SCREENS.indexOf(name) === -1) name = 'sign-in';
+    document.querySelectorAll('[data-auth-screen]').forEach(function (screen) {
+      var active = screen.getAttribute('data-auth-screen') === name;
+      screen.classList.toggle('hidden', !active);
+      if (active) {
+        screen.classList.remove('rise'); void screen.offsetWidth;
+        screen.classList.add('rise');
+      }
+    });
+    document.title = TITLES[name] + ' \u00b7 Attune';
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------------- Ambient equalizer ---------------- */
+  function renderEq() {
+    var strip = $('eqStrip');
+    if (!strip) return;
+    var heights = [34, 58, 42, 72, 92, 60, 44, 78, 88, 52, 38, 66, 90, 48, 58, 80, 46, 70, 96, 56, 40, 74, 84, 50];
+    strip.innerHTML = heights.map(function (h, i) {
+      var cls = (i % 7 === 3) ? 'bg-secondary/60' : 'bg-primary/60';
+      return '<span class="eq-bar flex-1 rounded-sm ' + cls + '" style="height:' + h + '%;animation-delay:' + (i * 0.12).toFixed(2) + 's"></span>';
+    }).join('');
+  }
+
+  /* ---------------- Passkey visibility toggles ---------------- */
+  function bindToggles() {
+    document.querySelectorAll('[data-toggle-for]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var input = $(btn.getAttribute('data-toggle-for'));
+        if (!input) return;
+        var show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.querySelector('.material-symbols-outlined').textContent = show ? 'visibility_off' : 'visibility';
+        btn.setAttribute('aria-label', show ? 'Hide passkey' : 'Show passkey');
+      });
+    });
+  }
+
+  /* ---------------- Strength meter ---------------- */
+  var STRENGTH_LABELS = ['EMPTY', 'WEAK', 'FAIR', 'GOOD', 'STRONG'];
+  var STRENGTH_COLORS = ['', 'bg-error', 'bg-secondary', 'bg-secondary', 'bg-tertiary'];
+  var ALL_SEG_CLASSES = ['bg-error', 'bg-secondary', 'bg-tertiary', 'bg-surface-container-highest'];
+  function passScore(v) {
+    if (!v) return 0;
+    var s = 0;
+    if (v.length >= 8) s++;
+    if (v.length >= 12) s++;
+    if (/[a-z]/.test(v) && /[A-Z]/.test(v)) s++;
+    if (/\d/.test(v) || /[^A-Za-z0-9]/.test(v)) s++;
+    if (v.length < 8) s = Math.min(s, 1);
+    return Math.max(s, 1);
+  }
+  function updateStrength() {
+    var score = passScore($('su-password').value);
+    document.querySelectorAll('[data-strength] [data-seg]').forEach(function (seg, idx) {
+      seg.classList.remove.apply(seg.classList, ALL_SEG_CLASSES);
+      seg.classList.add(idx < score ? (STRENGTH_COLORS[score] || 'bg-surface-container-highest') : 'bg-surface-container-highest');
+    });
+    var label = document.querySelector('[data-strength-label]');
+    label.textContent = STRENGTH_LABELS[score];
+    label.classList.toggle('text-error', score === 1);
+    label.classList.toggle('text-secondary', score === 2 || score === 3);
+    label.classList.toggle('text-tertiary', score === 4);
+    label.classList.toggle('text-outline-variant', score === 0);
+  }
+
+  /* ---------------- Shared sign-in / session start ---------------- */
+  function startSession(user, remember, welcomeMsg, toastIcon) {
+    setSession({
+      name: user.name,
+      email: user.email,
+      venue: user.venue,
+      provider: user.provider || 'email',
+      issuedAt: Date.now()
+    }, remember);
+    toast(welcomeMsg, toastIcon);
+    setTimeout(function () { location.replace(redirectTarget()); }, 950);
+  }
+
+  /* ---------------- Google / Apple sign-in ---------------- */
+  /* The Firebase module is deferred, so it finishes loading after this script
+     runs. Wait for its ready event instead of reading the global too early. */
+  function whenAuthReady() {
+    if (window.RoomtoneAuthReady) return window.RoomtoneAuthReady;
+    return new Promise(function (resolve) {
+      var settled = false;
+      function settle() {
+        if (settled) return;
+        settled = true;
+        resolve(window.RoomtoneAuthReady || Promise.resolve());
+      }
+      window.addEventListener('roomtone-auth-ready', settle, { once: true });
+      setTimeout(settle, 8000);
+    });
+  }
+
+  /* Provider failure copy lives in auth-firebase.js, shared with the in-app
+     auth shell; this shim keeps a sane fallback if the module never loads. */
+  function ssoErrorMessage(label, err) {
+    if (window.RoomtoneSsoError) return window.RoomtoneSsoError(label, err);
+    return (label ? label + ' sign-in' : 'Sign-in') + ' failed. Try again.';
+  }
+  function setSsoBusy(btn, busy) {
+    var text = btn.querySelector('span');
+    if (!text) return;
+    if (busy) {
+      btn.setAttribute('data-label', text.textContent);
+      text.textContent = 'Connecting\u2026';
+      btn.disabled = true;
+      btn.classList.add('opacity-60');
+    } else {
+      if (btn.getAttribute('data-label')) text.textContent = btn.getAttribute('data-label');
+      btn.disabled = false;
+      btn.classList.remove('opacity-60');
+    }
+  }
+
+  /* ---------------- Form bindings ---------------- */
+  function bindForms() {
+    /* --- Sign in --- */
+    $('signInForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      hideBanner($('signInError'));
+      var email = $('si-email').value.trim();
+      var pass = $('si-password').value;
+      var ok = true;
+      if (!EMAIL_RE.test(email)) { setFieldError('si-email', 'Enter a valid work email.'); ok = false; }
+      if (!pass) { setFieldError('si-password', 'Enter your passkey.'); ok = false; }
+      if (!ok) return;
+
+      setBusy($('signInSubmit'), true);
+      var user = loadUsers().find(function (u) {
+        return u.email.toLowerCase() === email.toLowerCase();
+      });
+      if (!user) {
+        setBusy($('signInSubmit'), false);
+        showBanner($('signInError'), $('signInErrorText'),
+          'No operator found for that email. Create an account, or explore the demo room below.');
+        return;
+      }
+      var hashed = await hashPass(email, pass);
+      if (user.pass !== hashed) {
+        setBusy($('signInSubmit'), false);
+        showBanner($('signInError'), $('signInErrorText'),
+          'Incorrect passkey. Try again, or use \u201cForgot?\u201d to reset it.');
+        return;
+      }
+      var first = user.name.split(' ')[0];
+      startSession(user, $('rememberMe').checked, 'Welcome back, ' + first + '. Tuning your room\u2026', 'graphic_eq');
+    });
+
+    /* --- Sign up --- */
+    $('signUpForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      hideBanner($('signUpError'));
+      var name = $('su-name').value.trim();
+      var email = $('su-email').value.trim();
+      var venue = $('su-venue').value.trim();
+      var pass = $('su-password').value;
+      var confirm = $('su-confirm').value;
+      var terms = $('su-terms').checked;
+      var ok = true;
+      if (name.length < 2) { setFieldError('su-name', 'Enter your name.'); ok = false; }
+      if (!EMAIL_RE.test(email)) { setFieldError('su-email', 'Enter a valid work email.'); ok = false; }
+      if (venue.length < 2) { setFieldError('su-venue', 'Enter your venue name.'); ok = false; }
+      if (pass.length < 8) { setFieldError('su-password', 'Use at least 8 characters.'); ok = false; }
+      if (confirm !== pass || !confirm) { setFieldError('su-confirm', 'Passkeys must match.'); ok = false; }
+      if (!terms) {
+        var termsErr = document.querySelector('[data-error-for="su-terms"]');
+        termsErr.textContent = 'Please accept the operator terms.';
+        termsErr.classList.remove('hidden');
+        ok = false;
+      }
+      if (!ok) return;
+
+      setBusy($('signUpSubmit'), true);
+      var exists = loadUsers().some(function (u) {
+        return u.email.toLowerCase() === email.toLowerCase();
+      });
+      if (exists) {
+        setBusy($('signUpSubmit'), false);
+        showBanner($('signUpError'), $('signUpErrorText'),
+          'An operator with that email already exists. Sign in instead.');
+        return;
+      }
+      var users = loadUsers();
+      var user = { name: name, email: email, venue: venue, pass: await hashPass(email, pass) };
+      users.push(user);
+      saveUsers(users);
+      /* First account creation: mark the room-tuning onboarding for the app. */
+      try { localStorage.setItem('attune.onboarding', 'pending'); } catch (e) {}
+      startSession(user, true, 'Account created. Opening the door\u2026', 'door_open');
+    });
+
+    /* --- Forgot passkey --- */
+    $('forgotForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var email = $('fp-email').value.trim();
+      if (!EMAIL_RE.test(email)) { setFieldError('fp-email', 'Enter a valid work email.'); return; }
+      $('sentEmail').textContent = email;
+      location.hash = 'forgot-sent';
+    });
+  }
+
+  /* ---------------- Misc actions ---------------- */
+  function bindMisc() {
+    /* Demo room: instant session with the seeded operator profile. */
+    $('demoAccess').addEventListener('click', async function () {
+      await seedDemo();
+      var user = loadUsers().find(function (u) { return u.email === 'demo@roomtone.os'; });
+      if (!user) { toast('Demo unavailable \u2014 create an account instead.', 'error'); return; }
+      startSession({ name: user.name, email: user.email, venue: user.venue, provider: 'demo' },
+        true, 'Demo room unlocked. Tuning\u2026', 'theater_comedy');
+    });
+
+    /* Google / Apple sign-in via Firebase Auth. Popup on desktop; redirect
+       hand-off on iOS and installed PWAs, where popups are unreliable. */
+    document.querySelectorAll('[data-sso]').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        var kind = btn.getAttribute('data-sso');
+        var label = kind === 'google' ? 'Google' : 'Apple';
+        hideBanner($('signInError'));
+        setSsoBusy(btn, true);
+        try {
+          await whenAuthReady();
+          if (!window.RoomtoneSSO) {
+            showBanner($('signInError'), $('signInErrorText'),
+              label + ' sign-in is unavailable right now. Use your email and passkey.');
+            return;
+          }
+          var who = await window.RoomtoneSSO(kind);
+          if (who && who.redirect) {
+            /* The page is handing off to the identity provider. */
+            toast('Opening ' + label + '\u2026', 'open_in_new');
+            return;
+          }
+          var linkedName = who.linked === 'apple' ? 'Apple' : who.linked === 'google' ? 'Google' : '';
+          startSession({ name: who.name, email: who.email, venue: null, provider: kind },
+            true,
+            linkedName
+              ? 'Linked ' + linkedName + ' to your operator profile. Tuning\u2026'
+              : 'Signed in with ' + label + '. Tuning\u2026',
+            linkedName ? 'link' : 'verified_user');
+        } catch (err) {
+          if (err && (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request')) return;
+          showBanner($('signInError'), $('signInErrorText'), ssoErrorMessage(label, err));
+        } finally {
+          setSsoBusy(btn, false);
+        }
+      });
+    });
+
+    /* Resend recovery link. */
+    $('resendLink').addEventListener('click', function () {
+      toast('Recovery link re-sent.', 'mark_email_read');
+    });
+
+    /* Strength meter live updates. */
+    $('su-password').addEventListener('input', updateStrength);
+  }
+
+  /* ---------------- Boot ---------------- */
+  window.addEventListener('hashchange', function () { showScreen(currentHash()); });
+
+  (async function boot() {
+    renderEq();
+    bindToggles();
+    bindForms();
+    bindMisc();
+    bindClearOnInput();
+    await seedDemo();
+
+    /* #force keeps these screens open for inspection (handy in development). */
+    var inspect = currentHash() === 'force';
+    var handoffPending = false;
+    try { handoffPending = !!sessionStorage.getItem('roomtone.sso.pending'); } catch (e) {}
+
+    /* Fast path: a stored session with no Google/Apple hand-off in flight. */
+    if (!inspect && !handoffPending && getSession()) {
+      location.replace(redirectTarget());
+      return;
+    }
+
+    /* Finish a redirect hand-off (a no-op when there is none). */
+    await whenAuthReady();
+    var back = window.RoomtoneRedirectUser
+      ? await window.RoomtoneRedirectUser()
+      : { user: null, error: null, provider: null };
+
+    if (back && back.user) {
+      var ssoUser = {
+        name: back.user.name, email: back.user.email, venue: null,
+        provider: back.user.provider
+      };
+      var providerName = back.user.provider === 'apple' ? 'Apple' : 'Google';
+      if (inspect) {
+        setSession(ssoUser, true);
+        toast('Signed in with ' + providerName + '. Session saved.', 'verified_user');
+      } else {
+        var linkedProvider = back.user.linked === 'apple' ? 'Apple' : back.user.linked === 'google' ? 'Google' : '';
+        startSession(ssoUser, true,
+          linkedProvider
+            ? 'Linked ' + linkedProvider + ' to your operator profile. Tuning\u2026'
+            : 'Signed in with ' + providerName + '. Tuning\u2026',
+          linkedProvider ? 'link' : 'verified_user');
+        return;
+      }
+    } else if (back && back.error) {
+      var failedName = back.provider === 'apple' ? 'Apple' : back.provider === 'google' ? 'Google' : '';
+      showScreen('sign-in');
+      showBanner($('signInError'), $('signInErrorText'), ssoErrorMessage(failedName, back.error));
+    } else if (!inspect && getSession()) {
+      location.replace(redirectTarget());
+      return;
+    }
+    showScreen(currentHash());
+  })();
+})();
+</script>
+
+<script type="module">
+  /* Google/Apple sign-in lives in auth-firebase.js, shared with the in-app
+     auth shell. This page only exposes it to the classic script above. */
+  import { ready, errorMessage } from './auth-firebase.js';
+
+  window.RoomtoneSsoError = errorMessage;
+  window.RoomtoneAuthReady = ready.then(function (api) {
+    window.RoomtoneSSO = api ? api.signIn : null;
+    window.RoomtoneRedirectUser = api ? api.resolveRedirect : null;
+    window.RoomtoneAuth = api ? api.auth : null;
+    window.RoomtoneFirebase = api ? api.app : null;
+    return !!api;
+  });
+
+  window.RoomtoneAuthReady.then(function () {
+    window.dispatchEvent(new Event('roomtone-auth-ready'));
+  });
+</script>
+<script>
+/* ================= ATTUNE "ROOM TONE" — cinematic ambient background =================
+   A bar at golden hour, out of focus: tungsten bokeh drifting in warm air, a slow
+   shaft of light leaning through the blinds, dust twinkling in the beam, the room's
+   own sound running as faint waveform ribbons, shot on 35mm (grain + vignette).
+   Theme-aware, reduced-motion safe, paused when hidden, DPR-capped, no deps. */
+(function initAmbientCinema() {
+  'use strict';
+  try {
+  const canvas = document.getElementById('auth-ambient');
+  if (!canvas || typeof canvas.getContext !== 'function') return;
+  const ctx = canvas.getContext('2d', { alpha: false });
+  if (!ctx) return;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const rand = (function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; })(20261031);
+
+  const palettes = {
+    dark: {
+      baseTop: '#12161d', baseMid: '#1a1f27', baseBot: '#2b2114',
+      hearthRGB: '217,119,54', hearthA: 0.24,
+      shaftRGB: '255,196,150', shaftA: 0.15,
+      bokeh: [['255,182,140', 0.20], ['255,201,163', 0.16], ['232,168,124', 0.14], ['255,221,180', 0.12]],
+      ribbons: ['255,182,140', '255,221,180', '110,222,190'],
+      ribbonA: [0.17, 0.13, 0.10],
+      moteRGB: '255,214,170', grain: 0.06, vigRGB: '0,0,0', vigA: 0.42, additive: true
+    },
+    light: {
+      baseTop: '#f7efe2', baseMid: '#f3e7d4', baseBot: '#ecdcbf',
+      hearthRGB: '217,119,54', hearthA: 0.10,
+      shaftRGB: '255,236,210', shaftA: 0.22,
+      bokeh: [['224,148,84', 0.13], ['233,171,116', 0.11], ['206,128,74', 0.10], ['240,190,138', 0.09]],
+      ribbons: ['200,116,50', '222,150,92', '38,150,120'],
+      ribbonA: [0.13, 0.10, 0.08],
+      moteRGB: '160,104,52', grain: 0.035, vigRGB: '87,66,27', vigA: 0.17, additive: false
+    }
+  };
+  let P = palettes.dark;
+
+  let W = 0, H = 0, DPR = 1;
+  let baseGrad = null, vignette = null, shaft = null, hearth = null;
+  const bokehSprites = [];
+  const grainTiles = [];
+  let bokeh = [], motes = [], ribbons = [];
+
+  function makeCanvas(w, h) { const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w)); c.height = Math.max(1, Math.round(h)); return c; }
+
+  function buildSprites() {
+    bokehSprites.length = 0;
+    P.bokeh.forEach(function (pair) {
+      const c = makeCanvas(128, 128), g = c.getContext('2d');
+      const grd = g.createRadialGradient(64, 64, 2, 64, 64, 64);
+      grd.addColorStop(0, 'rgba(255,255,255,0.85)');
+      grd.addColorStop(0.25, 'rgba(' + pair[0] + ',0.55)');
+      grd.addColorStop(0.62, 'rgba(' + pair[0] + ',0.16)');
+      grd.addColorStop(1, 'rgba(' + pair[0] + ',0)');
+      g.fillStyle = grd; g.fillRect(0, 0, 128, 128);
+      bokehSprites.push(c);
+    });
+    hearth = makeCanvas(720, 720);
+    const hg = hearth.getContext('2d');
+    const hgrd = hg.createRadialGradient(360, 360, 10, 360, 360, 360);
+    hgrd.addColorStop(0, 'rgba(' + P.hearthRGB + ',' + P.hearthA + ')');
+    hgrd.addColorStop(0.55, 'rgba(' + P.hearthRGB + ',' + (P.hearthA * 0.38) + ')');
+    hgrd.addColorStop(1, 'rgba(' + P.hearthRGB + ',0)');
+    hg.fillStyle = hgrd; hg.fillRect(0, 0, 720, 720);
+
+    shaft = makeCanvas(430, 940);
+    const sg = shaft.getContext('2d');
+    const sgrd = sg.createLinearGradient(0, 0, 430, 0);
+    sgrd.addColorStop(0, 'rgba(' + P.shaftRGB + ',0)');
+    sgrd.addColorStop(0.42, 'rgba(' + P.shaftRGB + ',' + P.shaftA + ')');
+    sgrd.addColorStop(0.58, 'rgba(' + P.shaftRGB + ',' + (P.shaftA * 0.8) + ')');
+    sgrd.addColorStop(1, 'rgba(' + P.shaftRGB + ',0)');
+    sg.fillStyle = sgrd;
+    sg.fillRect(0, 0, 430, 940);
+    const fade = sg.createLinearGradient(0, 0, 0, 940);
+    fade.addColorStop(0, 'rgba(0,0,0,0.9)'); fade.addColorStop(0.35, 'rgba(0,0,0,0)');
+    fade.addColorStop(0.75, 'rgba(0,0,0,0)'); fade.addColorStop(1, 'rgba(0,0,0,0.95)');
+    sg.globalCompositeOperation = 'destination-out';
+    sg.fillStyle = fade; sg.fillRect(0, 0, 430, 940);
+    sg.globalCompositeOperation = 'source-over';
+
+    grainTiles.length = 0;
+    for (let t = 0; t < 4; t++) {
+      const c = makeCanvas(192, 192), g = c.getContext('2d');
+      const img = g.createImageData(192, 192);
+      for (let i = 0; i < img.data.length; i += 4) {
+        const v = 120 + Math.floor(rand() * 135);
+        img.data[i] = v; img.data[i + 1] = v; img.data[i + 2] = v;
+        img.data[i + 3] = Math.floor(rand() * 46);
+      }
+      g.putImageData(img, 0, 0);
+      grainTiles.push(ctx.createPattern(c, 'repeat'));
+    }
+  }
+
+  function buildScene() {
+    bokeh = []; motes = []; ribbons = [];
+    for (let i = 0; i < 60; i++) {
+      const depth = 0.3 + rand() * 0.7;
+      bokeh.push({
+        s: Math.floor(rand() * bokehSprites.length),
+        x: rand(), y: rand(),
+        r: (20 + rand() * 95) * (0.5 + depth * 0.8),
+        vy: (3.5 + rand() * 6) / (0.35 + depth),
+        swayA: 5 + rand() * 14, swayT: 9 + rand() * 13, ph: rand() * TAU,
+        pulseT: 8 + rand() * 15, ph2: rand() * TAU, depth: depth
+      });
+    }
+    for (let i = 0; i < 70; i++) {
+      motes.push({ x: rand(), y: rand(), vx: (1.5 + rand() * 3) / 60, vy: (3 + rand() * 7) / 60, r: 0.5 + rand() * 1.2, tw: 2 + rand() * 4.5, ph: rand() * TAU });
+    }
+    const defs = [[0.30, 15, 17, [1.25, 2.6, 4.2], 0.26], [0.55, 24, 29, [1.05, 2.2, 3.6], 0.42], [0.76, 13, 41, [1.45, 2.9, 4.6], 0.19]];
+    defs.forEach(function (d, i) {
+      ribbons.push({ yFrac: d[0], amp: d[1], T: d[2], k: d[3], speed: d[4], hue: P.ribbons[i], alpha: P.ribbonA[i] });
+    });
+  }
+
+  function rebuild() {
+    DPR = Math.min(window.devicePixelRatio || 1, 1.75);
+    W = canvas.clientWidth || window.innerWidth; H = canvas.clientHeight || window.innerHeight;
+    canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    baseGrad = ctx.createLinearGradient(0, 0, 0, H);
+    baseGrad.addColorStop(0, P.baseTop); baseGrad.addColorStop(0.55, P.baseMid); baseGrad.addColorStop(1, P.baseBot);
+    vignette = makeCanvas(W, H);
+    const vg = vignette.getContext('2d');
+    const vr = vg.createRadialGradient(W / 2, H * 0.46, Math.min(W, H) * 0.36, W / 2, H * 0.5, Math.max(W, H) * 0.78);
+    vr.addColorStop(0, 'rgba(' + P.vigRGB + ',0)');
+    vr.addColorStop(1, 'rgba(' + P.vigRGB + ',' + P.vigA + ')');
+    vg.fillStyle = vr; vg.fillRect(0, 0, W, H);
+    buildSprites(); buildScene();
+  }
+
+  const ptr = { tx: 0, ty: 0, x: 0, y: 0, seen: false };
+  function onMove(e) { ptr.seen = true; ptr.tx = (e.clientX / window.innerWidth - 0.5); ptr.ty = (e.clientY / window.innerHeight - 0.5); }
+  window.addEventListener('pointermove', onMove, { passive: true });
+
+  function frame(now) {
+    const t = now / 1000;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = baseGrad; ctx.fillRect(0, 0, W, H);
+
+    if (!ptr.seen) { ptr.tx = Math.sin(t / 37) * 0.22; ptr.ty = Math.cos(t / 53) * 0.16; }
+    ptr.x += (ptr.tx - ptr.x) * 0.035; ptr.y += (ptr.ty - ptr.y) * 0.035;
+
+    ctx.globalCompositeOperation = P.additive ? 'lighter' : 'source-over';
+    const hx = W * (0.16 + 0.10 * Math.sin(t / 47)), hy = H * (0.80 + 0.07 * Math.cos(t / 61));
+    const hs = (0.85 + 0.15 * Math.sin(t / 23)) * Math.max(1.1, Math.min(W, H) / 620);
+    ctx.globalAlpha = 0.85 + 0.15 * Math.sin(t / 31);
+    ctx.drawImage(hearth, hx - 360 * hs, hy - 360 * hs, 720 * hs, 720 * hs);
+
+    const ang = -0.42 + Math.sin(t / 61) * 0.045;
+    const sa = 0.75 + 0.25 * Math.sin(t / 23 + 1.7);
+    ctx.save();
+    ctx.translate(W * 0.88, -H * 0.06); ctx.rotate(ang);
+    ctx.globalAlpha = sa;
+    const shw = Math.max(W, H) * 0.55;
+    ctx.drawImage(shaft, -shw / 2, -40, shw, H * 1.5);
+    ctx.restore();
+
+    ribbons.forEach(function (rb, ri) {
+      ctx.beginPath();
+      const segs = 96, w2 = 1 / segs;
+      for (let i = 0; i <= segs; i++) {
+        const u = i * w2, x = u * W;
+        const y = rb.yFrac * H + rb.amp * (Math.sin(u * rb.k[0] * TAU + t * rb.speed) + 0.5 * Math.sin(u * rb.k[1] * TAU - t * rb.speed * 0.62) + 0.25 * Math.sin(u * rb.k[2] * TAU + t * rb.speed * 0.35));
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      const g = ctx.createLinearGradient(0, 0, W, 0);
+      g.addColorStop(0, 'rgba(' + rb.hue + ',0)');
+      g.addColorStop(0.28, 'rgba(' + rb.hue + ',' + rb.alpha + ')');
+      g.addColorStop(0.62, 'rgba(' + rb.hue + ',' + (rb.alpha * 0.85) + ')');
+      g.addColorStop(1, 'rgba(' + rb.hue + ',0)');
+      ctx.strokeStyle = g; ctx.lineWidth = 2.2; ctx.stroke();
+    });
+
+    bokeh.forEach(function (b) {
+      const yNorm = ((b.y - t * b.vy / H) % 1 + 1) % 1;
+      const x = (b.x + Math.sin(t / b.swayT + b.ph) * b.swayA / W) * W + ptr.x * 26 * b.depth;
+      const y = yNorm * H + ptr.y * 18 * b.depth;
+      const a = (0.55 + 0.45 * Math.sin(t / b.pulseT + b.ph2));
+      ctx.globalAlpha = Math.max(0.08, a);
+      const r = b.r * (1 + 0.05 * Math.sin(t / 9 + b.ph));
+      ctx.drawImage(bokehSprites[b.s], x - r, y - r, r * 2, r * 2);
+    });
+
+    ctx.fillStyle = 'rgba(' + P.moteRGB + ',0.75)';
+    motes.forEach(function (m) {
+      const x = ((m.x + t * m.vx) % 1 + 1) % 1 * W + ptr.x * 34;
+      const y = ((m.y - t * m.vy) % 1 + 1) % 1 * H + ptr.y * 22;
+      const a = 0.28 + 0.5 * Math.max(0, Math.sin(t / m.tw + m.ph));
+      ctx.globalAlpha = a;
+      ctx.beginPath(); ctx.arc(x, y, m.r, 0, TAU); ctx.fill();
+    });
+
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = P.grain;
+    if (grainTiles.length) {
+      ctx.save();
+      ctx.translate(Math.floor(rand() * 192), Math.floor(rand() * 192));
+      ctx.fillStyle = grainTiles[Math.floor(rand() * grainTiles.length)];
+      ctx.fillRect(-192, -192, W + 384, H + 384);
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+    ctx.drawImage(vignette, 0, 0, W, H);
+  }
+
+  let rafId = 0, running = false;
+  function loop(now) { try { window.__ambientFrames = (window.__ambientFrames || 0) + 1; frame(now); } catch (e) { window.__ambientErr = String((e && e.stack) || e); running = false; } rafId = running ? requestAnimationFrame(loop) : 0; }
+  function start() { if (!running && !reduceMotion) { running = true; rafId = requestAnimationFrame(loop); } }
+  function stop() { running = false; if (rafId) cancelAnimationFrame(rafId); rafId = 0; }
+
+  function applyTheme() {
+    P = document.documentElement.classList.contains('light') ? palettes.light : palettes.dark;
+    try { rebuild(); } catch (e) { window.__ambientErr = String((e && e.stack) || e); return; }
+    if (reduceMotion) try { frame(13700); } catch (e2) { window.__ambientErr = String((e2 && e2.stack) || e2); }
+  }
+  new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+  let resizePending = 0;
+  window.addEventListener('resize', function () {
+    if (resizePending) return;
+    resizePending = requestAnimationFrame(function () { resizePending = 0; applyTheme(); });
+  });
+  document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
+
+  applyTheme();
+  start();
+  } catch (e) { window.__ambientErr = 'init: ' + String((e && e.stack) || e); }
+})();
+</script>
+</body>
+</html>
