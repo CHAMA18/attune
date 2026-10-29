@@ -1249,7 +1249,9 @@
 
       <!-- Drawer body -->
       <div class="px-space-md flex-1 overflow-y-auto pt-space-sm">
-        <section class="mt-space-md mb-space-sm rounded-xl bg-surface-container p-space-sm" aria-label="Operator profile" data-operator-panel>
+        <div role="button" tabindex="0" id="drawer-profile-open" aria-label="Operator profile — edit profile and venue"
+             aria-haspopup="dialog" aria-controls="profile-sheet" data-operator-panel
+             class="group mt-space-md mb-space-sm rounded-xl bg-surface-container p-space-sm cursor-pointer hover:bg-surface-container-high/70 ring-1 ring-transparent hover:ring-primary/25 focus-visible:ring-primary/60 transition-all">
           <div class="flex items-center gap-2.5 px-1">
             <span class="relative block w-9 h-9 rounded-full p-[1.5px] bg-gradient-to-br from-primary/70 via-primary-container/50 to-secondary/70 flex-shrink-0" aria-hidden="true">
               <span class="w-full h-full rounded-full bg-surface-container-high flex items-center justify-center font-label-caps text-label-caps text-primary tracking-wider" data-operator-initials>OP</span>
@@ -1258,12 +1260,13 @@
               <p class="font-body-md text-body-md text-on-surface font-medium truncate" data-operator-name>Operator</p>
               <p class="font-body-sm text-body-sm text-on-surface-variant truncate" data-operator-email>Not signed in</p>
             </div>
+            <span class="material-symbols-outlined text-lg text-outline group-hover:text-primary transition-colors flex-shrink-0" aria-hidden="true">chevron_right</span>
           </div>
           <div class="flex items-center gap-1.5 px-1 pt-2">
             <span class="material-symbols-outlined text-[14px] text-secondary" data-operator-provider-icon aria-hidden="true">verified_user</span>
             <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider" data-operator-provider>SIGNED IN WITH EMAIL</span>
           </div>
-        </section>
+        </div>
 
         <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">OPERATE</p>
         <div class="flex flex-col gap-1 pb-space-md" role="navigation" aria-label="Primary screens">
@@ -1282,6 +1285,62 @@
             <span class="material-symbols-outlined text-xl">nightlife</span>
             <span class="font-body-md text-body-md">Menu &amp; Audio</span>
           </a>
+        </div>
+
+        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">OPERATOR TOOLKIT</p>
+        <div class="flex flex-col gap-1 pb-space-md" role="navigation" aria-label="Operator toolkit">
+          <button type="button" data-drawer-act="shift-notes"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">sticky_note_2</span>
+            <span class="font-body-md text-body-md">Copy Shift Notes</span>
+          </button>
+          <button type="button" data-drawer-act="print-playbook"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">picture_as_pdf</span>
+            <span class="font-body-md text-body-md">Print Playbook</span>
+          </button>
+          <button type="button" data-drawer-act="grounding-json"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">data_object</span>
+            <span class="font-body-md text-body-md">Export Grounding JSON</span>
+          </button>
+          <button type="button" data-drawer-act="heat-map"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">download</span>
+            <span class="font-body-md text-body-md">Export Heat Map</span>
+          </button>
+          <button type="button" data-drawer-act="crowd-share"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">share</span>
+            <span class="font-body-md text-body-md">Share Crowd Profile</span>
+          </button>
+          <button type="button" data-drawer-act="rerun-agent"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">autorenew</span>
+            <span class="font-body-md text-body-md">Re-run the Agent</span>
+          </button>
+        </div>
+
+        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">PREFERENCES</p>
+        <div class="flex flex-col gap-1 pb-space-md">
+          <button type="button" data-sound-open aria-haspopup="dialog" aria-controls="sound-sheet"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">graphic_eq</span>
+            <span class="font-body-md text-body-md">Sound Settings</span>
+          </button>
+          <button type="button" data-drawer-act="retune-room"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl">tune</span>
+            <span class="font-body-md text-body-md">Re-tune the Room</span>
+          </button>
+          <button type="button" id="theme-toggle" aria-pressed="true"
+                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl" data-theme-icon>dark_mode</span>
+            <span class="font-body-md text-body-md" data-theme-label>Dark Mode</span>
+            <span class="ml-auto relative inline-flex h-4 w-8 items-center rounded-full bg-primary flex-shrink-0 transition-colors" data-theme-track>
+              <span class="absolute left-0.5 h-3 w-3 rounded-full bg-on-primary transition-transform translate-x-4" data-theme-knob></span>
+            </span>
+          </button>
         </div>
 
         <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">SUPPORT &amp; LEGAL</p>
@@ -1308,26 +1367,7 @@
           </a>
         </div>
 
-                <div class="flex flex-col gap-1 pb-space-md">
-          <button type="button" data-sound-open aria-haspopup="dialog" aria-controls="sound-sheet"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">graphic_eq</span>
-            <span class="font-body-md text-body-md">Sound Settings</span>
-          </button>
-        </div>
-
-<p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">PREFERENCES</p>
-        <div class="flex flex-col gap-1 pb-space-md">
-          <button type="button" id="theme-toggle" aria-pressed="true"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl" data-theme-icon>dark_mode</span>
-            <span class="font-body-md text-body-md" data-theme-label>Dark Mode</span>
-            <span class="ml-auto relative inline-flex h-4 w-8 items-center rounded-full bg-primary flex-shrink-0 transition-colors" data-theme-track>
-              <span class="absolute left-0.5 h-3 w-3 rounded-full bg-on-primary transition-transform translate-x-4" data-theme-knob></span>
-            </span>
-          </button>
-        </div>
-      </div>
+              </div>
 
       <!-- Footer -->
       <div class="px-space-md pt-space-sm pb-safe flex-shrink-0 border-t border-surface-container-high/70">
@@ -1336,7 +1376,7 @@
           <span class="material-symbols-outlined text-xl">logout</span>
           <span class="font-body-md text-body-md">Sign Out</span>
         </button>
-        <p class="font-label-caps text-label-caps text-outline px-space-sm pt-space-xs pb-space-sm">ATTUNE &#183; V1.0.0</p>
+        <p class="font-label-caps text-label-caps text-outline px-space-sm pt-space-xs pb-space-sm">ATTUNE &#183; V1.1.0</p>
       </div>
 
     </aside>
@@ -1438,7 +1478,7 @@
           </div>
         </section>
     </div>
-    <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-md py-3 flex-shrink-0 border-t border-surface-container-high/70">ATTUNE &#183; V1.0.0 &#183; IN-APP PREVIEW</p>
+    <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-md py-3 flex-shrink-0 border-t border-surface-container-high/70">ATTUNE &#183; V1.1.0 &#183; IN-APP PREVIEW</p>
   </div>
 </div>
 
@@ -3372,6 +3412,76 @@
     });
   })();
 
+  /* ---------------- Sidebar toolkit: every drawer action does the real thing ----------------
+     The audit showed the app's exports and agent controls were scattered across
+     screens (or unreachable, like onboarding replay). The sidebar now mirrors the
+     whole app. Each drawer button delegates to the canonical on-screen control —
+     one source of truth for logic + toasts — and on phones the drawer closes
+     first so the confirmation toast is visible. */
+  (function initDrawerToolkit() {
+    const root = document.getElementById('app-drawer');
+    if (!root) return;
+
+    const isDesktop = () => window.matchMedia('(min-width: 1024px)').matches;
+    function dismissDrawer() {
+      /* Desktop keeps the persistent sidebar open — sheets and dialogs stack
+         above it. Phones collapse the drawer so the result is on screen. */
+      if (isDesktop()) return;
+      root.classList.remove('drawer-open');
+      root.setAttribute('aria-hidden', 'true');
+      const trigger = document.getElementById('drawer-trigger');
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+    function toast(msg, icon) {
+      if (window.attuneToast) window.attuneToast(msg, icon);
+    }
+    function delegate(selector, label) {
+      const target = document.querySelector(selector);
+      if (target) { target.click(); return true; }
+      toast(label + ' is not available yet', 'error');
+      return false;
+    }
+
+    const ACTS = {
+      'shift-notes':    () => delegate('#shift-notes-btn', 'Shift notes'),
+      'print-playbook': () => delegate('#pdf-btn', 'Playbook print sheet'),
+      'grounding-json': () => delegate('#grounding-export', 'Grounding export'),
+      'heat-map':       () => delegate('#radar-export', 'Heat map export'),
+      'crowd-share':    () => delegate('#radar-share', 'Crowd share'),
+      'rerun-agent':    () => delegate('#radar-rescan', 'Agent re-run'),
+      'retune-room':    () => {
+        dismissDrawer();
+        if (window.AttuneOnboarding && window.AttuneOnboarding.start) {
+          window.AttuneOnboarding.start();
+          toast('Re-tune the room \u2014 walk through setup again', 'tune');
+        } else {
+          toast('Onboarding is not available yet', 'error');
+        }
+      }
+    };
+
+    root.querySelectorAll('[data-drawer-act]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const act = btn.getAttribute('data-drawer-act');
+        if (act !== 'retune-room') dismissDrawer();
+        const fn = ACTS[act];
+        if (fn) fn();
+      });
+    });
+
+    /* Operator card -> Profile & venue sheet. Same sheet the appbar avatar
+       opens; the card was display-only before the audit. */
+    const card = root.querySelector('[data-operator-panel]');
+    if (card) {
+      const openProfile = () => { dismissDrawer(); delegate('#profile-open', 'Profile'); };
+      card.addEventListener('click', openProfile);
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openProfile(); }
+      });
+    }
+  })();
+
   /* ---------------- Desktop shell: drawer becomes a persistent sidebar ----------------
      Keeps ARIA semantics truthful: on >=1024px the drawer is always visible, so it
      must not be aria-hidden or announce itself as a modal dialog. */
@@ -5290,8 +5400,7 @@
     }
     window.attuneToast = toast;
     function $(id) { return document.getElementById(id); }
-    function copyText(text) {
-      if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
+    function legacyCopy(text) {
       return new Promise(function (res) {
         var ta = document.createElement('textarea');
         ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
@@ -5299,6 +5408,15 @@
         try { document.execCommand('copy'); } catch (e) {}
         document.body.removeChild(ta); res();
       });
+    }
+    function copyText(text) {
+      /* Clipboard permission can be denied (private mode, in-app webviews,
+         headless). Fall back to execCommand instead of dying with an
+         unhandled rejection — the operator must always get the toast. */
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+      }
+      return legacyCopy(text);
     }
     window.attuneCopy = copyText;
     function shareOrCopy(title, text, doneMsg) {
