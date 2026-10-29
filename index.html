@@ -1268,75 +1268,111 @@
           </div>
         </div>
 
-        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">OPERATE</p>
+        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">YOUR ROOM</p>
         <div class="flex flex-col gap-1 pb-space-md" role="navigation" aria-label="Primary screens">
           <a href="#" data-path="playbook" aria-label="Week Playbook screen" aria-current="page"
-             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-primary bg-surface-container/80 hover:text-on-surface hover:bg-surface-container transition-colors">
-            <span class="material-symbols-outlined text-xl">calendar_month</span>
-            <span class="font-body-md text-body-md">Week Playbook</span>
+             class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-primary bg-surface-container/80 hover:text-on-surface hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-xl flex-shrink-0" aria-hidden="true">calendar_month</span>
+            <span class="min-w-0 flex-1">
+              <span class="block font-body-md text-body-md leading-tight">Week Playbook</span>
+              <span class="block font-body-sm text-[11px] text-outline leading-snug mt-0.5">The week planned, hour by hour</span>
+            </span>
           </a>
           <a href="#" data-path="taste-heat" aria-label="Taste radar screen"
-             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">
-            <span class="material-symbols-outlined text-xl">radar</span>
-            <span class="font-body-md text-body-md">Taste Radar</span>
+             class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-xl flex-shrink-0" aria-hidden="true">radar</span>
+            <span class="min-w-0 flex-1">
+              <span class="block font-body-md text-body-md leading-tight">Taste Radar</span>
+              <span class="block font-body-sm text-[11px] text-outline leading-snug mt-0.5">The block&rsquo;s taste, live from Qloo</span>
+            </span>
           </a>
           <a href="#" data-path="menu-sound" aria-label="Menu and audio screen"
-             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">
-            <span class="material-symbols-outlined text-xl">nightlife</span>
-            <span class="font-body-md text-body-md">Menu &amp; Audio</span>
+             class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-xl flex-shrink-0" aria-hidden="true">nightlife</span>
+            <span class="min-w-0 flex-1">
+              <span class="block font-body-md text-body-md leading-tight">Menu &amp; Audio</span>
+              <span class="block font-body-sm text-[11px] text-outline leading-snug mt-0.5">Pairings and tonight&rsquo;s sound</span>
+            </span>
           </a>
         </div>
 
-        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">OPERATOR TOOLKIT</p>
-        <div class="flex flex-col gap-1 pb-space-md" role="navigation" aria-label="Operator toolkit">
+        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">QUICK ACTIONS</p>
+        <div class="flex flex-col gap-1 pb-space-md" role="navigation" aria-label="Quick actions">
           <button type="button" data-drawer-act="shift-notes"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">sticky_note_2</span>
-            <span class="font-body-md text-body-md">Copy Shift Notes</span>
+                  class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl flex-shrink-0" aria-hidden="true">sticky_note_2</span>
+            <span class="min-w-0 flex-1">
+              <span class="block font-body-md text-body-md leading-tight">Copy Shift Notes</span>
+              <span class="block font-body-sm text-[11px] text-outline leading-snug mt-0.5">Tonight&rsquo;s plan, ready to paste</span>
+            </span>
           </button>
           <button type="button" data-drawer-act="print-playbook"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">picture_as_pdf</span>
-            <span class="font-body-md text-body-md">Print Playbook</span>
+                  class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl flex-shrink-0" aria-hidden="true">picture_as_pdf</span>
+            <span class="min-w-0 flex-1">
+              <span class="block font-body-md text-body-md leading-tight">Print Playbook</span>
+              <span class="block font-body-sm text-[11px] text-outline leading-snug mt-0.5">A paper copy for the wall</span>
+            </span>
           </button>
           <button type="button" data-drawer-act="grounding-json"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">data_object</span>
-            <span class="font-body-md text-body-md">Export Grounding JSON</span>
+                  class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl flex-shrink-0" aria-hidden="true">data_object</span>
+            <span class="min-w-0 flex-1">
+              <span class="block font-body-md text-body-md leading-tight">Download Taste Data</span>
+              <span class="block font-body-sm text-[11px] text-outline leading-snug mt-0.5">The Qloo numbers behind the plan</span>
+            </span>
           </button>
           <button type="button" data-drawer-act="heat-map"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">download</span>
-            <span class="font-body-md text-body-md">Export Heat Map</span>
+                  class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl flex-shrink-0" aria-hidden="true">download</span>
+            <span class="min-w-0 flex-1">
+              <span class="block font-body-md text-body-md leading-tight">Download Heat Map</span>
+              <span class="block font-body-sm text-[11px] text-outline leading-snug mt-0.5">Every scored spot, saved as a file</span>
+            </span>
           </button>
           <button type="button" data-drawer-act="crowd-share"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">share</span>
-            <span class="font-body-md text-body-md">Share Crowd Profile</span>
+                  class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl flex-shrink-0" aria-hidden="true">share</span>
+            <span class="min-w-0 flex-1">
+              <span class="block font-body-md text-body-md leading-tight">Share the Crowd</span>
+              <span class="block font-body-sm text-[11px] text-outline leading-snug mt-0.5">A snapshot of who&rsquo;s around</span>
+            </span>
           </button>
           <button type="button" data-drawer-act="rerun-agent"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">autorenew</span>
-            <span class="font-body-md text-body-md">Re-run the Agent</span>
+                  class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl flex-shrink-0" aria-hidden="true">autorenew</span>
+            <span class="min-w-0 flex-1">
+              <span class="block font-body-md text-body-md leading-tight">Refresh Recommendations</span>
+              <span class="block font-body-sm text-[11px] text-outline leading-snug mt-0.5">Re-read the block, rewrite the plan</span>
+            </span>
           </button>
         </div>
 
-        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">PREFERENCES</p>
+        <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">SETTINGS</p>
         <div class="flex flex-col gap-1 pb-space-md">
           <button type="button" data-sound-open aria-haspopup="dialog" aria-controls="sound-sheet"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">graphic_eq</span>
-            <span class="font-body-md text-body-md">Sound Settings</span>
+                  class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl flex-shrink-0" aria-hidden="true">graphic_eq</span>
+            <span class="min-w-0 flex-1">
+              <span class="block font-body-md text-body-md leading-tight">Sound Settings</span>
+              <span class="block font-body-sm text-[11px] text-outline leading-snug mt-0.5">Volume, quiet hours and units</span>
+            </span>
           </button>
           <button type="button" data-drawer-act="retune-room"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">tune</span>
-            <span class="font-body-md text-body-md">Re-tune the Room</span>
+                  class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl flex-shrink-0" aria-hidden="true">tune</span>
+            <span class="min-w-0 flex-1">
+              <span class="block font-body-md text-body-md leading-tight">Re-tune the Room</span>
+              <span class="block font-body-sm text-[11px] text-outline leading-snug mt-0.5">Walk through setup again</span>
+            </span>
           </button>
           <button type="button" id="theme-toggle" aria-pressed="true"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl" data-theme-icon>dark_mode</span>
-            <span class="font-body-md text-body-md" data-theme-label>Dark Mode</span>
+                  class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl flex-shrink-0" data-theme-icon aria-hidden="true">dark_mode</span>
+            <span class="min-w-0 flex-1">
+              <span class="block font-body-md text-body-md leading-tight" data-theme-label>Dark Mode</span>
+              <span class="block font-body-sm text-[11px] text-outline leading-snug mt-0.5">Easy on the eyes after dark</span>
+            </span>
             <span class="ml-auto relative inline-flex h-4 w-8 items-center rounded-full bg-primary flex-shrink-0 transition-colors" data-theme-track>
               <span class="absolute left-0.5 h-3 w-3 rounded-full bg-on-primary transition-transform translate-x-4" data-theme-knob></span>
             </span>
@@ -1346,24 +1382,36 @@
         <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">SUPPORT &amp; LEGAL</p>
         <div class="flex flex-col gap-1 pb-space-md">
           <button type="button" data-legal-open="terms"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">description</span>
-            <span class="font-body-md text-body-md">Terms &amp; Conditions</span>
+                  class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl flex-shrink-0" aria-hidden="true">description</span>
+            <span class="min-w-0 flex-1">
+              <span class="block font-body-md text-body-md leading-tight">Terms &amp; Conditions</span>
+              <span class="block font-body-sm text-[11px] text-outline leading-snug mt-0.5">The fine print, in plain words</span>
+            </span>
           </button>
           <button type="button" data-legal-open="privacy"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">privacy_tip</span>
-            <span class="font-body-md text-body-md">Privacy Policy</span>
+                  class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl flex-shrink-0" aria-hidden="true">privacy_tip</span>
+            <span class="min-w-0 flex-1">
+              <span class="block font-body-md text-body-md leading-tight">Privacy Policy</span>
+              <span class="block font-body-sm text-[11px] text-outline leading-snug mt-0.5">What we collect, and why</span>
+            </span>
           </button>
           <button type="button" data-legal-open="credits"
-                  class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">library_music</span>
-            <span class="font-body-md text-body-md">Music &amp; Data Credits</span>
+                  class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl flex-shrink-0" aria-hidden="true">library_music</span>
+            <span class="min-w-0 flex-1">
+              <span class="block font-body-md text-body-md leading-tight">Music &amp; Data Credits</span>
+              <span class="block font-body-sm text-[11px] text-outline leading-snug mt-0.5">Where the songs and data come from</span>
+            </span>
           </button>
           <a href="https://github.com/CHAMA18/attune/issues" target="_blank" rel="noopener noreferrer"
-             class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
-            <span class="material-symbols-outlined text-xl">support_agent</span>
-            <span class="font-body-md text-body-md">Feedback &amp; Support</span>
+             class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left">
+            <span class="material-symbols-outlined text-xl flex-shrink-0" aria-hidden="true">support_agent</span>
+            <span class="min-w-0 flex-1">
+              <span class="block font-body-md text-body-md leading-tight">Feedback &amp; Support</span>
+              <span class="block font-body-sm text-[11px] text-outline leading-snug mt-0.5">Tell us what&rsquo;s missing or broken</span>
+            </span>
           </a>
         </div>
 
@@ -2150,7 +2198,7 @@
               <span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-[0.14em] truncate">Powered by Qloo</span>
               <span id="llm-mode" class="micro-caps px-1.5 py-0.5 rounded bg-tertiary/10 text-tertiary flex-shrink-0" style="letter-spacing:.1em">CURATED</span>
             </div>
-            <button type="button" id="grounding-export" aria-label="Export grounding JSON" title="Export grounding JSON"
+            <button type="button" id="grounding-export" aria-label="Download taste data — the Qloo numbers behind the plan (JSON)" title="Download taste data (JSON)"
                     class="press flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-surface-container/70 hairline hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors">
               <span class="material-symbols-outlined text-base" data-export-icon>data_object</span>
             </button>
@@ -3446,10 +3494,10 @@
     const ACTS = {
       'shift-notes':    () => delegate('#shift-notes-btn', 'Shift notes'),
       'print-playbook': () => delegate('#pdf-btn', 'Playbook print sheet'),
-      'grounding-json': () => delegate('#grounding-export', 'Grounding export'),
-      'heat-map':       () => delegate('#radar-export', 'Heat map export'),
+      'grounding-json': () => delegate('#grounding-export', 'Taste data download'),
+      'heat-map':       () => delegate('#radar-export', 'Heat map download'),
       'crowd-share':    () => delegate('#radar-share', 'Crowd share'),
-      'rerun-agent':    () => delegate('#radar-rescan', 'Agent re-run'),
+      'rerun-agent':    () => delegate('#radar-rescan', 'Recommendation refresh'),
       'retune-room':    () => {
         dismissDrawer();
         if (window.AttuneOnboarding && window.AttuneOnboarding.start) {
