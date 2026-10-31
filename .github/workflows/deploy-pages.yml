@@ -35,7 +35,7 @@ jobs:
       - name: Assemble clean site artifact
         run: |
           mkdir -p site
-          cp index.html auth.html auth-firebase.js landing.html site/
+          cp index.html landing.html site/
           cp -R assets audio logo site/
           touch site/.nojekyll
           node -e "require('fs').writeFileSync('site/build.json', JSON.stringify({revision: process.env.GITHUB_SHA, builtAt: new Date().toISOString()}))"
