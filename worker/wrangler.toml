@@ -4,7 +4,7 @@ compatibility_date = "2026-10-01"
 
 [vars]
 LLM_PROVIDER = "openai"
-REQUIRE_AUTH = "1"
+REQUIRE_AUTH = "0"
 ENFORCE_RATE_LIMIT = "1"
 ALLOWED_ORIGINS = "https://chama18.github.io,https://qloo-api-1.web.app,http://localhost:3000,http://127.0.0.1:3000"
 # LLM_MODEL = "gpt-4o-mini"

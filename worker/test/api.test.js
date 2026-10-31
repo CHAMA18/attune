@@ -39,6 +39,19 @@ test('authentication and configured quota are enforced', async () => {
   assert.equal((await worker.fetch(req(), { QLOO_RATE_LIMITER: { limit: async () => ({ success: false }) } })).status, 429);
 });
 
+test('anonymous requests use the client IP for rate limiting', async () => {
+  let key;
+  const request = new Request('https://example.test/api/llm/playbook', {
+    method: 'POST', headers: { 'content-type': 'application/json', 'CF-Connecting-IP': '192.0.2.1' }, body: '{}'
+  });
+  const response = await worker.fetch(request, {
+    REQUIRE_AUTH: '0', ENFORCE_RATE_LIMIT: '1',
+    QLOO_RATE_LIMITER: { limit: async input => { key = input.key; return { success: true }; } }
+  });
+  assert.equal(response.status, 200);
+  assert.equal(key, 'ip:192.0.2.1');
+});
+
 test('configured origin policy rejects unapproved browser origins', async () => {
   const request = new Request('https://example.test/api/qloo/v2/search', { method: 'OPTIONS', headers: { Origin: 'https://untrusted.example' } });
   assert.equal((await worker.fetch(request, { ALLOWED_ORIGINS: 'https://approved.example' })).status, 403);

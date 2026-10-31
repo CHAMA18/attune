@@ -8,12 +8,6 @@
 <script>
   try {
     if (localStorage.getItem('roomtone-theme') === 'light') document.documentElement.classList.add('light');
-    /* Auth gate — sessions are minted by auth.html (one-tap demo login for judges). */
-    (function () {
-      var session = null;
-      try { session = localStorage.getItem('roomtone.session') || sessionStorage.getItem('roomtone.session'); } catch (e) { /* storage blocked */ }
-      if (!session) location.replace('landing.html');
-    })();
   } catch (e) { /* storage unavailable: stay dark */ }
 </script>
 <script>
@@ -1284,7 +1278,7 @@
           </div>
           <div class="flex items-center gap-1.5 px-1 pt-2">
             <span class="material-symbols-outlined text-[14px] text-secondary" data-operator-provider-icon aria-hidden="true">verified_user</span>
-            <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider" data-operator-provider>SIGNED IN WITH EMAIL</span>
+            <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider" data-operator-provider>EXPLORING AS A GUEST</span>
           </div>
         </section>
 
@@ -4832,7 +4826,15 @@
     try {
       session = JSON.parse(localStorage.getItem('roomtone.session') || sessionStorage.getItem('roomtone.session') || 'null');
     } catch (e) { session = null; }
-    if (!session) return;
+    if (!session) {
+      var guestIcon = document.querySelector('[data-operator-provider-icon]');
+      if (guestIcon) guestIcon.textContent = 'explore';
+      document.querySelectorAll('#drawer-signout, [data-profile-signout]').forEach(function (button) {
+        var label = button.querySelector('span:last-child');
+        if (label) label.textContent = 'Back to home';
+      });
+      return;
+    }
 
     var LABELS = { google: 'Google', apple: 'Apple', email: 'Email', demo: 'Demo room' };
     var ICONS = { google: 'verified_user', apple: 'verified_user', email: 'key', demo: 'theater_comedy' };
@@ -5335,7 +5337,8 @@
         if (typeof api.auth.authStateReady === 'function') await api.auth.authStateReady();
         if (!api.auth.currentUser && !(result && result.user)) {
           try { localStorage.removeItem('roomtone.session'); sessionStorage.removeItem('roomtone.session'); } catch (_) {}
-          location.replace('auth.html');
+          window.AttuneAuth.markReady(null);
+          location.reload();
           return;
         }
         if (result && result.user) {

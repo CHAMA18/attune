@@ -21,6 +21,21 @@ async function fixtures(page) {
     await route.fulfill({ status: 200, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify(body) });
   });
 }
+test('a visitor can enter, choose a venue and get recommendations without an account', async ({ page }) => {
+  await fixtures(page);
+  await page.goto('/landing.html');
+  await page.getByRole('link', { name: /explore your room/i }).click();
+  await page.waitForURL('**/index.html');
+  await expect(page.locator('#venue-required-prompt')).toBeVisible();
+  await page.locator('#open-venue-setup').click();
+  await page.locator('[data-venue-input]').fill('Fixture Venue');
+  await page.locator('[data-venue-area]').fill('Fixture City');
+  await page.locator('[data-venue-apply]').click();
+  await page.locator('[data-venue-results] button').first().click();
+  await expect(page.locator('#recommendation-evidence details')).toHaveCount(4);
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('roomtone.session'))).toBeNull();
+});
+
 test('sign in, confirm venue, inspect evidence, change radius and sign out', async ({ page }, info) => {
   await fixtures(page);
   await page.goto('/auth.html');

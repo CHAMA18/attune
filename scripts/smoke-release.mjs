@@ -14,5 +14,5 @@ try {
   const metadata = await build.json();
   if (!metadata.revision) throw new Error('Build metadata is missing revision');
   console.log('Revision: ' + String(metadata.revision).slice(0, 12));
-  await check('Anonymous API access', new URL('qloo/v2/search?query=example', api), [401]);
+  await check('Anonymous API access', new URL('qloo/v2/search?query=coffee&take=1', api), [200]);
 } catch (error) { console.error(error.message); process.exitCode = 1; }
