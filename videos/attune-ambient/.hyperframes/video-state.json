@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "historyId": "d17487d6-6496-4a56-a04f-9e6fa0a877b5",
+  "currentRevision": null,
+  "pendingChanges": false,
+  "files": {
+    "assets/gsap.min.js": {
+      "hash": "92bb9a96476f983d212a2bc4f54c889039c1696dd4461d40a736860938570fbb",
+      "content": "/Users/chunguchama/.cache/hyperframes/history/d17487d6-6496-4a56-a04f-9e6fa0a877b5/blobs/92/92bb9a96476f983d212a2bc4f54c889039c1696dd4461d40a736860938570fbb"
+    },
+    "assets/room.jpg": {
+      "hash": "cbfaa6ed6eebeff1b13376db47e0c5d6b59dda3c662be7cc26020bba81c7d0ba",
+      "content": "/Users/chunguchama/.cache/hyperframes/history/d17487d6-6496-4a56-a04f-9e6fa0a877b5/blobs/cb/cbfaa6ed6eebeff1b13376db47e0c5d6b59dda3c662be7cc26020bba81c7d0ba"
+    },
+    "index.html": {
+      "hash": "2bff974344055a8b09a48509fa91ee8602079c33c8617e6db2d87ff2555fa573",
+      "content": "/Users/chunguchama/.cache/hyperframes/history/d17487d6-6496-4a56-a04f-9e6fa0a877b5/blobs/2b/2bff974344055a8b09a48509fa91ee8602079c33c8617e6db2d87ff2555fa573"
+    },
+    "videos/attune-ambient/assets/gsap.min.js": {
+      "hash": "92bb9a96476f983d212a2bc4f54c889039c1696dd4461d40a736860938570fbb",
+      "content": "/Users/chunguchama/.cache/hyperframes/history/d17487d6-6496-4a56-a04f-9e6fa0a877b5/blobs/92/92bb9a96476f983d212a2bc4f54c889039c1696dd4461d40a736860938570fbb"
+    },
+    "videos/attune-ambient/index.html": {
+      "hash": "2bff974344055a8b09a48509fa91ee8602079c33c8617e6db2d87ff2555fa573",
+      "content": "/Users/chunguchama/.cache/hyperframes/history/d17487d6-6496-4a56-a04f-9e6fa0a877b5/blobs/2b/2bff974344055a8b09a48509fa91ee8602079c33c8617e6db2d87ff2555fa573"
+    }
+  },
+  "revisions": {},
+  "checks": {
+    "latest": null,
+    "revisions": {},
+    "unversioned": []
+  },
+  "snapshots": {
+    "latest": null,
+    "revisions": {},
+    "unversioned": []
+  },
+  "renders": {
+    "latest": {
+      "id": "1e5c44f5-248e-475f-be2b-1fb1767b33ed",
+      "completedAt": 1793411818425,
+      "output": "/Users/chunguchama/Qloo/assets/landing/attune-ambient.mp4",
+      "status": "completed",
+      "revision": null
+    },
+    "retainedRevisions": []
+  },
+  "pendingArtifactCleanup": []
+}

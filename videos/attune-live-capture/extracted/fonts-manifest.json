@@ -1,0 +1,39 @@
+{
+  "files": [
+    {
+      "file": "kJEhBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oFsLjBuVY.woff2",
+      "family": "Material Symbols Outlined",
+      "rawFamily": "Material Symbols Outlined",
+      "subfamily": "Regular",
+      "postscript": "MaterialSymbolsOutlined-Regular",
+      "weight": 400,
+      "style": "normal",
+      "variationAxes": [
+        "FILL",
+        "GRAD",
+        "opsz",
+        "wght"
+      ],
+      "identified": true,
+      "isIcon": false
+    }
+  ],
+  "families": [
+    {
+      "family": "Material Symbols Outlined",
+      "weights": [
+        400
+      ],
+      "variable": true,
+      "fileCount": 1,
+      "files": [
+        "kJEhBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oFsLjBuVY.woff2"
+      ]
+    }
+  ],
+  "unidentified": [],
+  "meta": {
+    "generatedAt": "2026-10-31T03:37:58.796Z",
+    "tool": "fontkit"
+  }
+}

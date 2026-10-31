@@ -1,0 +1,15 @@
+A great place has a feeling. The music, the menu, the neighborhood, and the people all belong to the same story. But for independent operators, understanding that story can mean juggling instincts, scattered data, and a lot of guesswork.
+
+Meet Attune: a cultural intelligence workspace designed to help hospitality teams explore the connections between a place and the tastes around it. Using Qloo's taste intelligence, Attune brings signals across culture into one place, so a team can turn inspiration into more considered decisions.
+
+Let's step into the live demo. From the sign-in screen, a visitor can open the demonstration workspace and explore the product using a sample venue. The dashboard offers a starting point for understanding the venue and the ideas available to the team. This recording shows the currently deployed prototype; its example labels and recommendations should be treated as demonstrations, not verified business results.
+
+The real opportunity begins with the venue. A neighborhood is more than a point on a map: it's a meeting place for music, food, entertainment, and everyday rituals. Attune is designed to bring those cultural connections together so an operator can look beyond a single category and see a richer picture of their surroundings.
+
+In Taste Radar, the team can explore the cultural signals associated with a location. Instead of asking only what is popular in isolation, the experience encourages a more useful question: which interests might belong together here? Qloo affinity scores describe relationships in taste. They do not prove that people visited a venue, purchased a product, or listened to an artist.
+
+Those insights can inform creative work. A hospitality team might use a cultural connection to inspire a playlist, a menu idea, an event concept, or a conversation with their community. Attune helps bring those ideas into a shared workflow, where operators can review recommendations, consider the context, and decide what actually fits their venue.
+
+And the human decision remains essential. Cultural signals are a starting point for discovery, not a replacement for local knowledge, customer conversations, or measured outcomes. The strongest ideas are the ones a team can test, learn from, and make their own.
+
+Attune makes cultural intelligence practical: one venue, a wider view of taste, and a clearer starting point for what's next. Explore the live demo, follow the connections, and discover what your place could become. Attune. Find your place in culture.

@@ -1,0 +1,87 @@
+[span] ATTUNE
+[span] AMBIENCE INTELLIGENCE
+[span] radar
+[p] Live taste graph of your block
+[p] Qloo affinity intelligence for the streets around your venue, plotted place by place.
+[span] calendar_month
+[p] Tonight’s operating playbook
+[p] An agent turns the block’s taste signals into a run-of-show your floor can execute.
+[span] graphic_eq
+[p] Licensed, dayparted room tone
+[p] A queue that follows your service — open soil mornings, creek afternoons, vinyl after dark.
+[span] OPERATOR ACCESS
+[h1] Welcome back to
+[em] the room.
+[p] Sign in to sync your playbook, sound settings, and what’s happening on the block.
+[span] lock_reset
+[span] WORK EMAIL
+[span] mail
+[span] PASSKEY
+[a] FORGOT?
+[span] key
+[span] visibility
+[span] check
+[span] Stay signed in
+[span] shield_lock
+[span] LOCAL ONLY
+[span] graphic_eq
+[span] Tune In • Sign In
+[span] theater_comedy
+[span] EXPLORE THE DEMO ROOM
+[span] • NO ACCOUNT
+[span] OR CONTINUE WITH
+[span] Google
+[span] Apple
+[p] New operator on the block?
+[a] Create your account
+[span] NEW OPERATOR
+[h1] Open the door to
+[em] your sound.
+[p] One account, every room. Set up your venue and start tuning in minutes.
+[span] error
+[span] OPERATOR NAME
+[span] person
+[span] WORK EMAIL
+[span] mail
+[span] VENUE NAME
+[span] storefront
+[span] PASSKEY
+[span] key
+[span] visibility
+[span] EMPTY
+[span] CONFIRM PASSKEY
+[span] verified_user
+[span] visibility
+[span] I agree to the
+[a] Operator Terms
+[span] and
+[a] Privacy Notes
+[span] door_open
+[span] Create Account
+[p] Already tuning a room?
+[a] Sign in
+[span] KEY RECOVERY
+[h1] Lost your
+[em] key?
+[p] Enter your work email and we’ll send a recovery link to reset your passkey.
+[span] WORK EMAIL
+[span] forward_to_inbox
+[span] send
+[span] Send Recovery Link
+[p] Remembered it?
+[a] Back to sign in
+[span] mark_email_read
+[h1] Recovery link sent
+[p] Check
+[span] your inbox
+[p] for a link to reset your passkey. It expires in 30 minutes.
+[span] schedule
+[p] Didn’t arrive? Check spam, or resend below.
+[span] refresh
+[span] RESEND LINK
+[span] arrow_back
+[span] Back to Sign In
+[span] EVERY ROOM HAS A TONE
+[p] DEMO AUTH • CREDENTIALS NEVER LEAVE THIS DEVICE
+[span] check_circle
+[span] Done
