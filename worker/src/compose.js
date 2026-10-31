@@ -55,6 +55,8 @@ export function compactGrounding(ctx, artists) {
     audiences: (ctx.micro_tribes || []).slice(0, 4),
     palate_tags: (ctx.palate_signals || []).slice(0, 4),
     live_feed: ctx.feed || "demo",
+    constraints: ctx.constraints || {},
+    freshness: ctx.freshness || null,
   };
 }
 

@@ -10,3 +10,11 @@ ui-debug.log
 caddy-bin/
 
 worker/.wrangler/
+
+# Browser test artifacts
+playwright-report/
+test-results/
+site/
+
+# Local screenshots may contain credentials or personal information
+image*.png

@@ -2,8 +2,12 @@
   "name": "attune",
   "version": "1.0.0",
   "private": true,
-  "description": "Attune — ambience intelligence for hospitality venues. Static single-file mobile web app (open index.html, no build step)",
+  "description": "Attune \u2014 ambience intelligence for hospitality venues. Static single-file mobile web app (open index.html, no build step)",
   "scripts": {
-    "dev": "npx --yes serve -l 3000 ."
+    "dev": "npx --yes serve -l 3000 .",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1"
   }
 }

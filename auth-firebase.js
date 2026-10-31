@@ -166,6 +166,19 @@ export const ready = Promise.all([
     app: app,
     auth: auth,
 
+    signInEmail: async function (email, password, remember) {
+      await mods[2].setPersistence(auth, remember ? mods[2].browserLocalPersistence : mods[2].browserSessionPersistence);
+      const credential = await mods[2].signInWithEmailAndPassword(auth, email, password);
+      return { uid: credential.user.uid, name: credential.user.displayName || email.split('@')[0], email: credential.user.email || email, provider: 'email' };
+    },
+    signUpEmail: async function (email, password, name) {
+      await mods[2].setPersistence(auth, mods[2].browserLocalPersistence);
+      const credential = await mods[2].createUserWithEmailAndPassword(auth, email, password);
+      try { await mods[2].updateProfile(credential.user, { displayName: name }); } catch (_) { /* account was created; profile can be updated later */ }
+      return { uid: credential.user.uid, name: name, email: credential.user.email || email, provider: 'email' };
+    },
+    resetPassword: function (email) { return mods[2].sendPasswordResetEmail(auth, email); },
+
     signIn: function (kind) {
       const provider = kind === 'google'
         ? new mods[2].GoogleAuthProvider()
@@ -226,12 +239,11 @@ export const ready = Promise.all([
     },
 
     /* Firebase ID token for /api/**; {} when there is no signed-in user. */
-    headers: function () {
+    headers: async function () {
+      if (typeof auth.authStateReady === 'function') await auth.authStateReady();
       const user = auth.currentUser;
-      if (!user) return Promise.resolve({});
-      return user.getIdToken().then(function (token) {
-        return { Authorization: 'Bearer ' + token };
-      }).catch(function () { return {}; });
+      if (!user) return {};
+      try { return { Authorization: 'Bearer ' + await user.getIdToken() }; } catch (_) { return {}; }
     },
 
     signOut: function () {

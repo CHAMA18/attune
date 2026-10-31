@@ -24,28 +24,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Verify application
+        run: |
+          npm ci
+          node --test tests/qloo-audit.test.cjs
+          npm test --prefix worker
+          npx playwright install --with-deps chromium
+          npm run test:e2e
+
       - name: Assemble clean site artifact
         run: |
-          mkdir -p dist
-          rsync -a \
-            --exclude '.git*' \
-            --exclude '.verify/' \
-            --exclude 'scripts/' \
-            --exclude 'docs/' \
-            --exclude 'worker/' \
-            --exclude '*.log' \
-            --exclude '.env.example' \
-            --exclude 'Caddyfile' \
-            --exclude 'firebase.json' \
-            --exclude '.firebaserc' \
-            --exclude 'worklog.md' \
-            --exclude 'dev-server.log' \
-            --exclude 'node_modules/' \
-            --exclude 'dist/' \
-            ./ dist/
-          # Dev screenshots are not referenced by the app
-          rm -f dist/preview-*.png "dist/image copy.png" "dist/image copy 2.png" dist/image.png
-          echo "Artifact contents:"; du -sh dist; ls dist
+          mkdir -p site
+          cp index.html auth.html auth-firebase.js landing.html site/
+          cp -R assets audio logo site/
+          touch site/.nojekyll
+          node -e "require('fs').writeFileSync('site/build.json', JSON.stringify({revision: process.env.GITHUB_SHA, builtAt: new Date().toISOString()}))"
+          du -sh site
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -53,7 +47,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: site
 
       - name: Deploy to GitHub Pages
         id: deployment

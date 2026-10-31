@@ -4,13 +4,18 @@ compatibility_date = "2026-10-01"
 
 [vars]
 LLM_PROVIDER = "openai"
+REQUIRE_AUTH = "1"
+ENFORCE_RATE_LIMIT = "1"
+ALLOWED_ORIGINS = "https://chama18.github.io,https://qloo-api-1.web.app,http://localhost:3000,http://127.0.0.1:3000"
 # LLM_MODEL = "gpt-4o-mini"
 
-# Firebase ID token verification (worker/src/auth.js). Leave REQUIRE_AUTH unset
-# so the demo room stays anonymous; set it to "1" to require a Google/Apple
-# session on every /api/** call.
-# FIREBASE_PROJECT_ID = "qloo-api-1"
-# REQUIRE_AUTH = "1"
+# Enable Firebase Email/Password and configure authorized frontend domains before deployment.
+# Set QLOO_API_KEY with `wrangler secret put QLOO_API_KEY`.
 
-# Secrets are set with `wrangler secret put`, never committed:
-#   QLOO_API_KEY, LLM_API_KEY
+# Approximate per-location rate limit. Use a namespace ID unique to this account.
+[[ratelimits]]
+name = "QLOO_RATE_LIMITER"
+namespace_id = "1001"
+[ratelimits.simple]
+limit = 60
+period = 60

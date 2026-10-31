@@ -10,13 +10,24 @@
       "download/**",
       ".verify/**",
       "worklog.md",
-      "dev-server.log"
+      "dev-server.log",
+      "gallery/**",
+      "videos/**",
+      "docs/**",
+      "tests/**",
+      "worker/**",
+      "image*.png",
+      "preview-*.png",
+      "*.log"
     ],
     "headers": [
       {
         "source": "**/*.html",
         "headers": [
-          { "key": "Cache-Control", "value": "max-age=300" }
+          {
+            "key": "Cache-Control",
+            "value": "max-age=300"
+          }
         ]
       }
     ]

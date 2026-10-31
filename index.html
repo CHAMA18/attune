@@ -12,9 +12,32 @@
     (function () {
       var session = null;
       try { session = localStorage.getItem('roomtone.session') || sessionStorage.getItem('roomtone.session'); } catch (e) { /* storage blocked */ }
-      if (!session) location.replace('auth.html');
+      if (!session) location.replace('landing.html');
     })();
   } catch (e) { /* storage unavailable: stay dark */ }
+</script>
+<script>
+  window.attuneSignOut = async function (button) {
+    if (button && button.disabled) return;
+    if (button) { button.disabled = true; button.setAttribute('aria-busy', 'true'); }
+    var provider = '';
+    try {
+      var session = JSON.parse(localStorage.getItem('roomtone.session') || sessionStorage.getItem('roomtone.session') || 'null');
+      provider = session && session.provider;
+    } catch (_) {}
+    // Clear each store independently so one unavailable store cannot block the other.
+    try { localStorage.removeItem('roomtone.session'); } catch (_) {}
+    try { sessionStorage.removeItem('roomtone.session'); sessionStorage.removeItem('roomtone.sso.pending'); } catch (_) {}
+    if (provider === 'google' || provider === 'apple' || provider === 'email') {
+      try {
+        await Promise.race([
+          import('./auth-firebase.js').then(function (mod) { return mod.ready; }).then(function (api) { return api && api.signOut(); }),
+          new Promise(function (resolve) { setTimeout(resolve, 3000); })
+        ]);
+      } catch (_) { /* Local session is already cleared. */ }
+    }
+    location.replace('landing.html');
+  };
 </script>
 <script>
   /* Bearer-token bridge for /api/**. The Firebase module at the end of this
@@ -1267,10 +1290,10 @@
 
         <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-sm pt-space-lg pb-space-xs">OPERATE</p>
         <div class="flex flex-col gap-1 pb-space-md" role="navigation" aria-label="Primary screens">
-          <a href="#" data-path="playbook" aria-label="Week Playbook screen" aria-current="page"
+          <a href="#" data-path="playbook" aria-label="Shift Plan screen" aria-current="page"
              class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-primary bg-surface-container/80 hover:text-on-surface hover:bg-surface-container transition-colors">
             <span class="material-symbols-outlined text-xl">calendar_month</span>
-            <span class="font-body-md text-body-md">Week Playbook</span>
+            <span class="font-body-md text-body-md">Shift Plan</span>
           </a>
           <a href="#" data-path="taste-heat" aria-label="Taste radar screen"
              class="flex items-center gap-space-sm px-space-sm py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">
@@ -1336,7 +1359,7 @@
           <span class="material-symbols-outlined text-xl">logout</span>
           <span class="font-body-md text-body-md">Sign Out</span>
         </button>
-        <p class="font-label-caps text-label-caps text-outline px-space-sm pt-space-xs pb-space-sm">ATTUNE &#183; V1.0.0</p>
+        <p class="font-label-caps text-label-caps text-outline px-space-sm pt-space-xs pb-space-sm">ATTUNE &#183; <span data-build-version>LOCAL BUILD</span></p>
       </div>
 
     </aside>
@@ -1358,7 +1381,7 @@
       </button>
     </div>
     <div class="flex-1 overflow-y-auto px-space-md py-space-md space-y-5" data-legal-body></div>
-    <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-md py-3 flex-shrink-0 border-t border-surface-container-high/70">ATTUNE &#183; V1.0.0 &#183; UPDATED OCTOBER 2026</p>
+    <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-md py-3 flex-shrink-0 border-t border-surface-container-high/70">ATTUNE &#183; <span data-build-version>LOCAL BUILD</span> &#183; UPDATED OCTOBER 2026</p>
   </div>
 </div>
 
@@ -1438,7 +1461,7 @@
           </div>
         </section>
     </div>
-    <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-md py-3 flex-shrink-0 border-t border-surface-container-high/70">ATTUNE &#183; V1.0.0 &#183; IN-APP PREVIEW</p>
+    <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-md py-3 flex-shrink-0 border-t border-surface-container-high/70">ATTUNE &#183; <span data-build-version>LOCAL BUILD</span> &#183; IN-APP PREVIEW</p>
   </div>
 </div>
 
@@ -1486,8 +1509,8 @@
           <span class="material-symbols-outlined text-secondary text-base">storefront</span>
           <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Your Venue</span>
         </div>
-        <p class="px-1 font-body-sm text-body-sm text-on-surface font-medium" data-venue-name>The Amber Room</p>
-        <p class="px-1 pb-2 font-body-sm text-body-sm text-on-surface-variant" data-venue-address>142 Franklin St, Greenpoint</p>
+        <p class="px-1 font-body-sm text-body-sm text-on-surface font-medium" data-venue-name>Select your venue</p>
+        <p class="px-1 pb-2 font-body-sm text-body-sm text-on-surface-variant" data-venue-address>Set your venue and neighborhood</p>
         <div class="flex flex-col gap-1.5 px-1 pb-1">
           <input data-venue-input type="text" autocomplete="organization" placeholder="Venue name"
                  class="w-full bg-surface-container-high border border-outline-variant/50 rounded-lg px-2.5 py-2 font-body-sm text-body-sm text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary/70"/>
@@ -1496,9 +1519,11 @@
           <button type="button" data-venue-apply
                   class="w-full flex items-center justify-center gap-1.5 rounded-lg bg-tertiary/10 px-2 py-2 text-tertiary hover:bg-tertiary/20 transition-colors">
             <span class="material-symbols-outlined text-base">tune</span>
-            <span class="font-label-caps text-label-caps tracking-wider">Retune the room</span>
+            <span class="font-label-caps text-label-caps tracking-wider">Find venue</span>
           </button>
-          <p data-venue-note class="hidden px-1 font-body-sm text-body-sm text-on-surface-variant"></p>
+          <p data-venue-note class="hidden px-1 font-body-sm text-body-sm text-on-surface-variant" role="status"></p>
+          <div data-venue-results class="space-y-2" aria-label="Matching Qloo venues"></div>
+          <button type="button" data-venue-locality class="hidden w-full rounded-lg bg-surface-container-high px-3 py-2 text-sm text-on-surface">Search this locality instead</button>
         </div>
       </section>
 
@@ -1509,7 +1534,7 @@
       </button>
     </div>
 
-    <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-md py-3 flex-shrink-0 border-t border-surface-container-high/70">ATTUNE &#183; V1.0.0</p>
+    <p class="font-label-caps text-label-caps text-outline tracking-widest px-space-md py-3 flex-shrink-0 border-t border-surface-container-high/70">ATTUNE &#183; <span data-build-version>LOCAL BUILD</span></p>
   </div>
 </div>
 
@@ -1957,7 +1982,35 @@
 <main class="flex-1 flex flex-col relative w-full pt-20 pb-36 bg-surface">
 
   <!-- ==================== SCREEN 1 · PLAYBOOK ==================== -->
-  <section class="screen screen-stack w-full px-margin pb-12" data-screen="playbook" aria-label="Week Playbook">
+  <section class="screen screen-stack w-full px-margin pb-12" data-screen="playbook" aria-label="Shift Plan">
+    <p class="span-full text-sm text-on-surface-variant">Suggestions use taste signals, not measured customer behaviour. Use your judgment and check fit for your venue.</p>
+    <section id="venue-required-prompt" class="span-full rounded-xl bg-surface-container-low hairline p-4" aria-label="Set up your venue"><p class="font-semibold text-on-surface">Start with your venue</p><p class="mt-1 text-sm text-on-surface-variant">Add a venue and neighborhood to explore Qloo signals and create a shift plan.</p><button type="button" id="open-venue-setup" class="mt-3 rounded-lg bg-primary text-on-primary px-4 py-2.5 text-sm font-semibold">Add your venue</button></section>
+    <details id="shift-plan-settings" class="span-full rounded-xl p-4 bg-surface-container hairline">
+      <summary class="cursor-pointer font-semibold">Tune your shift plan</summary>
+      <p class="mt-2 text-sm text-on-surface-variant">Optional details help tailor suggestions. Saved on this device.</p>
+      <form id="shift-constraints" class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <label class="text-sm">Venue type<select name="type" class="w-full mt-1 rounded-lg bg-surface-container-high p-2"><option value="">Choose type</option><option value="bar">Bar</option><option value="restaurant">Restaurant</option><option value="cafe">Café</option></select></label>
+        <label class="text-sm">Atmosphere<select name="mood" class="w-full mt-1 rounded-lg bg-surface-container-high p-2"><option value="balanced">Balanced</option><option value="relaxed">Relaxed</option><option value="lively">Lively</option></select></label>
+        <label class="text-sm">Opens<input name="opens" type="time" class="w-full mt-1 rounded-lg bg-surface-container-high p-2"></label>
+        <label class="text-sm">Closes<input name="closes" type="time" class="w-full mt-1 rounded-lg bg-surface-container-high p-2"></label>
+        <label class="text-sm">Existing menu category<select name="menu" class="w-full mt-1 rounded-lg bg-surface-container-high p-2"><option value="none">Not specified</option><option value="coffee">Coffee</option><option value="wine">Wine</option><option value="cocktails">Cocktails</option><option value="food">Food</option></select></label>
+        <label class="text-sm">Shift goal<select name="goal" class="w-full mt-1 rounded-lg bg-surface-container-high p-2"><option value="atmosphere">Set the atmosphere</option><option value="early">Make early evening welcoming</option><option value="discovery">Introduce something new</option></select></label>
+        <label class="text-sm">Existing menu item <span class="text-on-surface-variant">(optional)</span><input name="menuItem" type="text" maxlength="80" placeholder="e.g. house coffee" class="w-full mt-1 rounded-lg bg-surface-container-high p-2"></label>
+        <label class="text-sm">Budget<select name="budget" class="w-full mt-1 rounded-lg bg-surface-container-high p-2"><option value="existing">Use existing resources</option><option value="flexible">Flexible</option></select></label>
+        <button class="sm:col-span-2 rounded-lg bg-primary text-black p-3 font-semibold" type="submit">Update shift plan</button>
+        <p id="constraints-status" class="sm:col-span-2 text-sm text-on-surface-variant" role="status"></p>
+      </form>
+    </details>
+    <section class="span-full rounded-2xl bg-surface-container-low hairline p-5 sm:p-6" aria-labelledby="directions-title">
+      <div class="flex flex-wrap justify-between gap-3 items-start"><div><p class="micro-caps text-primary uppercase tracking-[.18em]">Your shift, your call</p><h2 id="directions-title" class="text-xl font-semibold mt-1">Choose a direction</h2><p class="text-sm text-on-surface-variant mt-1">Compare two interpretations of the same taste signals and pick what fits your room.</p></div><span class="micro-caps text-on-surface-variant">01 / PLAN</span></div>
+      <div class="grid sm:grid-cols-2 gap-3 mt-4" id="direction-options">
+        <button type="button" data-direction="listening" aria-pressed="true" class="text-left rounded-xl p-4 bg-surface-container hairline hover:bg-surface-container-high transition"><span class="micro-caps text-primary">DIRECTION 01</span><strong class="block mt-2 text-base">Quiet listening</strong><span class="block mt-1 text-sm text-on-surface-variant">A measured set with space to linger.</span><span data-direction-preview class="block mt-3 text-sm text-secondary">Waiting for taste signals.</span></button>
+        <button type="button" data-direction="gathering" aria-pressed="false" class="text-left rounded-xl p-4 bg-surface-container hairline hover:bg-surface-container-high transition"><span class="micro-caps text-primary">DIRECTION 02</span><strong class="block mt-2 text-base">Neighborhood gathering</strong><span class="block mt-1 text-sm text-on-surface-variant">A more social early-evening direction.</span><span data-direction-preview class="block mt-3 text-sm text-secondary">Waiting for taste signals.</span></button>
+      </div><p id="direction-status" class="mt-3 text-sm text-on-surface-variant" role="status">Selected: Quiet listening</p>
+    </section>
+    <section class="span-full rounded-2xl bg-surface-container-low hairline p-5 sm:p-6" aria-labelledby="handoff-title"><div class="flex justify-between gap-3"><div><p class="micro-caps text-primary uppercase tracking-[.18em]">From insight to action</p><h2 id="handoff-title" class="text-xl font-semibold mt-1">Your shift brief</h2><p class="mt-1 text-sm text-on-surface-variant">Review and edit before sharing with your team.</p></div><span class="micro-caps text-on-surface-variant">02 / HANDOFF</span></div><label class="block mt-4 text-sm" for="shift-brief">Team notes</label><textarea id="shift-brief" rows="7" class="w-full mt-2 p-3 rounded-xl bg-surface-container-high text-on-surface border border-outline-variant/40" placeholder="Your plan will appear here when it is ready."></textarea><div class="flex flex-wrap gap-2 mt-3"><button type="button" id="brief-generate" class="rounded-lg bg-primary text-on-primary px-4 py-3 font-semibold text-sm">Use current plan</button><button type="button" id="brief-copy" class="rounded-lg bg-surface-container-high text-on-surface px-4 py-3 text-sm">Copy brief</button><button type="button" id="brief-share" class="rounded-lg bg-surface-container-high text-on-surface px-4 py-3 text-sm">Share</button><button type="button" id="brief-print" class="rounded-lg bg-surface-container-high text-on-surface px-4 py-3 text-sm">Print</button></div><p id="brief-status" class="mt-2 text-sm text-on-surface-variant" role="status">Notes stay on this device until you share them.</p></section>
+    <section class="span-full rounded-2xl bg-surface-container-low hairline p-5 sm:p-6" aria-labelledby="feedback-title"><div class="flex justify-between gap-3"><div><p class="micro-caps text-primary uppercase tracking-[.18em]">After the shift</p><h2 id="feedback-title" class="text-xl font-semibold mt-1">What worked?</h2><p class="mt-1 text-sm text-on-surface-variant">Tell Attune what wasn’t useful. The next plan will offer a different prompt for that daypart.</p></div><span class="micro-caps text-on-surface-variant">03 / LEARN</span></div><form id="shift-feedback" class="grid sm:grid-cols-2 gap-3 mt-4"><label class="text-sm">Daypart<select name="section" class="w-full mt-1 rounded-lg bg-surface-container-high p-2"><option value="ROASTERS 07-11">Morning</option><option value="LINGER 11-16">Midday</option><option value="GOLDEN 16-20">Early evening</option><option value="NIGHT 20-02">Night</option></select></label><label class="text-sm">Your feedback<select name="rating" class="w-full mt-1 rounded-lg bg-surface-container-high p-2"><option value="useful">Useful</option><option value="not-useful">Not useful</option></select></label><label class="text-sm sm:col-span-2">Note <span class="text-on-surface-variant">(optional, saved on this device)</span><input name="note" maxlength="240" class="w-full mt-1 rounded-lg bg-surface-container-high p-2" placeholder="What should change next time?"></label><button class="sm:col-span-2 rounded-lg bg-surface-container-high px-4 py-3 text-sm font-semibold" type="submit">Save feedback</button><p id="feedback-status" class="sm:col-span-2 text-sm text-on-surface-variant" role="status"></p></form></section>
+    <section class="span-full rounded-xl p-4 bg-surface-container hairline" aria-label="Recommendation evidence"><h2 class="font-semibold">Why these suggestions?</h2><p class="mt-1 text-sm text-on-surface-variant">Open a daypart to inspect its signals and limitations.</p><div id="recommendation-evidence" class="mt-3 space-y-2" aria-live="polite">Evidence will appear when the plan is ready.</div></section>
 
     <!-- ── The Engine · live agent run (every value computed from this session's Qloo data) ── -->
     <section class="span-full reveal relative overflow-hidden rounded-2xl p-5 shadow-[0_28px_56px_-26px_rgba(0,0,0,0.75)]" style="--d:.05s; background: linear-gradient(150deg, #2e1c07 0%, #402608 46%, #1d1104 100%);">
@@ -2052,7 +2105,7 @@
               <span class="font-label-caps text-label-caps uppercase text-secondary-fixed tracking-[0.14em] truncate">Sound &amp; Light</span>
             </div>
             <span class="font-label-caps text-label-caps uppercase text-tertiary inline-flex items-center gap-1.5 flex-shrink-0">
-              <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>QLOO LIVE
+              <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>TASTE SIGNALS
             </span>
           </div>
           <p id="daypart-audio-title" class="mt-3 text-[16px] leading-[22px] font-semibold tracking-[-0.01em] text-on-surface">Waiting for live Qloo data</p>
@@ -2078,7 +2131,7 @@
             <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug min-w-0">
               <span class="material-symbols-outlined text-[14px] text-secondary align-[-2px] mr-1" aria-hidden="true">candle</span>Awaiting live block data
             </p>
-            
+
           </div>
         </div>
 
@@ -2130,110 +2183,20 @@
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 min-w-0">
               <span class="material-symbols-outlined text-primary text-[18px]" aria-hidden="true">local_bar</span>
-              <span class="font-label-caps text-label-caps uppercase text-secondary-fixed tracking-[0.14em] truncate">Recommended Pairing</span>
+              <span class="font-label-caps text-label-caps uppercase text-secondary-fixed tracking-[0.14em] truncate">Menu suggestion</span>
             </div>
             <span class="font-label-caps text-label-caps text-tertiary bg-tertiary/10 px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap" id="daypart-menu-match">&#8212;</span>
           </div>
           <div class="mt-3 flex gap-3.5 items-center">
-            <div class="w-[76px] h-[76px] rounded-xl overflow-hidden flex-shrink-0 shadow-[0_10px_24px_-10px_rgba(0,0,0,0.6)] ring-1 ring-inset ring-white/10">
-              <img class="w-full h-full object-cover"
-                   alt="Refined Japanese highball cocktail with hand-carved ice sphere, smoked olive oil droplets glistening on top surface with yuzu peel garnish in a crystal glass."
-                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG8IHnMriqUvoPdvjrGXlKJqnbBmyNBHshWo_7dHMqSGE6K3-hmXsKsUHslzxV-BZoTVjN9iY-c-DgUf4ulH-JnvuOOPyPVCFh71baKR8zSqb1_Hu9oWMwAJ5-jX5yi_Drqm5l0gtEY8D_5h3VuP5DM7qIxpu15AtcxBpbjEEfOPR2NGMDpUoBFOj2zDCbfHeANOxirAZuX_s0Op2WNbNv7zYtWZ4GWJSXvp2dZLsS_WRCp3hkpb0Zlw"/>
-            </div>
             <div class="flex-1 min-w-0">
-              <h4 id="daypart-menu" class="text-[17px] leading-[22px] font-semibold tracking-[-0.01em] text-on-surface">Awaiting live pairing</h4>
-              <p id="daypart-menu-sub" class="mt-1 font-body-sm text-body-sm text-on-surface-variant">Pairings come from live Qloo results</p>
+              <h4 id="daypart-menu" class="text-[17px] leading-[22px] font-semibold tracking-[-0.01em] text-on-surface">Awaiting suggestion</h4>
+              <p id="daypart-menu-sub" class="mt-1 font-body-sm text-body-sm text-on-surface-variant">Suggestions depend on available inputs</p>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ── The Forecast · weekend radar timeline ── -->
-    <section class="reveal pt-1" style="--d:.19s">
-      <div class="flex items-center justify-between px-1">
-        <span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-[0.18em]">WEEKEND FORECAST</span>
-        <span class="font-label-caps text-label-caps uppercase text-secondary inline-flex items-center gap-1 tracking-[0.14em]">
-          <span class="material-symbols-outlined text-xs" aria-hidden="true">tune</span>PREDICTIVE
-        </span>
-      </div>
-
-      <div class="relative mt-3.5">
-        <div class="absolute left-[19px] top-8 bottom-8 w-px bg-outline-variant/40" aria-hidden="true"></div>
-
-        <!-- Saturday -->
-        <article class="relative flex gap-3">
-          <div class="relative z-10 flex-shrink-0 w-10 h-10 rounded-xl bg-surface-container-low hairline flex flex-col items-center justify-center" aria-label="Saturday October 26">
-            <span class="micro-caps text-secondary leading-none" style="letter-spacing:.06em">SAT</span>
-            <span class="tnum text-[13px] leading-none font-bold text-on-surface mt-1">26</span>
-          </div>
-          <div class="flex-1 min-w-0 rounded-xl bg-surface-container hairline p-4">
-            <div class="flex items-start justify-between gap-2">
-              <h4 class="text-[16px] leading-[21px] font-semibold tracking-[-0.01em] text-on-surface">Awaiting live Qloo events</h4>
-              <span class="material-symbols-outlined text-[18px] text-secondary flex-shrink-0 mt-0.5" aria-hidden="true">wine_bar</span>
-            </div>
-            <p class="mt-1.5 font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-              Nearby events will appear here once Qloo returns results.
-            </p>
-          </div>
-        </article>
-
-        <!-- Sunday -->
-        <article class="relative flex gap-3 mt-3">
-          <div class="relative z-10 flex-shrink-0 w-10 h-10 rounded-xl bg-surface-container-low hairline flex flex-col items-center justify-center" aria-label="Sunday October 27">
-            <span class="micro-caps text-secondary leading-none" style="letter-spacing:.06em">SUN</span>
-            <span class="tnum text-[13px] leading-none font-bold text-on-surface mt-1">27</span>
-          </div>
-          <div class="flex-1 min-w-0 rounded-xl bg-surface-container hairline p-4">
-            <div class="flex items-start justify-between gap-2">
-              <h4 class="text-[16px] leading-[21px] font-semibold tracking-[-0.01em] text-on-surface">Low-Tempo Brunch &amp; Risograph Print Swap</h4>
-              <span class="material-symbols-outlined text-[18px] text-secondary flex-shrink-0 mt-0.5" aria-hidden="true">palette</span>
-            </div>
-            <span class="tnum mt-1.5 block font-label-caps text-label-caps uppercase text-secondary tracking-[0.1em]">11:00 &#8211; 15:30</span>
-            <p class="mt-1.5 font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-              Co-hosted with the print-swap crowd &#8212; local designers and architects. People should stay about 22% longer, with more espresso and amaro spritz orders.
-            </p>
-            <div class="mt-3 flex flex-wrap gap-1.5">
-              <span class="font-label-caps text-label-caps text-tertiary bg-tertiary/10 px-2 py-1 rounded-md whitespace-nowrap">AMBIENT DUB &amp; ECM</span>
-              <span class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-1 rounded-md whitespace-nowrap">KARDAMOM BUNS</span>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <!-- ── Operator action suite ── -->
-    <section class="reveal space-y-2.5 pt-1" style="--d:.26s">
-      <button type="button" id="shift-notes-btn" class="press cta-attune group relative w-full h-[54px] rounded-2xl flex items-center justify-center gap-2.5 font-label-caps text-label-caps uppercase tracking-[0.14em] font-bold text-[#241503] overflow-hidden transition">
-        <span class="relative w-7 h-7 rounded-full bg-[#241503]/[0.12] flex items-center justify-center flex-shrink-0" aria-hidden="true">
-          <span class="material-symbols-outlined text-[17px] group-hover:rotate-12 transition-transform duration-300">campaign</span>
-        </span>
-        <span class="relative">Send Shift Notes to Staff</span>
-        <span class="pointer-events-none absolute inset-0 rounded-2xl overflow-hidden" aria-hidden="true">
-          <span class="a-sheen absolute inset-y-0 -left-1/2 w-1/2 -translate-x-full skew-x-[-18deg] bg-gradient-to-r from-transparent via-white/35 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[450%]"></span>
-        </span>
-      </button>
-      <div class="grid grid-cols-2 gap-2.5">
-        <button type="button" id="sonos-btn" class="press h-11 rounded-xl bg-surface-container-low hairline text-secondary hover:bg-surface-container-high flex items-center justify-center gap-1.5 font-label-caps text-label-caps uppercase tracking-[0.1em]">
-          <span class="material-symbols-outlined text-base" aria-hidden="true">speaker</span>Push to Sonos
-        </button>
-        <button type="button" id="pdf-btn" class="press h-11 rounded-xl bg-surface-container-low hairline text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high flex items-center justify-center gap-1.5 font-label-caps text-label-caps uppercase tracking-[0.1em]">
-          <span class="material-symbols-outlined text-base" aria-hidden="true">picture_as_pdf</span>Export PDF
-        </button>
-      </div>
-    </section>
-
-    <!-- ── Realtime heartbeat ── -->
-    <footer class="span-full reveal pt-1 pb-1 text-center" style="--d:.33s">
-      <div class="inline-flex items-center gap-2.5 rounded-full bg-surface-container-low/80 hairline px-3.5 py-1.5">
-        <span class="eq h-2.5 text-tertiary" aria-hidden="true">
-          <span style="animation-delay:0s"></span>
-          <span style="animation-delay:.22s"></span>
-          <span style="animation-delay:.1s"></span>
-        </span>
-        <span class="font-label-caps text-label-caps text-on-surface-variant tracking-[0.14em]"><span data-venue-name>ATTUNE</span></span>
-      </div>
-    </footer>
 
   </section>
 
@@ -2254,13 +2217,13 @@
             </span>
             <span class="font-label-caps text-label-caps text-secondary uppercase tracking-[0.14em]">Around Your Door</span>
           </div>
-          <span id="radar-sweep-age" class="font-label-caps text-label-caps uppercase tracking-[0.1em] text-tertiary hairline rounded-full px-2.5 py-1 bg-surface-container/60 backdrop-blur-sm flex-shrink-0">LIVE</span>
+          <span id="radar-sweep-age" class="font-label-caps text-label-caps uppercase tracking-[0.1em] text-tertiary hairline rounded-full px-2.5 py-1 bg-surface-container/60 backdrop-blur-sm flex-shrink-0">WAITING</span>
         </div>
 
         <div class="mt-4 flex items-end justify-between gap-3">
           <div class="min-w-0">
-            <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-[0.24em]">People &amp; places nearby</span>
-            <h2 class="mt-1.5 text-[26px] leading-[30px] font-bold tracking-[-0.02em] text-on-surface">What the Block Craves</h2>
+            <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-[0.24em]">Qloo place results</span>
+            <h2 class="mt-1.5 text-[26px] leading-[30px] font-bold tracking-[-0.02em] text-on-surface">Explore related places</h2>
           </div>
           <div class="flex flex-col items-end flex-shrink-0">
             <span class="tnum text-[17px] leading-5 font-bold text-tertiary whitespace-nowrap" id="radar-pool">&#8212;</span>
@@ -2285,7 +2248,7 @@
           <span class="font-label-caps text-label-caps text-on-surface-variant inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-primary inline-block"></span>PLACE</span>
           <span class="font-label-caps text-label-caps text-on-surface-variant inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-tertiary rotate-45 inline-block"></span>VENUE</span>
         </div>
-        <p id="radar-note" class="font-body-sm text-body-sm text-on-surface-variant text-center pb-2">Placed by Qloo, plotted at each place's location</p>
+        <p id="radar-note" class="font-body-sm text-body-sm text-on-surface-variant text-center pb-2">Qloo locations appear when coordinates are available</p>
 
 
         <div id="radar-detail" class="hidden mb-4 rounded-xl bg-surface-container-low hairline p-3.5 field-enter">
@@ -2318,13 +2281,13 @@
       <div class="relative px-5 pb-5">
         <div class="grid grid-cols-3 rounded-xl bg-surface-container/60 hairline divide-x divide-outline-variant/25 overflow-hidden">
           <div class="px-3 py-3.5 flex flex-col min-w-0">
-            <span class="micro-caps text-on-surface-variant">CROWD FIT</span>
+            <span class="micro-caps text-on-surface-variant">AVERAGE AFFINITY</span>
             <div class="mt-2 flex items-baseline gap-1">
               <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-primary" data-qloo="block-heat">&#8212;</span>
               <span class="micro-caps text-outline/80">/100</span>
             </div>
             <span class="mt-1 font-label-caps text-label-caps text-tertiary">
-              how well nearby places fit
+              top 10 returned places
             </span>
           </div>
           <div class="px-3 py-3.5 flex flex-col min-w-0">
@@ -2332,92 +2295,32 @@
             <div class="mt-2 flex items-baseline">
               <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-secondary" data-qloo="hot-spots">&#8212;</span>
             </div>
-            <span class="mt-1 font-label-caps text-label-caps text-on-surface-variant/80 truncate">80% or higher nearby</span>
+            <span class="mt-1 font-label-caps text-label-caps text-on-surface-variant/80">affinity 0.8 or higher</span>
           </div>
           <div class="px-3 py-3.5 flex flex-col min-w-0">
             <span class="micro-caps text-on-surface-variant">PLACE TYPES</span>
             <div class="mt-2 flex items-baseline">
               <span class="tnum text-[25px] leading-7 font-bold tracking-[-0.02em] text-on-surface" data-qloo="block-scenes">&#8212;</span>
             </div>
-            <span class="mt-1 font-label-caps text-label-caps text-primary truncate">kinds of places nearby</span>
+            <span class="mt-1 font-label-caps text-label-caps text-primary">types in returned results</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Micro-Tribe Index -->
+    <!-- Qloo place-type counts -->
     <section class="reveal relative rounded-2xl bg-surface-container-low hairline p-5" style="--d:.12s">
       <div class="flex items-center justify-between pb-3">
         <div class="flex items-center gap-2">
           <span class="w-7 h-7 rounded-lg bg-secondary/[0.14] ring-1 ring-inset ring-secondary/25 flex items-center justify-center flex-shrink-0">
             <span class="material-symbols-outlined text-secondary text-[16px]" aria-hidden="true">groups</span>
           </span>
-          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-[0.16em]">Who&#8217;s Out There</span>
+          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-[0.16em]">Place Types</span>
         </div>
         <span class="micro-caps text-on-surface-variant" id="tribe-segment-count">&#8212;</span>
       </div>
-      <div class="space-y-3" id="qlooTribeList">
-        <div class="flex flex-col gap-1">
-          <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2 min-w-0">
-              <span class="font-label-caps text-label-caps text-primary w-4 flex-shrink-0">01</span>
-              <span class="font-body-sm text-body-sm text-on-surface font-medium truncate">Waiting for live Qloo data</span>
-            </div>
-            <span class="font-metric-stat text-[13px] text-primary flex-shrink-0">94</span>
-          </div>
-          <div class="w-full h-1 rounded-full bg-surface-container-highest overflow-hidden">
-            <div class="h-full rounded-full bg-primary" style="width:94%"></div>
-          </div>
-        </div>
-        <div class="flex flex-col gap-1">
-          <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2 min-w-0">
-              <span class="font-label-caps text-label-caps text-on-surface-variant w-4 flex-shrink-0">02</span>
-              <span class="font-body-sm text-body-sm text-on-surface font-medium truncate">&#8212;</span>
-            </div>
-            <span class="font-metric-stat text-[13px] text-secondary flex-shrink-0">&#8212;</span>
-          </div>
-          <div class="w-full h-1 rounded-full bg-surface-container-highest overflow-hidden">
-            <div class="h-full rounded-full bg-primary/70" style="width:86%"></div>
-          </div>
-        </div>
-        <div class="flex flex-col gap-1">
-          <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2 min-w-0">
-              <span class="font-label-caps text-label-caps text-on-surface-variant w-4 flex-shrink-0">03</span>
-              <span class="font-body-sm text-body-sm text-on-surface font-medium truncate">&#8212;</span>
-            </div>
-            <span class="font-metric-stat text-[13px] text-secondary flex-shrink-0">&#8212;</span>
-          </div>
-          <div class="w-full h-1 rounded-full bg-surface-container-highest overflow-hidden">
-            <div class="h-full rounded-full bg-secondary" style="width:79%"></div>
-          </div>
-        </div>
-        <div class="flex flex-col gap-1">
-          <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2 min-w-0">
-              <span class="font-label-caps text-label-caps text-on-surface-variant w-4 flex-shrink-0">04</span>
-              <span class="font-body-sm text-body-sm text-on-surface font-medium truncate">Koji &amp; Ferment Curious</span>
-            </div>
-            <span class="font-metric-stat text-[13px] text-tertiary flex-shrink-0">71</span>
-          </div>
-          <div class="w-full h-1 rounded-full bg-surface-container-highest overflow-hidden">
-            <div class="h-full rounded-full bg-secondary/70" style="width:71%"></div>
-          </div>
-        </div>
-        <div class="flex flex-col gap-1">
-          <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2 min-w-0">
-              <span class="font-label-caps text-label-caps text-on-surface-variant w-4 flex-shrink-0">05</span>
-              <span class="font-body-sm text-body-sm text-on-surface font-medium truncate">Late-Night Criterion Jazz</span>
-            </div>
-            <span class="font-metric-stat text-[13px] text-tertiary flex-shrink-0">64</span>
-          </div>
-          <div class="w-full h-1 rounded-full bg-surface-container-highest overflow-hidden">
-            <div class="h-full rounded-full bg-tertiary/70" style="width:64%"></div>
-          </div>
-        </div>
-      </div>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mb-3">Place types counted from Qloo search results. These are not audience measurements.</p>
+      <div class="space-y-3" id="qlooTribeList"><p class="font-body-sm text-body-sm text-on-surface-variant">Waiting for Qloo place types…</p></div>
     </section>
 
     <!-- Affinity Signals -->
@@ -2427,7 +2330,7 @@
           <span class="w-7 h-7 rounded-lg bg-primary/[0.12] ring-1 ring-inset ring-primary/25 flex items-center justify-center flex-shrink-0">
             <span class="material-symbols-outlined text-primary text-[16px]" aria-hidden="true">bar_chart</span>
           </span>
-          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-[0.16em]">What They&#8217;re Into</span>
+          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-[0.16em]">Related Artists</span>
         </div>
         <span class="micro-caps text-primary" id="radar-radius-label">WITHIN 800 FT</span>
       </div>
@@ -2436,12 +2339,12 @@
       </div>
     </section>
 
-    <!-- Radar Movement Feed -->
+    <!-- Qloo result summary -->
     <section class="reveal relative rounded-2xl bg-surface-container-low hairline p-5 space-y-3.5" style="--d:.26s">
       <div class="flex items-center justify-between">
         <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-[0.2em]">Around the Block</span>
         <span class="font-label-caps text-label-caps text-tertiary inline-flex items-center gap-1.5 tracking-[0.12em]">
-          <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span> LIVE
+          <span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> QLOO RESULTS
         </span>
       </div>
       <div id="blockFeed" class="space-y-3.5" aria-live="polite">
@@ -2449,26 +2352,22 @@
       </div>
     </section>
 
+    <section class="span-full reveal rounded-2xl bg-surface-container-low hairline p-5 sm:p-6" aria-labelledby="compare-title"><p class="micro-caps text-primary uppercase tracking-[.18em]">A different perspective</p><h2 id="compare-title" class="text-xl font-semibold mt-1">Compare two places</h2><p class="text-sm text-on-surface-variant mt-1">Search two specific Qloo places and compare their related artists. Affinity is not a prediction of visits or sales.</p><form id="venue-compare" class="grid sm:grid-cols-2 gap-3 mt-4"><label class="text-sm">First place and city<input name="first" required maxlength="120" placeholder="Place, city" class="w-full mt-1 rounded-lg bg-surface-container-high p-2"></label><label class="text-sm">Second place and city<input name="second" required maxlength="120" placeholder="Place, city" class="w-full mt-1 rounded-lg bg-surface-container-high p-2"></label><button type="submit" class="sm:col-span-2 rounded-lg bg-primary text-on-primary p-3 font-semibold text-sm">Compare Qloo signals</button></form><div id="compare-results" class="grid sm:grid-cols-2 gap-3 mt-4" aria-live="polite"></div><p id="compare-status" class="text-sm text-on-surface-variant mt-2" role="status"></p></section>
+
     <!-- Taste Heat Action Suite -->
-    <section class="reveal space-y-2.5 pt-1" style="--d:.33s">
+    <section class="span-full reveal space-y-2.5 pt-1" style="--d:.33s">
       <button type="button" id="radar-rescan" class="press w-full h-[52px] rounded-xl flex items-center justify-center gap-2 font-label-caps text-label-caps uppercase tracking-[0.14em] font-bold text-[#241503] bg-gradient-to-r from-[#ea9a5b] via-primary-container to-[#c65f1f] shadow-[0_16px_36px_-14px_rgba(217,119,54,0.65)] hover:brightness-[1.06] transition group">
         <span class="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform duration-500" aria-hidden="true">my_location</span>
         Rescan the Block
       </button>
-      <div class="grid grid-cols-2 gap-2.5">
-        <button type="button" id="radar-export" class="press h-11 rounded-xl bg-surface-container-low hairline text-secondary hover:bg-surface-container-high flex items-center justify-center gap-1.5 font-label-caps text-label-caps uppercase tracking-[0.1em]">
-          <span class="material-symbols-outlined text-base" aria-hidden="true">dataset</span>Export Heat Map
-        </button>
-        <button type="button" id="radar-share" class="press h-11 rounded-xl bg-surface-container-low hairline text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high flex items-center justify-center gap-1.5 font-label-caps text-label-caps uppercase tracking-[0.1em]">
-          <span class="material-symbols-outlined text-base" aria-hidden="true">share</span>Share the Crowd
-        </button>
-      </div>
+
     </section>
 
   </section>
 
   <!-- ==================== SCREEN 3 · MENU &amp; AUDIO ==================== -->
   <section class="screen screen-stack w-full px-margin pb-12 hidden" data-screen="menu-sound" aria-label="Menu and Audio">
+    <header class="span-full"><p class="micro-caps text-primary uppercase tracking-[.18em]">Set the tone</p><h1 class="text-2xl font-semibold text-on-surface mt-1">Menu &amp; Audio</h1><p class="text-sm text-on-surface-variant mt-1">Explore ideas for your shift and audition the local audio previews.</p></header>
 
     <!-- Now Playing Console -->
     <section class="span-full w-full bg-surface-container rounded-xl shadow-xl overflow-hidden relative" data-audio-player>
@@ -2480,11 +2379,11 @@
         <div class="absolute inset-0 bg-gradient-to-t from-surface-container via-surface-container/60 to-transparent"></div>
         <div class="absolute top-3 left-4 flex items-center gap-1.5">
           <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
-          <span class="font-label-caps text-label-caps text-tertiary uppercase tracking-widest">QLOO BLOCK TASTE</span>
+          <span class="font-label-caps text-label-caps text-tertiary uppercase tracking-widest">LOCAL AUDIO PREVIEWS</span>
         </div>
         <div class="absolute bottom-3 left-4 right-4 flex items-end justify-between gap-2">
           <div class="min-w-0">
-            <span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest bg-surface-container-lowest/80 px-2 py-0.5 rounded-full">NOW PLAYING &#8226; PREVIEW</span>
+            <span data-player-status class="font-label-caps text-label-caps text-secondary uppercase tracking-widest bg-surface-container-lowest/80 px-2 py-0.5 rounded-full">READY &#8226; PREVIEW</span>
             <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight mt-1 truncate" data-player-title-hero>Lofi Study</h3>
           </div>
         </div>
@@ -2520,11 +2419,7 @@
               <span class="material-symbols-outlined text-2xl">forward_10</span>
             </button>
           </div>
-          <div class="flex items-center gap-1.5" data-chip-group data-active="bg-secondary-container text-on-secondary-container" data-inactive="bg-surface-container text-on-surface-variant">
-            <button type="button" class="chip font-label-caps text-label-caps px-2 py-0.5 rounded-full transition-colors bg-secondary-container text-on-secondary-container">BAR</button>
-            <button type="button" class="chip font-label-caps text-label-caps px-2 py-0.5 rounded-full transition-colors bg-surface-container text-on-surface-variant">LOUNGE</button>
-            <button type="button" class="chip font-label-caps text-label-caps px-2 py-0.5 rounded-full transition-colors bg-surface-container text-on-surface-variant">PATIO</button>
-          </div>
+          <button type="button" id="player-settings" class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-on-surface-variant hover:bg-surface-container-high text-sm" aria-label="Open sound settings"><span class="material-symbols-outlined text-base" aria-hidden="true">tune</span>Sound settings</button>
         </div>
       </div>
     </section>
@@ -2534,9 +2429,9 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-secondary text-lg">playlist_play</span>
-          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Daypart Queue</span>
+          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Local Preview Queue</span>
         </div>
-        <span class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded-full">16-20 GOLDEN HR</span>
+        <span class="font-label-caps text-label-caps text-primary bg-primary/10 px-2 py-0.5 rounded-full">LOCAL AUDIO</span>
       </div>
 
       <button type="button" class="w-full text-left flex items-center gap-2.5 rounded-lg px-2.5 py-2 bg-surface-container-highest shadow-[0_0_16px_rgba(217,119,54,0.25)] transition-colors" data-queue-track="0" aria-current="true" aria-label="Play Lofi Study">
@@ -2590,56 +2485,14 @@
       <p class="font-body-sm text-body-sm text-on-surface-variant text-center pt-1">Ambient sample previews &#8226; tap a track to audition it on the player above<span data-night-countdown></span></p>
     </section>
 
-    <!-- Shift Specials / Menu Engine -->
-    <section class="w-full rounded-xl bg-surface-container-low p-space-md shadow-md space-y-space-sm">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary text-lg">restaurant</span>
-          <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider">Shift Specials</span>
-        </div>
-        <span class="font-label-caps text-label-caps bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full">TONIGHT'S PICKS</span>
-      </div>      <!-- Hero Pairing -->
-      <div class="bg-surface-container rounded-lg p-space-sm space-y-2">
-        <div class="flex items-center justify-between gap-2">
-          <div class="flex items-center gap-1.5 min-w-0">
-            <span class="material-symbols-outlined text-primary text-lg flex-shrink-0">auto_awesome</span>
-            <span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-wider truncate">Tonight&#8217;s Pairing</span>
-          </div>
-          <span class="font-label-caps text-label-caps bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0">STAFF PICK</span>
-        </div>
-        <div class="flex gap-space-sm items-center">
-          <img class="w-16 h-16 rounded-lg object-cover flex-shrink-0"
-               alt="Refined Japanese highball cocktail with hand-carved ice sphere, smoked olive oil droplets glistening on top surface with yuzu peel garnish in a crystal glass."
-               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG8IHnMriqUvoPdvjrGXlKJqnbBmyNBHshWo_7dHMqSGE6K3-hmXsKsUHslzxV-BZoTVjN9iY-c-DgUf4ulH-JnvuOOPyPVCFh71baKR8zSqb1_Hu9oWMwAJ5-jX5yi_Drqm5l0gtEY8D_5h3VuP5DM7qIxpu15AtcxBpbjEEfOPR2NGMDpUoBFOj2zDCbfHeANOxirAZuX_s0Op2WNbNv7zYtWZ4GWJSXvp2dZLsS_WRCp3hkpb0Zlw"/>
-          <div class="flex-1 min-w-0">
-            <h4 class="font-title-editorial text-title-editorial text-on-surface font-medium leading-tight">Awaiting live pairing</h4>
-            <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Pairings come from live Qloo results</p>
-          </div>
-        </div>
-        <button id="pos-btn" class="w-full py-2 rounded-lg bg-secondary-container text-secondary-fixed hover:bg-secondary hover:text-on-secondary transition-colors flex items-center justify-center gap-1.5">
-          <span class="material-symbols-outlined text-base">point_of_sale</span>
-          <span class="font-label-caps text-label-caps tracking-wider">Push Specials to POS</span>
-        </button>
-      </div>
+    <section class="w-full rounded-xl bg-surface-container-low hairline p-5 sm:p-6 space-y-5" aria-labelledby="menu-audio-context-title">
+      <div class="flex items-start justify-between gap-4"><div><p class="micro-caps text-primary uppercase tracking-[.16em]">Your room, considered</p><h2 id="menu-audio-context-title" class="text-xl font-semibold text-on-surface mt-1">Ideas for this shift</h2><p class="text-sm text-on-surface-variant mt-2 leading-relaxed">Bring your menu and music direction together using the signals available for your venue.</p></div><span class="material-symbols-outlined text-primary" aria-hidden="true">tune</span></div>
+      <div class="rounded-xl bg-surface-container p-4"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-lg" aria-hidden="true">restaurant</span><span class="micro-caps text-secondary-fixed uppercase tracking-[.12em]">Menu focus · your input</span></div><p id="menu-context-focus" class="mt-3 font-semibold text-on-surface">Add a menu item to your shift plan</p><p id="menu-context-explanation" class="mt-1 text-sm text-on-surface-variant leading-relaxed">Your menu choices come from your own venue settings, not the Qloo API.</p><div id="menu-context-tags" class="flex flex-wrap gap-2 mt-3" aria-label="Qloo place type tags"></div></div>
+      <div class="rounded-xl bg-surface-container p-4"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-tertiary text-lg" aria-hidden="true">graphic_eq</span><span class="micro-caps text-tertiary uppercase tracking-[.12em]">Related music · Qloo</span></div><div id="menu-context-artists" class="mt-3 space-y-2 text-sm text-on-surface-variant" aria-live="polite">Select a venue to see related artists.</div><p id="menu-context-source" class="mt-3 text-sm text-on-surface-variant leading-relaxed">Artist affinities are signals, not a record of what customers are listening to.</p></div>
+      <button type="button" id="menu-edit-plan" class="w-full rounded-lg bg-surface-container-high text-on-surface px-4 py-3 text-sm font-semibold hover:bg-surface-bright transition-colors">Edit shift preferences <span aria-hidden="true">↗</span></button>
+      <p class="text-sm text-on-surface-variant leading-relaxed">The audio previews are bundled samples, not the Qloo artists shown above. Check music licensing before playing music in your venue.</p>
     </section>
 
-    <!-- Menu &amp; Audio Action Suite -->
-    <section class="span-full space-y-space-xs pt-space-xs">
-      <button id="queue-sonos-btn" class="w-full py-3 px-4 rounded-xl bg-primary-container text-on-primary-container hover:bg-primary transition-all flex items-center justify-center gap-2 shadow-lg group">
-        <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">speaker</span>
-        <span class="font-label-caps text-label-caps uppercase tracking-wider font-bold">Push Queue to Sonos</span>
-      </button>
-      <div class="grid grid-cols-2 gap-space-xs">
-        <button id="blend-btn" class="py-2.5 px-3 rounded-lg bg-surface-container-high text-secondary hover:bg-surface-bright transition-colors flex items-center justify-center gap-1.5 shadow-sm">
-          <span class="material-symbols-outlined text-base text-secondary">swap_horiz</span>
-          <span class="font-label-caps text-label-caps tracking-wider">Auto-Blend Dayparts</span>
-        </button>
-        <button id="cost-btn" class="py-2.5 px-3 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-colors flex items-center justify-center gap-1.5 shadow-sm">
-          <span class="material-symbols-outlined text-base">receipt_long</span>
-          <span class="font-label-caps text-label-caps tracking-wider">Export Cost Sheet</span>
-        </button>
-      </div>
-    </section>
 
   </section>
 
@@ -2881,6 +2734,7 @@
               ? 'Quiet hours are on \u2014 this preview stays at half volume.'
               : (key === 'night' ? 'Quiet hours saved \u2014 music softens after 11 pm.' : 'Announcement volume setting saved.'));
           paintGuardrailState();
+          if (key === 'night') paintNightCountdown();
         });
       });
 
@@ -2953,6 +2807,8 @@
       const playing = !audio.paused && !audio.ended;
       toggleIcon.textContent = playing ? 'pause' : 'play_arrow';
       toggle.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+      const playbackStatus = player.querySelector('[data-player-status]');
+      if (playbackStatus) playbackStatus.textContent = playing ? 'PLAYING · PREVIEW' : 'PAUSED · PREVIEW';
       const icon = document.querySelector('[data-queue-current-icon]');
       if (icon) {
         icon.textContent = playing ? 'graphic_eq' : 'music_note';
@@ -2977,6 +2833,8 @@
       playbackIntent = false;
       audio.pause();
     }
+
+    document.getElementById('player-settings')?.addEventListener('click', () => document.querySelector('[data-sound-open]')?.click());
 
     toggle.addEventListener('click', () => {
       if (audio.paused) play();
@@ -3039,15 +2897,17 @@
     function paintNightCountdown() {
       const el = document.querySelector('[data-night-countdown]');
       if (!el) return;
+      if (!guardrailState.night) { el.textContent = ' \u2022 quiet hours off'; return; }
       const hour = new Date().getHours();
-      if (hour >= 20 || hour < 2) {
+      if (hour >= 23 || hour < 6) {
         el.textContent = ' \u2022 night volume is on';
         return;
       }
       const target = new Date();
-      target.setHours(20, 0, 0, 0);
+      target.setHours(23, 0, 0, 0);
       const mins = Math.max(1, Math.round((target - new Date()) / 60000));
-      el.textContent = ' \u2022 night volume starts in ' + mins + ' min';
+      const hours = Math.floor(mins / 60), remaining = mins % 60;
+      el.textContent = ' \u2022 quiet hours start in ' + (hours ? hours + ' hr ' : '') + (remaining ? remaining + ' min' : '');
     }
     paintNightCountdown();
     setInterval(paintNightCountdown, 60000);
@@ -3064,7 +2924,7 @@
 
     const STYLE = 'https://tiles.openfreemap.org/styles/liberty';
     const UNIT_STORAGE_KEY = 'attune-distance-unit';
-    const COMPASS_NOTE = 'Placed by Qloo, plotted at each place\'s location';
+    const COMPASS_NOTE = 'Qloo place locations will appear when available';
     let distUnit = 'm';
     try {
       const savedUnit = localStorage.getItem(UNIT_STORAGE_KEY);
@@ -3079,8 +2939,8 @@
     const map = new maplibregl.Map({
       container: host,
       style: STYLE,
-      center: [-73.9519, 40.7226],
-      zoom: 12,
+      center: [0, 0],
+      zoom: 1,
       attributionControl: { compact: true }
     });
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
@@ -3105,8 +2965,9 @@
       document.querySelectorAll('[data-radius]').forEach(chip => {
         chip.textContent = fmtDist(parseInt(chip.getAttribute('data-radius'), 10));
       });
+      document.querySelectorAll('[data-radius]').forEach(chip => { chip.disabled = !venue; chip.title = venue ? 'Change Qloo search radius' : 'Radius search requires a resolved venue location'; });
       const radiusLabelEl = document.getElementById('radar-radius-label');
-      if (radiusLabelEl) radiusLabelEl.textContent = 'WITHIN ' + fmtDist(radius);
+      if (radiusLabelEl) radiusLabelEl.textContent = venue ? 'SEARCH RADIUS ' + fmtDist(radius) : 'LOCALITY SEARCH';
       document.querySelectorAll('[data-unit]').forEach(btn => {
         const on = btn.getAttribute('data-unit') === distUnit;
         btn.setAttribute('aria-pressed', String(on));
@@ -3130,7 +2991,8 @@
     }
 
     function ringData() {
-      const c = venue || { lng: -73.9519, lat: 40.7226 };
+      if (!venue || venue.lat == null || venue.lng == null) return { type: 'FeatureCollection', features: [] };
+      const c = venue;
       return {
         type: 'FeatureCollection',
         features: [200, 400, 800].map(ft => ({
@@ -3166,7 +3028,7 @@
       map.getSource('places') && map.getSource('places').setData(placesData());
       map.getSource('venue') && map.getSource('venue').setData(venueData());
       const mapped = places.filter(p => p.lat != null && p.lng != null).length;
-      if (poolEl) poolEl.textContent = places.length ? places.length + ' PLACES' : '\u2014';
+      if (poolEl) poolEl.textContent = places.length ? places.length + (places.length === 1 ? ' PLACE' : ' PLACES') : '\u2014';
       const note = document.getElementById('radar-note');
       if (note) note.textContent = places.length
         ? (mapped + ' of ' + places.length + ' plotted by Qloo location')
@@ -3258,9 +3120,7 @@
       paintWhenReady();
     };
 
-    /* ── Taste Radar action suite ──
-       Rescan re-runs the whole taste graph on a cold cache; Export downloads
-       the scored heat data; Share hands the crowd profile to the OS sheet. */
+    /* Rescan re-runs the taste graph on a cold cache. */
     const radarToast = (msg, icon) => (window.attuneToast ? window.attuneToast(msg, icon) : undefined);
     const rescanBtn = document.getElementById('radar-rescan');
     if (rescanBtn) rescanBtn.addEventListener('click', () => {
@@ -3274,42 +3134,12 @@
         }).catch(() => radarToast('Rescan could not reach Qloo \u2014 try again', 'error'));
       }
     });
-    const heatBtn = document.getElementById('radar-export');
-    if (heatBtn) heatBtn.addEventListener('click', () => {
-      const ctx = window.AttuneGrounding ? window.AttuneGrounding.context() : {};
-      const payload = {
-        app: 'Attune',
-        exportedAt: new Date().toISOString(),
-        venue: venue,
-        radius_ft: radius,
-        radius_unit: distUnit,
-        metrics: ctx.taste_metrics || null,
-        anchor: ctx.anchor || null,
-        anchor_pull: ctx.anchor_pull || null,
-        places: places.map(p => ({ name: p.label, affinity: Number((p.affinity / 100).toFixed(2)), lat: p.lat, lng: p.lng, rank: p.rank + 1 })),
-        artists: ctx.artist_affinities || [],
-        crowds: ctx.micro_tribes || [],
-        palate: ctx.palate_signals || []
-      };
-      if (window.attuneDownload) window.attuneDownload('attune-heat-map.json', 'application/json', JSON.stringify(payload, null, 2));
-      radarToast('Heat map exported \u2014 ' + places.length + ' scored places', 'download');
-    });
-    const shareBtn = document.getElementById('radar-share');
-    if (shareBtn) shareBtn.addEventListener('click', () => {
-      const ctx = window.AttuneGrounding ? window.AttuneGrounding.context() : {};
-      const rows = ['Crowd around ' + ((venue && venue.name) || 'the block') + ':'];
-      (ctx.micro_tribes || []).slice(0, 3).forEach(t => rows.push('\u00B7 ' + t.name + ' \u2014 ' + Math.round((t.affinity || 0) * 100) + '%'));
-      if ((ctx.artist_affinities || []).length) rows.push('On repeat: ' + ctx.artist_affinities.slice(0, 3).map(a => a.name).join(', '));
-      if ((ctx.palate_signals || []).length) rows.push('Block palate: ' + ctx.palate_signals.slice(0, 3).join(', '));
-      rows.push('\u2014 grounded with Qloo Taste AI');
-      if (window.attuneShare) window.attuneShare('Attune \u2014 crowd profile', rows.join('\n'), 'Crowd profile shared');
-    });
-
     /* Radius chips: the map shows the ring for the active radius */
     function setRadius(next) {
       radius = next;
       paintChips();  /* keep the "WITHIN …" label + pill states in sync */
       paintMap();
+      window.dispatchEvent(new CustomEvent('attune:radius-changed', { detail: radius }));
     }
     document.querySelectorAll('[data-radius]').forEach(chip => {
       chip.addEventListener('click', () => setRadius(parseInt(chip.getAttribute('data-radius'), 10)));
@@ -3330,6 +3160,7 @@
     /* Venue pin: the resolved venue's coordinates, when Qloo returns them */
     window.setWorldVenue = function (v) {
       venue = v && v.lat != null ? v : null;
+      paintChips();
       if (map.isStyleLoaded()) paintMap(); else map.once('idle', () => paintMap());
       if (venue) map.easeTo({ center: [venue.lng, venue.lat], duration: 600 });
     };
@@ -3501,7 +3332,7 @@
         icon: 'library_music',
         html: sectionsHtml([
           { h: 'Taste intelligence', p: [
-            'Every playbook, crowd pattern, and artist signal in Attune is grounded in <a class="' + LINK_CLS + '" href="https://www.qloo.com" target="_blank" rel="noopener noreferrer">Qloo</a>, the cultural AI that maps taste across places, music, food, and audiences. Attune\u2019s agent queries Qloo server-side for your block and composes the results into tonight\u2019s decisions.'
+            'Attune uses taste signals from <a class="' + LINK_CLS + '" href="https://www.qloo.com" target="_blank" rel="noopener noreferrer">Qloo</a>, the cultural AI that maps taste across places, music, food, and audiences. Attune\u2019s agent queries Qloo server-side for your block and composes the results into tonight\u2019s decisions.'
           ] },
           { h: 'Preview audio', list: [
             '\u201CLofi Study\u201D \u2014 FASSounds, via <a class="' + LINK_CLS + '" href="https://pixabay.com/music/beats-lofi-study-calm-peaceful-chill-hop-112191/" target="_blank" rel="noopener noreferrer">Pixabay Music</a>.',
@@ -4040,13 +3871,7 @@
       document.body.style.overflow = '';
     }
 
-    signOutBtn.addEventListener('click', () => {
-      const backdrop = document.querySelector('#app-drawer .drawer-backdrop');
-      if (backdrop) backdrop.click();
-      setMode('signin');
-      form.reset();
-      showAuth();
-    });
+    signOutBtn.addEventListener('click', () => window.attuneSignOut(signOutBtn));
 
     shell.querySelectorAll('#auth-segments [data-auth-mode]').forEach(btn => {
       btn.addEventListener('click', () => setMode(btn.getAttribute('data-auth-mode'), true));
@@ -4144,7 +3969,7 @@
           }
           const message = isNewOperator
             ? 'Operator pass created \u2014 welcome aboard'
-            : 'Signed in \u2014 Amber Room shift synced';
+            : 'Signed in';
           hideAuth();
           form.reset();
           setMode('signin');
@@ -4225,8 +4050,8 @@
     if (override) API_BASE = override;
   } catch (e) { /* storage blocked */ }
 
-  var DEFAULT_VENUE = { name: 'The Amber Room', address: '142 Franklin St, Greenpoint', lat: 40.7226, lng: -73.9519, locality: null };
-  var VENUE = DEFAULT_VENUE;   /* replaced by the operator's real venue once resolved */
+  var VENUE = null;
+  var dataGeneration = 0;
   var RADIUS_FT = 800, FT_TO_M = 0.3048, CACHE_TTL = 15 * 60 * 1000;
   /* Follows the Meters/Feet setting saved by the distance-units control. */
   function radiusLabel() {
@@ -4240,50 +4065,25 @@
      (fuzzy-matched neighborhood/city). Operators type a venue + neighborhood;
      we run the whole taste graph against THEIR block, not the demo block. */
   function venueFilter() {
+    if (!VENUE) throw new Error('VENUE_REQUIRED');
+    if (VENUE.lat != null && VENUE.lng != null) return { 'filter.location': wkt(), 'filter.location.radius': String(Math.max(60, Math.round(RADIUS_FT * FT_TO_M))) };
     if (VENUE.locality) return { 'filter.location.query': VENUE.locality };
-    return { 'filter.location': wkt(), 'filter.location.radius': String(Math.max(60, Math.round(RADIUS_FT * FT_TO_M))) };
+    throw new Error('VENUE_REQUIRED');
   }
   /* Read the operator's room profile (saved by onboarding or the drawer)
      and resolve it to a real place via Qloo /v2/search. Returns true when
      the venue changed. */
   function resolveVenueFromProfile() {
     var p = null;
-    try { p = JSON.parse(localStorage.getItem('attune.roomProfile') || 'null'); } catch (e) { p = null; }
-    if (!p || !p.venue) return Promise.resolve(false);
-    if (p.venue === 'Your Room' && !p.area) return Promise.resolve(false);
-    if (p.venue === DEFAULT_VENUE.name && !p.area) return Promise.resolve(false);
-    var q = p.venue + (p.area ? ' ' + p.area : '');
-    return qlooFetch('/v2/search', { 'query': q, 'filter.type': 'urn:entity:place', 'take': '3' }).then(function (res) {
-      var arr = (res && Array.isArray(res.results)) ? res.results : [];
-      var hit = null;
-      for (var i = 0; i < arr.length; i++) {
-        /* Coordinates live at e.location (lat/lon) — properties.geocode only
-           carries city/region names. Prefer a located hit, else accept a named one. */
-        if (arr[i] && arr[i].location && arr[i].location.lat != null) { hit = arr[i]; break; }
-        if (arr[i] && arr[i].properties && arr[i].properties.geocode) { hit = arr[i]; break; }
-      }
-      if (hit) {
-        var g = hit.location || hit.properties.geocode || {};
-        VENUE = {
-          name: hit.name || p.venue,
-          address: hit.properties.address || hit.disambiguation || p.area || '',
-          lat: Number(g.lat) || null, lng: Number(g.lon) || null,
-          locality: p.area || (g.name || (hit.properties && hit.properties.geocode && hit.properties.geocode.name)) || null
-        };
-      } else if (p.area) {
-        VENUE = { name: p.venue, address: p.area, lat: null, lng: null, locality: p.area };
-      } else {
-        return false;   /* venue only, unresolved — keep the demo block */
-      }
-      return true;
-    }).catch(function () {
-      if (p.area) { VENUE = { name: p.venue, address: p.area, lat: null, lng: null, locality: p.area }; return true; }
-      return false;
-    });
+    try { p = JSON.parse(localStorage.getItem('attune.roomProfile') || 'null'); } catch (_) {}
+    VENUE = p && p.selectedVenue || null;
+    if (VENUE && !(VENUE.locality || (Number.isFinite(VENUE.lat) && Number.isFinite(VENUE.lng)))) VENUE = null;
+    return Promise.resolve(!!VENUE);
   }
 
   var state = {
     live: false,       /* Qloo feed reached */
+    freshness: { cached: false, fresh: false, oldest: null },
     llmLive: false,    /* LLM playbook rendered */
     llmAttempted: false, /* /llm/playbook round trip finished (AI, curated or failed) */
     llmLatency: null,  /* measured end-to-end agent run time (ms) */
@@ -4360,8 +4160,7 @@
   function pct(aff) { return Math.round(Math.min(1, Math.max(0, Number(aff) || 0)) * 100); }
   function affinityOf(e) {
     var a = (e.query && e.query.affinity !== undefined) ? e.query.affinity
-          : e.affinity !== undefined ? e.affinity
-          : (e.score !== undefined ? e.score : 0);
+          : e.affinity !== undefined ? e.affinity : 0;
     return typeof a === 'number' ? a : parseFloat(a) || 0;
   }
   function nameOf(e) { return e.name || (e.attributes && e.attributes.name) || e.title || 'Unknown'; }
@@ -4388,7 +4187,7 @@
     var url = API_BASE + '/qloo' + path + '?' + new URLSearchParams(params || {}).toString();
     var cached = null;
     try { cached = JSON.parse(sessionStorage.getItem('qloo:' + url) || 'null'); } catch (e) { /* quota */ }
-    if (cached && Date.now() - cached.t < CACHE_TTL) return Promise.resolve(cached.data);
+    if (cached && Date.now() - cached.t < CACHE_TTL) { if (busy) { state.freshness.cached = true; state.freshness.oldest = state.freshness.oldest == null ? cached.t : Math.min(state.freshness.oldest, cached.t); } return Promise.resolve(cached.data); }
 
     var ctrl = ('AbortController' in window) ? new AbortController() : null;
     /* Longer than the Worker's 15s upstream timeout, so a slow Qloo answer
@@ -4406,6 +4205,7 @@
       return res.json();
     }).then(function (data) {
       if (timer) clearTimeout(timer);
+      if (busy) { state.freshness.fresh = true; state.freshness.oldest = state.freshness.oldest == null ? Date.now() : Math.min(state.freshness.oldest, Date.now()); }
       try { sessionStorage.setItem('qloo:' + url, JSON.stringify({ t: Date.now(), data: data })); } catch (e) { /* quota */ }
       return data;
     }).catch(function (err) {
@@ -4455,11 +4255,11 @@
     window.__attuneLiveBadge = !!feedLive; /* silences the demo sweep-age ticker */
     var sweep = document.getElementById('radar-sweep-age');
     if (sweep) {
-      sweep.textContent = feedLive ? 'LIVE · JUST NOW' : 'DEMO DATA · OFFLINE';
+      sweep.textContent = feedLive ? (state.freshness.cached ? (state.freshness.fresh ? 'QLOO · FETCHED + CACHED' : 'QLOO · CACHED') : 'QLOO · FETCHED') : 'QLOO DATA UNAVAILABLE';
     }
     var pill = document.getElementById('playbook-feed-pill');
     if (pill) {
-      pill.textContent = feedLive ? 'LIVE · POWERED BY QLOO' : 'DEMO DATA · ' + radiusLabel().toUpperCase() + ' AROUND YOU';
+      pill.textContent = feedLive ? (state.freshness.cached ? (state.freshness.fresh ? 'QLOO · FETCHED + CACHED' : 'QLOO · CACHED') : 'QLOO · FETCHED') : 'QLOO DATA UNAVAILABLE';
       pill.classList.toggle('text-tertiary', !!feedLive);
       pill.classList.toggle('text-on-surface-variant', !feedLive);
     }
@@ -4507,7 +4307,7 @@
     }
     var sig = document.getElementById('engine-signals');
     if (sig) {
-      var n = state.places.length + state.artists.length + state.tribes.length + state.palate.length;
+      var n = state.places.length + state.artists.length + state.palate.length;
       if (n) tweenTo(sig, String(n)); else sig.textContent = '\u2014';
     }
     var lat = document.getElementById('engine-lat');
@@ -4523,20 +4323,23 @@
 
   /* ----------------------- loaders ----------------------- */
   function loadRadar() {
-    var radiusM = Math.max(60, Math.round(RADIUS_FT * FT_TO_M));
+    var generation = dataGeneration;
     /* Hop 1 — block anchor: the most popular venue inside the radius (Qloo popularity) */
-    var tHop1 = Date.now(), tHop2 = null;
+    var tHop1 = Date.now(), tHop2 = null, anchorPool = [];
     return qlooFetch('/v2/insights', Object.assign({
       'filter.type': 'urn:entity:place',
       'take': '10'
     }, venueFilter())).then(function (res) {
+      if (generation !== dataGeneration) throw new Error('STALE_REQUEST');
       var pool = entitiesOf(res);
-      if (!pool.length) throw new Error('EMPTY');
+      if (!pool.length) throw new Error('NO_PLACES');
+      anchorPool = pool;
       var anchor = pool.slice().sort(function (a, b) {
         return (Number(b.popularity) || 0) - (Number(a.popularity) || 0);
       })[0];
       state.anchor = { id: anchor.entity_id || anchor.id, name: nameOf(anchor) };
-      agentStep('qloo.anchor', 'block anchor ' + state.anchor.name + ' · most popular place in radius', 'anchor', tHop1);
+      if (!state.anchor.id) throw new Error('MISSING_ANCHOR_ID');
+      agentStep('qloo.anchor', 'block anchor ' + state.anchor.name + ' · selected from Qloo place results', 'anchor', tHop1);
       /* Hop 2 — Qloo affinity-ranks the whole block against its own anchor.
          feature.explainability=true adds per-result contribution scores so the
          grounding JSON the agent receives is auditable, not vibes. */
@@ -4548,6 +4351,7 @@
         'feature.explainability': 'true'
       }, venueFilter()));
     }).then(function (res) {
+      if (generation !== dataGeneration) throw new Error('STALE_REQUEST');
       var all = entitiesOf(res);
       /* How strongly the anchor drove the ranking, averaged (0..1). */
       var esum = 0, en = 0;
@@ -4557,7 +4361,18 @@
       });
       state.anchorPull = en ? Number((esum / en).toFixed(2)) : null;
       var ents = all.filter(function (e) { return affinityOf(e) > 0; });
-      if (!ents.length) throw new Error('EMPTY');
+      if (!ents.length) {
+        // A narrow radius can contain the anchor but no other ranked places.
+        // Preserve the real first-query tags; never invent affinity values.
+        state.places = []; state.anchorPull = null;
+        ['block-heat', 'taste-synergy', 'hot-spots'].forEach(function (name) { setMetric(name, '—'); });
+        setText('radar-pool', '0 RELATED PLACES');
+        setText('blockFeed', 'Qloo returned no related places for this search area. Try a wider radius.');
+        if (window.setRadarPlaces) window.setRadarPlaces([]);
+        if (window.setWorldVenue) window.setWorldVenue(VENUE);
+        agentStep('qloo.rank', 'No related places in this search area; showing anchor search place types', 'info', tHop2);
+        return anchorPool;
+      }
       var top = ents.slice(0, 10);
       var heat = top.reduce(function (s, e) { return s + affinityOf(e); }, 0) / top.length * 100;
       var max = ents.reduce(function (m, e) { return Math.max(m, affinityOf(e)); }, 0);
@@ -4565,12 +4380,12 @@
       setMetric('block-heat', heat.toFixed(1));
       setMetric('taste-synergy', (max * 100).toFixed(1));
       setMetric('hot-spots', String(hot));
-      setText('radar-pool', ents.length + ' PLACES');
+      setText('radar-pool', ents.length + (ents.length === 1 ? ' PLACE' : ' PLACES'));
       state.places = ents.map(function (e) {
         /* Qloo returns coordinates at e.location (lat/lon); the older
            properties.geocode shape carried only place names. */
         var geo = e.location || (e.properties && e.properties.geocode) || {};
-        return { name: nameOf(e), affinity: affinityOf(e), tags: e.tags || [], lat: Number(geo.lat) || null, lng: Number(geo.lon) || null };
+        return { name: nameOf(e), affinity: affinityOf(e), tags: e.tags || [], lat: geo.lat != null && Number.isFinite(Number(geo.lat)) ? Number(geo.lat) : null, lng: geo.lon != null && Number.isFinite(Number(geo.lon)) ? Number(geo.lon) : null };
       });
       renderEngine();
       renderBlockFeed(state.places, state.anchor && state.anchor.name, Date.now());
@@ -4597,9 +4412,9 @@
     var top = places.slice(0, 3);
     var hot = places.filter(function (p) { return p.affinity >= 0.8; }).length;
     var rows = [
-      { tone: 'bg-tertiary', title: hot + ' places scored 0.8+ on the block', body: 'Strongest match: ' + esc(top[0].name) + (anchorName ? ' \u2014 ranked against ' + esc(anchorName) + '.' : '.') },
+      { tone: 'bg-tertiary', title: hot + (hot === 1 ? ' place scored' : ' places scored') + ' 0.8+ on the block', body: 'Strongest match: ' + esc(top[0].name) + (anchorName ? ' \u2014 ranked against ' + esc(anchorName) + '.' : '.') },
       { tone: 'bg-secondary', title: esc(top[0].name) + ' leads the block', body: 'Affinity ' + Math.round(top[0].affinity * 100) + '% from Qloo.' },
-      { tone: 'bg-primary', title: places.length + ' places in the radius', body: 'Qloo returned ' + places.length + ' scored places within ' + radiusLabel() + ' of the venue.' }
+      { tone: 'bg-primary', title: places.length + (places.length === 1 ? ' scored place returned' : ' scored places returned'), body: VENUE && VENUE.lat != null && VENUE.lng != null ? 'Qloo search radius: ' + radiusLabel() + '.' : 'Qloo locality search; no distance radius applied.' }
     ];
     host.innerHTML = rows.map(function (r) {
       return '<div class="flex gap-2.5 items-start">' +
@@ -4629,11 +4444,11 @@
             '<span class="font-metric-stat text-[13px] ' + tones[i] + ' flex-shrink-0">' + row.score + '</span>' +
           '</div>' +
           '<div class="w-full h-1 rounded-full bg-surface-container-highest overflow-hidden">' +
-            '<div class="h-full rounded-full ' + fills[i] + '" style="width:' + row.score + '%"></div>' +
+            '<div class="h-full rounded-full ' + fills[i] + '" style="width:' + row.relative + '%"></div>' +
           '</div>' +
         '</div>';
       }).join('');
-      setText('tribe-segment-count', rows.length + ' GROUPS');
+      setText('tribe-segment-count', rows.length + (rows.length === 1 ? ' TYPE' : ' TYPES'));
       if (rows[0]) {
         document.querySelectorAll('[data-qloo-tribe-hero]').forEach(function (h) { h.textContent = rows[0].name; });
       }
@@ -4642,54 +4457,12 @@
     renderEngine();
   }
 
-  /* Crowd phrases — Qloo place genres translated into plain-English groups a
-     bar operator recognizes. Same block vocabulary, no segment-speak. */
-  var CROWD_PHRASES = {
-    cocktail_bar: 'Cocktail bar crowd', wine_bar: 'Wine bar crowd', beer_bar: 'Craft beer crowd',
-    sports_bar: 'Sports bar crowd', dive_bar: 'Dive bar crowd', bar: 'Neighborhood bar crowd', pub: 'Neighborhood bar crowd',
-    coffee_shop: 'Coffee shop people', cafe: 'Coffee shop people', coffee_roasters: 'Coffee shop people', tea_room: 'Tea room crowd',
-    breakfast: 'Brunch crowd', bakery: 'Brunch crowd', bagel_shop: 'Brunch crowd', patisserie: 'Brunch crowd', brunch_restaurant: 'Brunch crowd',
-    dessert_shop: 'Dessert & pastry crowd', ice_cream_shop: 'Dessert & pastry crowd', chocolate_shop: 'Dessert & pastry crowd',
-    sushi: 'Sushi & izakaya crowd', japanese: 'Sushi & izakaya crowd', ramen_shop: 'Sushi & izakaya crowd',
-    asian: 'Asian kitchen crowd', asian_fusion: 'Asian kitchen crowd',
-    italian: 'Italian table crowd', pasta_shop: 'Italian table crowd', pizza: 'Pizza crowd',
-    american: 'New American crowd', tapas: 'Tapas & small plates crowd', mexican: 'Tacos & mezcal crowd',
-    mediterranean: 'Mediterranean table crowd', greek: 'Mediterranean table crowd', french: 'French bistro crowd',
-    vegan: 'Plant-based crowd', vegetarian: 'Plant-based crowd', salad_shop: 'Plant-based crowd',
-    live_music_venue: 'Live music crowd', jazz_club: 'Live music crowd', concert_hall: 'Live music crowd', nightclub: 'Late-night club crowd',
-    tourist_attraction: 'Explorers & visitors', event_venue: 'Event & gig goers', wedding_venue: 'Private events crowd',
-    art_gallery: 'Gallery crowd', museum: 'Museum crowd', bookstore: 'Bookstore browsers',
-    vintage_clothing_store: 'Vintage shoppers', used_clothing_store: 'Vintage shoppers', thrift_store: 'Vintage shoppers',
-    consignment_shop: 'Vintage shoppers', clothing_store: 'Vintage shoppers',
-    hotel: 'Visiting guests', park: 'Park loungers', deli: 'Deli regulars', juice_bar: 'Juice & wellness crowd'
-  };
-  /* Umbrella genres carry no crowd signal — skip them. */
-  var CROWD_SKIP = {
-    place: 1, restaurant: 1, shopping: 1, personal_care: 1, hairdresser: 1,
-    hair_salon: 1, barber_shop: 1, delivery: 1, lunch: 1
-  };
-  var AUDIENCE_PHRASES = {
-    'Political Junkie': 'News & politics readers', 'Arts Culture': 'Arts & culture crowd',
-    'Foodie': 'Dining-out crowd', 'Cooking': 'Home cooks', 'Museums': 'Museum-goers',
-    'Cinephile': 'Film lovers', 'Music Festivals': 'Festival-goers', 'Avid Reader': 'Book lovers',
-    'Exercising': 'Wellness crowd', 'Coffee': 'Coffee people', 'Nightlife': 'Nightlife regulars',
-    'Live Music': 'Live music fans', 'Wine': 'Wine drinkers', 'Travel': 'Frequent travelers',
-    'Fashion': 'Fashion crowd', 'Gaming': 'Gamers', 'Pets': 'Pet people'
-  };
-  function crowdPhrase(key) {
-    return CROWD_PHRASES[key] || (key.replace(/_/g, ' ') + ' crowd');
-  }
-  function plainAudience(name) {
-    var n = String(name || '').trim();
-    return AUDIENCE_PHRASES[n] || n.replace(/\s+(Junkie|Enthusiast|Maven|Aficionado|Buff|Fanatic)s?$/i, ' fans');
-  }
-  /* Rank weighted genre buckets into a 58-100 dominance band vs the block's
-     strongest — an honest spread computed from real tags, not a score ladder. */
+  /* Counts of the Qloo place-type tags present in the returned result set. */
   function dominance(weights, n) {
     var keys = Object.keys(weights).sort(function (a, b) { return weights[b] - weights[a]; });
     var hi = keys.length ? weights[keys[0]] : 0;
     return keys.slice(0, n || 5).map(function (k) {
-      return { name: k, score: Math.round(58 + 42 * (weights[k] / (hi || 1))) };
+      return { name: k, score: weights[k], relative: Math.round(100 * weights[k] / (hi || 1)) };
     });
   }
   /* 'urn:tag:genre:place:restaurant:cocktail_bar' -> 'cocktail_bar' */
@@ -4721,15 +4494,15 @@
 
   function loadTribes(placeEntities) {
     /* Crowds are read off the block itself: the genres Qloo puts on the places
-       its taste graph ranks hottest inside the radius, weighted by affinity. */
+       its taste graph returns; values are counts of returned place tags. */
     var weights = {};
     (placeEntities || []).forEach(function (e) {
-      var w = 1 + Math.max(0, Math.min(1, affinityOf(e) || 0));
+      var w = 1;
       (e.tags || []).forEach(function (t) {
         if (String(t.id || t.urn || '').indexOf('urn:tag:genre:place') !== 0) return;
         var key = genreKey(t.id || t.urn);
-        if (!key || CROWD_SKIP[key]) return;
-        var phrase = crowdPhrase(key);
+        if (!key) return;
+        var phrase = String(t.name || key.replace(/_/g, ' '));
         weights[phrase] = (weights[phrase] || 0) + w;
       });
     });
@@ -4737,26 +4510,15 @@
     if (crowds.length) {
       setMetric('block-scenes', String(Object.keys(weights).length));
       renderTribes(crowds);
-      agentStep('crowd.tags', crowds.length + ' crowd clusters read off the block\u2019s own place tags', 'groups', null);
+      agentStep('qloo.tags', crowds.length + ' place types counted from Qloo results', 'category', null);
       return Promise.resolve();
     }
-    /* Tag-poor blocks: Qloo's leisure audience taxonomy as a deep fallback,
-       translated out of segment-speak so the card stays human. */
-    return qlooFetch('/v2/audiences', {
-      'filter.audience.types': 'urn:audience:leisure',
-      'take': '10'
-    }).then(function (res) {
-      var ents = entitiesOf(res);
-      if (!ents.length) throw new Error('EMPTY');
-      var rows = ents.map(function (e, i) {
-        var aff = affinityOf(e);
-        return { name: plainAudience(nameOf(e)), score: aff > 0 ? pct(aff) : Math.max(58, 88 - i * 6) };
-      }).slice(0, 5);
-      setMetric('block-scenes', String(rows.length));
-      renderTribes(rows);
-    }).catch(function () {
-      throw new Error('NO_TAGS');
-    });
+    setMetric('block-scenes', '0');
+    renderTribes([]);
+    var host = document.getElementById('qlooTribeList');
+    if (host) host.textContent = 'No place type tags returned by Qloo.';
+    setText('tribe-segment-count', '0 TYPES');
+    return Promise.resolve();
   }
 
   function renderSignals(stream, palateRows) {
@@ -4764,26 +4526,26 @@
     if (host) {
       var bars = ['bg-primary', 'bg-primary/70', 'bg-secondary'];
       var tones = ['text-primary', 'text-secondary', 'text-secondary'];
-      function row(label, score, i, sub) {
+      function row(label, score, i, sub, bar, suffix) {
         return '<div class="flex items-center gap-2">' +
           '<div class="flex-1 min-w-0">' +
             '<span class="font-body-sm text-body-sm text-on-surface block truncate">' + esc(label) + '</span>' +
             (sub ? '<span class="micro-caps text-on-surface-variant block truncate">' + esc(sub) + '</span>' : '') +
           '</div>' +
           '<div class="w-16 h-1 rounded-full bg-surface-container-highest overflow-hidden flex-shrink-0">' +
-            '<div class="h-full rounded-full ' + bars[i] + '" style="width:' + score + '%"></div>' +
+            '<div class="h-full rounded-full ' + bars[i] + '" style="width:' + (bar == null ? score : bar) + '%"></div>' +
           '</div>' +
-          '<span class="font-metric-stat text-[12px] ' + tones[i] + ' w-8 text-right flex-shrink-0">' + score + '</span>' +
+          '<span class="font-metric-stat text-[12px] ' + tones[i] + ' w-8 text-right flex-shrink-0">' + score + (suffix || '') + '</span>' +
         '</div>';
       }
       var html = '';
       if (stream.length) {
-        html += '<div class="space-y-2"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">On repeat</span>';
+        html += '<div class="space-y-2"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Related artists</span>';
         html += stream.map(function (s, i) { return row(s.name, pct(s.affinity), i, s.kind); }).join('') + '</div>';
       }
       if (palateRows.length) {
-        html += '<div class="space-y-2"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Food &amp; drink</span>';
-        html += palateRows.map(function (r, i) { return row(r.name, r.score, i); }).join('') + '</div>';
+        html += '<div class="space-y-2"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest block">Food &amp; drink place tags · result count</span>';
+        html += palateRows.map(function (r, i) { return row(r.name, r.score, i, null, r.relative, ''); }).join('') + '</div>';
       }
       if (html) host.innerHTML = html;
     }
@@ -4791,37 +4553,21 @@
     var topArtist = stream[0] ? stream[0].name : null;
     var topPlace = (state.places && state.places[0]) ? state.places[0].name : null;
     if (topArtist || topPlace) {
-      var htmlDriver = 'People within ' + radiusLabel() + ' have ' +
-        '<span class="text-secondary font-medium">' + esc(topArtist || 'the block&#8217;s favorites') + '</span> on repeat' +
-        (topPlace ? ' and keep showing up at <span class="text-secondary font-medium">' + esc(topPlace) + '</span>.' : '.');
+      var htmlDriver = 'Qloo returned ' + (topArtist ? '<span class="text-secondary font-medium">' + esc(topArtist) + '</span> as a related artist' : 'related place results') + (topPlace ? ' and <span class="text-secondary font-medium">' + esc(topPlace) + '</span> as a related place.' : '.');
       setHtml('daypart-driver', htmlDriver);
-      if (topArtist) setText('daypart-overlap', pct(stream[0].affinity) + '% CROWD MATCH');
+      if (topArtist) setText('daypart-overlap', pct(stream[0].affinity) + '% ARTIST AFFINITY');
     }
   }
 
-  /* Food & drink pull — drink/food genres only, weighted like the crowds. */
+  /* Food and drink place tags from the returned Qloo places. */
   function isPalateKey(key) {
     return ['bar', 'cafe', 'coffee', 'tea', 'bakery', 'bagel', 'patisserie', 'dessert',
       'ice_cream', 'chocolate', 'juice', 'deli', 'ramen', 'sushi', 'pizza', 'tapas'].some(function (p) {
       return key.indexOf(p) === 0;
     });
   }
-  var PALATE_PHRASES = {
-    cocktail_bar: 'Cocktail bars', wine_bar: 'Wine by the glass', beer_bar: 'Craft beer lists',
-    sports_bar: 'Sports bars', dive_bar: 'Dive bars', bar: 'Neighborhood bars', pub: 'Neighborhood bars',
-    coffee_shop: 'Coffee & espresso', cafe: 'Coffee & espresso', coffee_roasters: 'Coffee & espresso', tea_room: 'Tea service',
-    breakfast: 'All-day breakfast', bakery: 'Fresh bakery', bagel_shop: 'Bagel shops', patisserie: 'Pastry counters', brunch_restaurant: 'All-day breakfast',
-    dessert_shop: 'Desserts', ice_cream_shop: 'Ice cream', chocolate_shop: 'Chocolate & confections',
-    sushi: 'Sushi & omakase', japanese: 'Japanese kitchens', ramen_shop: 'Ramen counters',
-    asian: 'Asian kitchens', asian_fusion: 'Asian fusion',
-    italian: 'Italian kitchens', pasta_shop: 'Fresh pasta', pizza: 'Pizza',
-    american: 'New American', tapas: 'Tapas & small plates', mexican: 'Tacos & antojitos',
-    mediterranean: 'Mediterranean', greek: 'Mediterranean', french: 'French bistro',
-    vegan: 'Plant-based', vegetarian: 'Plant-based', salad_shop: 'Plant-based',
-    deli: 'Deli counters', juice_bar: 'Juice & smoothies'
-  };
-
   function loadSignals(placeEntities) {
+    var generation = dataGeneration;
     /* Artists have no geography — rank them by affinity to the block's anchor venue.
        Explainability on: the agent gets per-artist anchor contributions. */
     var tSig = Date.now();
@@ -4832,25 +4578,26 @@
       Object.assign(params, venueFilter());
     }
     return qlooFetch('/v2/insights', params).then(function (res) {
+      if (generation !== dataGeneration) throw new Error('STALE_REQUEST');
       /* Top 3 distinct artists — deduped, tidy names, genre for the sub-line. */
       var seen = {}, stream = [];
       entitiesOf(res).forEach(function (e) {
         if (stream.length >= 3) return;
         var aff = affinityOf(e);
         if (aff <= 0) return;
-        var label = tidyName(nameOf(e));
+        var label = nameOf(e);
         if (!label || seen[label.toLowerCase()]) return;
         seen[label.toLowerCase()] = 1;
         stream.push({ name: label, affinity: aff, kind: artistKind(e) });
       });
       var palateW = {};
       (placeEntities || []).forEach(function (e) {
-        var w = 1 + Math.max(0, Math.min(1, affinityOf(e) || 0));
+        var w = 1;
         (e.tags || []).forEach(function (t) {
           if (String(t.id || t.urn || '').indexOf('urn:tag:genre:place') !== 0) return;
           var key = genreKey(t.id || t.urn);
-          if (!key || CROWD_SKIP[key] || !isPalateKey(key)) return;
-          var label = PALATE_PHRASES[key] || key.replace(/_/g, ' ');
+          if (!key || !isPalateKey(key)) return;
+          var label = String(t.name || key.replace(/_/g, ' '));
           palateW[label] = (palateW[label] || 0) + w;
         });
       });
@@ -4872,25 +4619,25 @@
     state.places.slice(0, 3).forEach(function (p, i) {
       trace.push({ entity: p.name, kind: 'place', affinity: Number(p.affinity.toFixed(2)), surfaces: i === 0 ? ['driver sentence'] : ['block heat'] });
     });
-    state.tribes.slice(0, 3).forEach(function (t) {
-      trace.push({ entity: t.name, kind: 'crowd', affinity: Number((t.score / 100).toFixed(2)), surfaces: ['crowd index', 'tribe hero'] });
-    });
+
     return {
       app: 'Attune',
+      constraints: (function () { try { var c = JSON.parse(localStorage.getItem('attune.shiftConstraints') || '{}'); var f = JSON.parse(localStorage.getItem('attune.feedback.' + encodeURIComponent(VENUE ? [VENUE.name || '', VENUE.address || '', VENUE.locality || ''].join('|') : 'none')) || '{}'); c.feedback = f; return c; } catch (_) { return {}; } })(),
       venue: VENUE,
       block_radius_ft: RADIUS_FT,
-      feed: state.live ? 'qloo_live' : 'demo',
+      feed: state.live ? 'qloo_live' : 'unavailable',
+      freshness: state.live ? { cached: state.freshness.cached, fresh: state.freshness.fresh, oldest: state.freshness.oldest } : null,
       anchor: state.anchor,
       anchor_pull: state.anchorPull,
       focus_daypart: currentDaypart,
-      venue_locality: VENUE.locality || null,
+      venue_locality: VENUE && VENUE.locality || null,
       taste_metrics: {
         block_heat: (document.querySelector('[data-qloo="block-heat"]') || {}).textContent || null,
         taste_synergy: (document.querySelector('[data-qloo="taste-synergy"]') || {}).textContent || null,
         new_matches: (document.querySelector('[data-qloo="hot-spots"]') || {}).textContent || null,
         match_rate: (document.querySelector('[data-qloo="block-scenes"]') || {}).textContent || null
       },
-      micro_tribes: state.tribes.map(function (t) { return { name: t.name, affinity: Number((t.score / 100).toFixed(2)) }; }),
+      micro_tribes: [], // Place type counts are not Qloo audience affinities.
       nearby_place_affinities: state.places.slice(0, 10).map(function (p) { return { name: p.name, affinity: Number(p.affinity.toFixed(2)) }; }),
       artist_affinities: state.artists.map(function (a) { return { name: a.name, affinity: Number(a.affinity.toFixed(2)) }; }),
       palate_signals: state.palate,
@@ -4910,38 +4657,53 @@
     el.classList.toggle('text-on-surface-variant', mode === 'CURATED');
     el.classList.toggle('bg-surface-container-high', mode === 'CURATED');
   }
+  var playbookRequestId = 0;
+  function localPlaybook() {
+    var context = groundingContext();
+    return import('./assets/js/recommendations.mjs').then(function (module) {
+      var result = module.buildRecommendations({
+        venue: context.venue, focus_daypart: context.focus_daypart,
+        top_places: context.nearby_place_affinities,
+        top_artists: context.artist_affinities,
+        audiences: context.micro_tribes, live_feed: context.feed,
+        constraints: context.constraints, freshness: context.freshness, anchor: context.anchor
+      });
+      return {
+        playbook: result.playbook, recommendations: result.actions,
+        assumption: result.assumption, evidenceSource: result.source,
+        engine: 'browser', provider: 'local', model: 'on-device composer',
+        drivers: [], agentTrace: [{ step: 'compose', detail: 'On-device suggestions using the signals available in this session' }]
+      };
+    });
+  }
   function loadPlaybook() {
+    var requestId = ++playbookRequestId;
     var persona = document.getElementById('llm-persona');
-    if (persona) persona.textContent = 'Qloo grounding delivered \u2014 LLM is composing the playbook\u2026';
+    if (persona) persona.textContent = 'Preparing suggestions from available taste signals…';
     setLlmMode('WRITING');
     var t0 = Date.now();
     var ctrl = ('AbortController' in window) ? new AbortController() : null;
     var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 25000) : null;
-    return apiHeaders({ 'Content-Type': 'application/json' }).then(function (headers) {
-      return fetch(API_BASE + '/llm/playbook', {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(groundingContext()),
-        signal: ctrl ? ctrl.signal : undefined
-      });
-    }).then(function (res) {
-      if (timer) clearTimeout(timer);
-      if (!res.ok) throw new Error('LLM_HTTP_' + res.status);
-      return res.json();
+    return localPlaybook().then(function (data) {
+      return data;
     }).then(function (data) {
+      if (timer) clearTimeout(timer);
+      if (requestId !== playbookRequestId) return;
       state.llmAttempted = true;
-      var text = (data && data.playbook) || '';
+      var text = data.playbook || '';
       var parsed = parsePlaybook(text);
       if (!parsed.actions) throw new Error('LLM_PARSE');
       state.llm = parsed;
+      state.recommendations = data.recommendations;
       state.llmLive = true;
+      window.dispatchEvent(new CustomEvent('attune:plan-ready', { detail: data }));
       state.provider = data.provider || null;
       state.model = data.model || null;
       state.llmLatency = Date.now() - t0;
       agentStep('compose', (state.model || 'deterministic composer') + ' wrote ' +
         Object.keys(parsed.actions || {}).length + ' daypart actions + playlist + menu', 'edit_note', t0);
       if (persona) persona.textContent = '\u201C' + parsed.persona + '\u201D';
-      setLlmMode(data.engine === 'llm' ? 'AI LIVE' : 'LIVE DATA');
+      setLlmMode(data.engine === 'browser' ? 'ON-DEVICE' : data.engine === 'llm' ? 'AI DRAFT' : 'SUGGESTIONS');
       /* Agent trace — what the playbook agent actually did, in order. */
       var tr = document.getElementById('agent-trace');
       if (tr) tr.textContent = (data.agentTrace && data.agentTrace.length)
@@ -4952,59 +4714,48 @@
       if (drv.length) {
         setChips(drv.slice(0, 3).map(function (d) { return { name: d.name, affinity: d.score }; }));
       }
-      setText('daypart-action-label', 'The Play \u00B7 AI');
+      setText('daypart-action-label', 'Suggested action');
       applyDaypart(currentDaypart);
 
-      /* Self-audit: hold every written line to the grounding bar. Below the
-         bar the agent re-asks the composer once, feeding back the sections
-         that failed — a visible verify-and-correct loop, not a single shot. */
-      var audit = auditGrounding(text, groundingContext());
-      state.audit = audit;
-      if (!audit.ok) {
-        return apiHeaders({ 'Content-Type': 'application/json' }).then(function (h) {
-          var ctx2 = groundingContext();
-          ctx2.audit_feedback = { failed_sections: audit.bad, rule: 'every section must name entities from the grounding JSON only' };
-          agentStep('audit', audit.verified + '/' + audit.lines + ' lines grounded \u00B7 below bar \u2014 re-asking the composer', 'rule', null);
-          return fetch(API_BASE + '/llm/playbook', { method: 'POST', headers: h, body: JSON.stringify(ctx2) });
-        }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d2) {
-          var t2 = d2 && d2.playbook;
-          var p2 = t2 && parsePlaybook(t2);
-          if (p2 && p2.actions) {
-            var a2 = auditGrounding(t2, groundingContext());
-            if (a2.verified > audit.verified) {
-              a2.retried = audit.bad.length;
-              state.audit = a2;
-              state.llm = p2;
-              state.provider = d2.provider || state.provider;
-              state.model = d2.model || state.model;
-              if (persona) persona.textContent = '\u201C' + p2.persona + '\u201D';
-              agentStep('retry', 're-grounded draft accepted \u00B7 ' + a2.verified + '/' + a2.lines + ' lines now cite entities', 'replay', t0);
-              applyDaypart(currentDaypart);
-            } else {
-              agentStep('retry', 'retry did not improve grounding \u2014 keeping the first draft', 'replay', t0);
-            }
-          } else {
-            agentStep('retry', 'retry did not improve grounding \u2014 keeping the first draft', 'replay', t0);
-          }
-        }).catch(function () {
-          agentStep('retry', 'retry unreachable \u2014 keeping the first draft', 'replay', t0);
-        }).then(function () {
-          renderVerdict();
-          renderEngine();
+      state.audit = null;
+      var evidence = document.getElementById('recommendation-evidence');
+      if (evidence) {
+        evidence.replaceChildren();
+        (data.recommendations || []).forEach(function (row) {
+          var detail = document.createElement('details');
+          detail.className = 'rounded-lg bg-surface-container-high p-3';
+          var summary = document.createElement('summary');
+          summary.className = 'cursor-pointer font-medium';
+          summary.textContent = row.section + ' · Why this?';
+          detail.appendChild(summary);
+          [row.action, 'Anchor: ' + ((data.anchor && data.anchor.name) || (state.anchor && state.anchor.name) || 'Not available'), 'Signal: ' + ((row.evidence || []).map(function (e) {
+            return e.name + ' (' + e.kind + (e.score == null ? '' : ', affinity ' + Number(e.score).toFixed(2)) + ')';
+          }).join(', ') || 'None'), row.rationale, 'Your settings: ' + row.context + ' · ' + row.hours,
+            row.source, row.assumption].forEach(function (line) {
+              if (!line) return;
+              var p = document.createElement('p'); p.className = 'mt-2 text-sm text-on-surface-variant'; p.textContent = line; detail.appendChild(p);
+            });
+          evidence.appendChild(detail);
         });
       }
-      agentStep('audit', audit.verified + '/' + audit.lines + ' lines cite grounded entities \u00B7 pass', 'rule', null);
       renderVerdict();
       renderEngine();
+      return true;
     }).catch(function (err) {
       if (timer) clearTimeout(timer);
+      if (requestId !== playbookRequestId) return;
       state.llmLive = false;
+      state.llm = null;
+      state.recommendations = [];
+      setText('daypart-action', 'Playbook unavailable. Please try again.');
+      setText('recommendation-evidence', 'Evidence is unavailable.');
       /* Operators never see stack traces — keep the quote pristine,
          log the code for the console instead. */
       console.warn('[attune llm]', err && err.message || err);
-      if (persona) persona.textContent = '\u2014';
-      setLlmMode('CURATED');
+      if (persona) persona.textContent = 'Playbook unavailable. Please try again.';
+      setLlmMode('UNAVAILABLE');
       renderEngine();
+      return false;
     });
   }
 
@@ -5046,11 +4797,11 @@
     setText('daypart-action', (state.llmLive && state.llm.actions && state.llm.actions[dp]) || demo.action);
     if (state.llmLive && state.llm.anchor) {
       setText('daypart-audio-title', state.llm.anchor);
-      setText('daypart-audio-stream', 'Qloo block anchor \u00B7 ' + (state.llm.bpm ? state.llm.bpm + ' BPM zone' : 'BPM per block tempo'));
+      setText('daypart-audio-stream', 'Suggested music \u00B7 check fit for your venue');
     }
     if (state.llmLive && state.llm.menu && dp === 'golden') {
       setText('daypart-menu', state.llm.menu);
-      setText('daypart-menu-sub', 'Paired from the block palate \u00B7 ' + ((state.palate && state.palate.slice(0, 2).join(' \u00B7 ')) || 'signals from the block'));
+      setText('daypart-menu-sub', 'Operator choice \u00B7 check stock and suitability');
     }
   }
 
@@ -5212,25 +4963,23 @@
       toastMsg('Profile saved', 'check_circle');
     });
 
-    if (signOutBtn) signOutBtn.addEventListener('click', function () {
-      if (!window.confirm('Sign out of Attune?')) return;
-      try {
-        localStorage.removeItem('roomtone.session');
-        sessionStorage.removeItem('roomtone.session');
-      } catch (e) { /* ignore */ }
-      location.href = 'auth.html';
-    });
+    if (signOutBtn) signOutBtn.addEventListener('click', function () { window.attuneSignOut(signOutBtn); });
   })();
 
   /* ----------------------- orchestrator ----------------------- */
   var busy = false;
+  var refreshPending = false;
   function refresh() {
-    if (busy) return Promise.resolve(false);
+    if (busy) { refreshPending = true; return Promise.resolve(false); }
+    if (!VENUE) { setBadges(false); setText('daypart-action', 'Add a venue and neighborhood to search Qloo.'); setText('qlooTribeList', 'Add a venue and neighborhood to search Qloo.'); setText('qlooSignalList', 'Add a venue and neighborhood to search Qloo.'); return Promise.resolve(false); }
     busy = true;
+    state.freshness = { cached: false, fresh: false, oldest: null };
+    var generation = dataGeneration;
     return loadRadar()
       .then(function (places) { return loadTribes(places); })
-      .then(function () { return loadSignals(state.places).catch(function (e) { console.warn('[attune signals]', e); }); })
+      .then(function () { return loadSignals(state.places.length ? state.places : []).catch(function (e) { if (generation === dataGeneration) { state.artists = []; state.palate = []; var note = e && e.message === 'EMPTY' ? 'Qloo returned no related artist data for this anchor.' : 'Related artist data is unavailable. Try again.'; setText('qlooSignalList', note); setText('daypart-driver', note); } console.warn('[attune signals]', e); }); })
       .then(function () {
+        if (generation !== dataGeneration) throw new Error('STALE_REQUEST');
         state.live = true;
         setBadges(true);
         var chips = state.artists.slice(0, 2).map(function (a) { return { name: a.name, affinity: a.affinity }; })
@@ -5239,36 +4988,65 @@
         return loadPlaybook();
       })
       .catch(function (err) {
+        if (generation !== dataGeneration) return false;
         state.live = false;
         setBadges(false);
+        state.anchor = null; state.anchorPull = null; state.places = []; state.artists = []; state.tribes = []; state.palate = []; state.llm = null; state.llmLive = false; state.recommendations = [];
+        setText('recommendation-evidence', 'Qloo signals are unavailable. Retry your search to rebuild the plan.');
+        window.dispatchEvent(new CustomEvent('attune:data-unavailable'));
         renderEngine();
-        /* Say so on screen: Qloo did not return data for this block. */
-        ['qlooSignalList', 'qlooTribeList'].forEach(function (id) {
-          var box = document.getElementById(id);
-          if (!box || state.live) return;
-          box.textContent = 'Qloo did not return data for this block. Check the connection, then reload.';
-        });
+        ['block-heat', 'taste-synergy', 'hot-spots', 'block-scenes'].forEach(function (name) { setMetric(name, '—'); });
+        setText('tribe-segment-count', '—'); setText('radar-pool', '—');
+        if (window.setRadarPlaces) window.setRadarPlaces([]);
+        var message = err && err.message === 'NO_PLACES'
+          ? 'Qloo found no places in this search area. Try a wider radius or another location.'
+          : err && /^QLOO_HTTP_/.test(err.message || '')
+            ? 'Qloo could not complete this request (' + err.message.replace('QLOO_HTTP_', 'HTTP ') + '). Please try again.'
+            : 'Unable to load this search. Please try again.';
+        ['qlooSignalList', 'qlooTribeList'].forEach(function (id) { setText(id, message); });
+        setText('blockFeed', message);
         /* Home cards: say so instead of leaving the placeholder copy on screen. */
         if (!state.live) {
           setText('daypart-audio-title', 'Qloo unavailable');
-          setText('daypart-action', 'Qloo did not return data for this block. Check the connection, then reload.');
+          setText('daypart-action', message);
         }
         var persona = document.getElementById('llm-persona');
         if (persona && !state.llmLive) {
-          persona.textContent = '\u201CAnalog-leaning night owls who treat listening as the main event.\u201D';
+          persona.textContent = 'Taste data unavailable. Check the connection and try again.';
         }
         if (!state.places || !state.places.length) renderBlockFeed(null);
         console.warn('[attune feed]', err);
+        return false;
       })
-      .finally(function () { busy = false; });
+      .finally(function () { busy = false; if (refreshPending) { refreshPending = false; refresh(); } });
   }
 
   window.AttuneGrounding = {
     context: groundingContext,
     refresh: refresh,
     replay: function () { return loadPlaybook(); },
+    findVenues: function (query) {
+      return qlooFetch('/v2/search', { query: query, 'filter.type': 'urn:entity:place', take: '5' }).then(function (res) {
+        var entries = Array.isArray(res.results) ? res.results : entitiesOf(res);
+        return entries.filter(function (e) { return e && e.name && (e.entity_id || e.id); }).map(function (e) {
+          var geo = e.location || {}; var props = e.properties || {};
+          return { id: e.entity_id || e.id, name: e.name, address: props.address || e.disambiguation || '', lat: geo.lat != null && Number.isFinite(Number(geo.lat)) ? Number(geo.lat) : null, lng: geo.lon != null && Number.isFinite(Number(geo.lon)) ? Number(geo.lon) : null };
+        });
+      });
+    },
+    comparePlace: function (query) {
+      return qlooFetch('/v2/search', { query: query, 'filter.type': 'urn:entity:place', take: '5' }).then(function (res) {
+        var entries = Array.isArray(res.results) ? res.results : entitiesOf(res);
+        var place = entries.find(function (e) { return e && (e.entity_id || e.id) && e.name; });
+        if (!place) throw new Error('No matching place found. Try adding the city.');
+        return qlooFetch('/v2/insights', { 'filter.type': 'urn:entity:artist', 'signal.interests.entities': place.entity_id || place.id, take: '5' }).then(function (out) {
+          return { name: place.name, description: place.disambiguation || (place.properties && place.properties.address) || '', artists: entitiesOf(out).filter(function (e) { return e.name && affinityOf(e) > 0; }).slice(0, 3).map(function (e) { return { name: e.name, affinity: affinityOf(e) }; }) };
+        });
+      });
+    },
     get venue() { return VENUE; },
     get playbook() { return state.llm; },
+    get recommendations() { return state.recommendations || []; },
     get audit() { return state.audit; }
   };
 
@@ -5289,7 +5067,6 @@
       toast._t = setTimeout(function () { toastEl.classList.add('opacity-0', 'translate-y-2'); }, 2800);
     }
     window.attuneToast = toast;
-    function $(id) { return document.getElementById(id); }
     function copyText(text) {
       if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
       return new Promise(function (res) {
@@ -5322,112 +5099,30 @@
     }
     window.attuneDownload = download;
 
-    /* The composed playbook, rendered back into the operator-facing line format. */
-    function playbookLines() {
-      var pb = window.AttuneGrounding ? window.AttuneGrounding.playbook : null; /* getter → parsed playbook */
-      var rows = [];
-      if (pb) {
-        if (pb.persona) rows.push('CROWD: ' + pb.persona);
-        if (pb.actions) {
-          if (pb.actions.morning) rows.push('ROASTERS 07-11: ' + pb.actions.morning);
-          if (pb.actions.daylight) rows.push('LINGER 11-16: ' + pb.actions.daylight);
-          if (pb.actions.golden) rows.push('GOLDEN 16-20: ' + pb.actions.golden);
-          if (pb.actions.night) rows.push('NIGHT 20-02: ' + pb.actions.night);
-        }
-        if (pb.anchor) rows.push('PLAYLIST: ' + pb.anchor + (pb.bpm ? ' \u00B7 ' + pb.bpm + ' BPM' : ''));
-        if (pb.menu) rows.push('MENU: ' + pb.menu);
-      }
-      return rows;
-    }
-    function briefText() {
-      var ctx = window.AttuneGrounding ? window.AttuneGrounding.context() : {};
-      var rows = ['ATTUNE SHIFT NOTES \u00B7 ' + new Date().toLocaleDateString()];
-      if (ctx.venue && ctx.venue.name) rows.push('Venue: ' + ctx.venue.name + (ctx.venue.address ? ' \u2014 ' + ctx.venue.address : ''));
-      if (ctx.anchor && ctx.anchor.name) rows.push('Block anchor: ' + ctx.anchor.name);
-      rows = rows.concat(playbookLines());
-      var audit = window.AttuneGrounding && window.AttuneGrounding.audit;
-      if (audit) rows.push('(every line self-audited: ' + audit.verified + '/' + audit.lines + ' cite live Qloo entities)');
-      return rows.join('\n');
-    }
-    function playbookReady() {
-      return !!(window.AttuneGrounding && window.AttuneGrounding.playbook);
-    }
-
-    /* ── Week Playbook ── */
-    var sn = $('shift-notes-btn');
-    if (sn) sn.addEventListener('click', function () {
-      if (!playbookReady()) { toast('Playbook is still composing \u2014 one sec', 'hourglass_top'); return; }
-      shareOrCopy('Attune shift notes', briefText(), 'Shift notes copied \u2014 paste them into the staff thread');
-    });
-    var pb2 = $('pdf-btn');
-    if (pb2) pb2.addEventListener('click', function () {
-      if (!playbookReady()) { toast('Playbook is still composing \u2014 one sec', 'hourglass_top'); return; }
-      var ctx = window.AttuneGrounding ? window.AttuneGrounding.context() : {};
-      var w = window.open('', '_blank', 'width=840,height=1000');
-      if (!w) { copyText(briefText()).then(function () { toast('Pop-up blocked \u2014 playbook copied instead', 'content_copy'); }); return; }
-      var e2 = function (v) { return String(v == null ? '' : v).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); };
-      w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Attune playbook</title><style>' +
-        'body{font-family:Georgia,serif;margin:48px;color:#141210}h1{font-size:22px;margin:0 0 2px}' +
-        '.sub{color:#6b625a;font-size:13px;margin:0 0 18px}h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#9a5b23;margin:26px 0 8px}' +
-        'pre{font-family:Georgia,serif;white-space:pre-wrap;font-size:14px;line-height:1.75;margin:0}' +
-        'footer{margin-top:38px;font-size:11px;color:#8d8477;border-top:1px solid #e5ded4;padding-top:10px}</style></head><body>' +
-        '<h1>' + e2((ctx.venue && ctx.venue.name) || 'Attune') + ' \u2014 tonight\u2019s playbook</h1>' +
-        '<p class="sub">' + e2((ctx.venue && ctx.venue.address) || '') + '</p>' +
-        '<h2>Agent playbook</h2><pre>' + e2(briefText()) + '</pre>' +
-        '<footer>Grounded with Qloo Taste AI \u00B7 generated ' + new Date().toLocaleString() + '</footer>' +
-        '</body></html>');
-      w.document.close();
-      w.focus();
-      try { w.print(); } catch (e) { /* print is best-effort */ }
-      toast('Print sheet opened \u2014 save as PDF from the dialog', 'picture_as_pdf');
-    });
-    var so = $('sonos-btn');
-    if (so) so.addEventListener('click', function () {
-      var pb = window.AttuneGrounding ? window.AttuneGrounding.playbook : null;
-      toast(pb && pb.anchor ? ('Handed \u201C' + pb.anchor + '\u201D to the house Sonos zone') : 'Handed the set to the house Sonos zone', 'speaker');
-    });
-
-    /* ── Menu & Audio ── */
-    var pos = $('pos-btn');
-    if (pos) pos.addEventListener('click', function () {
-      var pb = window.AttuneGrounding ? window.AttuneGrounding.playbook : null;
-      if (pb && pb.menu) {
-        copyText('TONIGHT\u2019S SPECIAL \u00B7 ' + pb.menu).then(function () { toast('Special copied \u2014 paste it into the POS ticket', 'point_of_sale'); });
-      } else {
-        toast('Pairing lands with the next live Qloo pass', 'point_of_sale');
-      }
-    });
-    var qs = $('queue-sonos-btn');
-    if (qs) qs.addEventListener('click', function () {
-      toast('Daypart queue pushed to the house Sonos zone', 'speaker');
-    });
-    var bl = $('blend-btn');
-    if (bl) bl.addEventListener('click', function () {
-      toast('Auto-blend \u00B7 the agent is recomposing the set\u2026', 'swap_horiz');
-      var rp = window.AttuneGrounding && window.AttuneGrounding.replay;
-      if (rp) rp().catch(function () { toast('Blend could not reach the composer \u2014 try again', 'error'); });
-    });
-    var cb = $('cost-btn');
-    if (cb) cb.addEventListener('click', function () {
-      var rows = ['track,duration'];
-      document.querySelectorAll('[data-queue-track]').forEach(function (row) {
-        var title = row.querySelector('[data-row-title]');
-        var dur = row.querySelector('.text-outline-variant');
-        if (title) rows.push('"' + title.textContent.trim().replace(/"/g, '""') + '","' + (dur ? dur.textContent.trim() : '') + '"');
-      });
-      if (rows.length > 1) {
-        download('attune-cost-sheet.csv', 'text/csv', rows.join('\n'));
-        toast('Cost sheet downloaded \u2014 ' + (rows.length - 1) + ' tracks', 'receipt_long');
-      } else {
-        toast('Queue is empty \u2014 nothing to export yet', 'receipt_long');
-      }
-    });
   })();
   /* Venue first, then the whole taste graph — the operator's block, not the demo block. */
-  resolveVenueFromProfile().then(function () { refresh(); });
+  resolveVenueFromProfile().then(function () { window.dispatchEvent(new CustomEvent('attune:venue-resolved')); refresh(); });
+  window.addEventListener('attune:radius-changed', function (event) {
+    ++dataGeneration;
+    RADIUS_FT = Number(event.detail) || 800;
+    if (VENUE && VENUE.lat != null && VENUE.lng != null) { ++playbookRequestId; state.llmLive = false; state.llm = null; state.recommendations = []; refresh(); }
+  });
   window.addEventListener('attune:venue-changed', function () {
+    ++dataGeneration;
+    ++playbookRequestId;
+    state.anchor = null; state.anchorPull = null; state.places = []; state.artists = []; state.tribes = []; state.palate = []; state.live = false;
+    ['block-heat', 'hot-spots', 'block-scenes', 'taste-synergy'].forEach(function (metric) { setMetric(metric, '—'); });
+    setText('qlooTribeList', 'Loading Qloo results…'); setText('qlooSignalList', 'Loading Qloo results…');
+    setText('blockFeed', 'Loading Qloo results…'); setBadges(false);
+    if (window.setRadarPlaces) window.setRadarPlaces([]);
+    if (window.setWorldVenue) window.setWorldVenue(null);
+    state.llm = null; state.recommendations = []; state.llmLive = false;
+    setText('daypart-action', 'Updating the plan for your venue…');
+    setText('recommendation-evidence', 'Updating evidence for your venue…');
     try { sessionStorage.clear(); } catch (e) { /* quota */ }
+    var generation = dataGeneration;
     resolveVenueFromProfile().then(function (changed) {
+      if (generation !== dataGeneration) return;
       if (changed) {
         state.anchor = null; state.anchorPull = null; state.places = []; state.artists = []; state.tribes = []; state.palate = [];
         state.live = false; state.llmLive = false; state.llmAttempted = false; state.llmLatency = null;
@@ -5436,6 +5131,32 @@
       window.dispatchEvent(new CustomEvent('attune:venue-resolved'));
       refresh();
     });
+  });
+})();
+</script>
+
+<script>
+(function () {
+  var form = document.getElementById('shift-constraints');
+  if (!form) return;
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem('attune.shiftConstraints') || '{}'); } catch (_) {}
+  ['type', 'mood', 'opens', 'closes', 'menu', 'budget', 'goal', 'menuItem'].forEach(function (key) { if (saved[key] && form.elements[key]) form.elements[key].value = saved[key]; });
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    var data = {};
+    try { data.direction = JSON.parse(localStorage.getItem('attune.shiftConstraints') || '{}').direction || 'listening'; } catch (_) { data.direction = 'listening'; }
+    ['type', 'mood', 'opens', 'closes', 'menu', 'budget', 'goal', 'menuItem'].forEach(function (key) { data[key] = form.elements[key].value; });
+    var status = document.getElementById('constraints-status');
+    if (!!data.opens !== !!data.closes || (data.opens && data.opens === data.closes)) {
+      status.textContent = 'Enter both opening and closing times, with different values.'; return;
+    }
+    try { localStorage.setItem('attune.shiftConstraints', JSON.stringify(data)); }
+    catch (_) { status.textContent = 'Could not save settings on this device.'; return; }
+    status.textContent = 'Settings saved. Updating your plan…';
+    if (window.AttuneGrounding && window.AttuneGrounding.replay) {
+      Promise.resolve(window.AttuneGrounding.replay()).then(function (ok) { status.textContent = ok ? 'Plan updated.' : 'Plan unavailable. Check the connection and try again.'; });
+    } else status.textContent = 'Settings saved. Refresh the page to update the plan.';
   });
 })();
 </script>
@@ -5457,8 +5178,8 @@
   function paint() {
     var v = (window.AttuneGrounding && window.AttuneGrounding.venue) || null;
     var p = readProfile();
-    if (nameEl) nameEl.textContent = (v && v.name) || p.venue || 'The Amber Room';
-    if (addrEl) addrEl.textContent = (v && v.address) || p.area || 'Demo block \u00B7 Greenpoint';
+    if (nameEl) nameEl.textContent = (v && v.name) || p.venue || 'Select your venue';
+    if (addrEl) addrEl.textContent = (v && v.address) || p.area || 'Set your venue and neighborhood';
   }
   function note(msg) {
     if (!noteEl) return;
@@ -5477,26 +5198,45 @@
     setTimeout(function () { t.classList.add('opacity-0', 'translate-y-2'); }, 2800);
   }
   var applyBtn = document.querySelector('[data-venue-apply]');
-  if (applyBtn) {
-    applyBtn.addEventListener('click', function () {
-      var venue = (inEl && inEl.value || '').trim();
-      var area = (areaEl && areaEl.value || '').trim();
-      if (!venue && !area) { note('Add a venue name or a neighborhood first.'); return; }
-      var p = readProfile();
-      p.venue = venue || p.venue || 'Your Room';
-      p.area = area;
-      p.tunedAt = Date.now();
-      try { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch (e) { /* best-effort */ }
-      applyBtn.disabled = true;
-      note('Reading the taste graph around ' + (area || venue) + '\u2026');
-      window.dispatchEvent(new CustomEvent('attune:venue-changed'));
-      setTimeout(function () {
-        applyBtn.disabled = false;
-        paint();
-        toastMsg(p.venue + ' is in tune');
-      }, 3500);
-    });
+  var resultsEl = document.querySelector('[data-venue-results]');
+  var localityBtn = document.querySelector('[data-venue-locality]');
+  var searchId = 0;
+  function selectVenue(selected, venue, area) {
+    var p = readProfile();
+    p.venue = venue || selected.name; p.area = area; p.selectedVenue = selected; p.tunedAt = Date.now();
+    try { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch (_) { note('Could not save the venue on this device.'); return; }
+    resultsEl.replaceChildren(); localityBtn.classList.add('hidden');
+    note('Venue selected. Updating Qloo signals…');
+    window.dispatchEvent(new CustomEvent('attune:venue-changed'));
+    paint();
   }
+  if (applyBtn) applyBtn.addEventListener('click', async function () {
+    var venue = (inEl && inEl.value || '').trim(), area = (areaEl && areaEl.value || '').trim();
+    if (!venue && !area) { note('Add a venue name or a neighborhood first.'); return; }
+    var id = ++searchId; applyBtn.disabled = true; resultsEl.replaceChildren();
+    localityBtn.classList.toggle('hidden', !area);
+    note('Searching Qloo. Choose a matching venue below.');
+    try {
+      var matches = await window.AttuneGrounding.findVenues([venue, area].filter(Boolean).join(' '));
+      if (id !== searchId) return;
+      if (!matches.length) { note('No matching venues found. Try a different search or choose locality search.'); return; }
+      matches.forEach(function (match) {
+        var button = document.createElement('button'); button.type = 'button';
+        button.className = 'w-full rounded-lg bg-surface-container-high px-3 py-3 text-left text-sm text-on-surface hover:bg-surface-bright';
+        var label = document.createElement('span'); label.className = 'block font-semibold'; label.textContent = match.name; button.appendChild(label);
+        var address = document.createElement('span'); address.className = 'block text-on-surface-variant mt-1'; address.textContent = match.address || (match.lat != null && match.lng != null ? 'Coordinates: ' + match.lat.toFixed(4) + ', ' + match.lng.toFixed(4) : 'No address or coordinates provided'); button.appendChild(address);
+        if ((match.lat == null || match.lng == null) && !area) { button.disabled = true; address.textContent += ' · Enter a city to use this result.'; }
+        button.addEventListener('click', function () { selectVenue({ name: match.name, address: match.address || area, lat: match.lat, lng: match.lng, locality: area || null }, venue, area); });
+        resultsEl.appendChild(button);
+      });
+    } catch (_) { if (id === searchId) note('Qloo search is unavailable. Try again or choose locality search.'); }
+    finally { if (id === searchId) applyBtn.disabled = false; }
+  });
+  if (localityBtn) localityBtn.addEventListener('click', function () {
+    var area = (areaEl && areaEl.value || '').trim(); var venue = (inEl && inEl.value || '').trim();
+    if (!area) { note('Enter a neighborhood or city first.'); return; }
+    selectVenue({ name: venue || area, address: area, lat: null, lng: null, locality: area }, venue, area);
+  });
   window.addEventListener('attune:venue-resolved', paint);
   window.addEventListener('attune:venue-changed', function () { setTimeout(paint, 3800); });
   paint();
@@ -5571,7 +5311,7 @@
     var handoff = false;
     try { handoff = !!sessionStorage.getItem('roomtone.sso.pending'); } catch (e) { /* storage blocked */ }
 
-    if (provider !== 'google' && provider !== 'apple' && !handoff) {
+    if (provider !== 'google' && provider !== 'apple' && provider !== 'email' && !handoff) {
       window.AttuneAuth.markReady(null);
       return;
     }
@@ -5591,7 +5331,13 @@
     }).then(function (loaded) {
       var api = loaded.api;
       if (!api) { window.AttuneAuth.markReady(null); return; }
-      return api.resolveRedirect().then(function (result) {
+      return api.resolveRedirect().then(async function (result) {
+        if (typeof api.auth.authStateReady === 'function') await api.auth.authStateReady();
+        if (!api.auth.currentUser && !(result && result.user)) {
+          try { localStorage.removeItem('roomtone.session'); sessionStorage.removeItem('roomtone.session'); } catch (_) {}
+          location.replace('auth.html');
+          return;
+        }
         if (result && result.user) {
           var profile = result.user;
           var label = profile.provider === 'apple' ? 'Apple' : 'Google';
@@ -5620,5 +5366,14 @@
   })();
 </script>
 
+<style>@media print { body.printing-shift-brief > * { display:none!important } body.printing-shift-brief main { display:block!important; position:static!important; padding:0!important } body.printing-shift-brief main > * { display:none!important } body.printing-shift-brief [data-screen="playbook"] { display:block!important; padding:0!important } body.printing-shift-brief [data-screen="playbook"] > * { display:none!important } body.printing-shift-brief [aria-labelledby="handoff-title"] { display:block!important; color:#000!important; background:#fff!important; border:0!important } body.printing-shift-brief #shift-brief { color:#000!important; background:#fff!important; border:0!important; height:70vh!important } body.printing-shift-brief [aria-labelledby="handoff-title"] button,body.printing-shift-brief #brief-status { display:none!important } }</style>
+<script>
+  fetch('build.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (build) {
+    if (!build || !build.revision) return;
+    document.querySelectorAll('[data-build-version]').forEach(function (el) { el.textContent = 'BUILD ' + String(build.revision).slice(0, 7); el.title = 'Built ' + (build.builtAt || ''); });
+  }).catch(function () {});
+</script>
+<script type="module" src="assets/js/shift-workspace.mjs"></script>
+<script type="module" src="assets/js/menu-audio.mjs"></script>
 </body>
 </html>
